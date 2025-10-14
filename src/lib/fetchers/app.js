@@ -449,6 +449,11 @@ export async function retrieveClientList() {
   return fetchData("app/downline/client-list")
 }
 
+export function retrieveIncrement(query) {
+  const endpoint = buildUrlWithQueryParams("way-to-wellness/increment", query)
+  return fetchData(endpoint)
+}
+
 // User login function
 export async function loginUser(userData) {
   try {
