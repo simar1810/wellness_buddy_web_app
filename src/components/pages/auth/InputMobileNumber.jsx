@@ -91,11 +91,10 @@ export default function InputMobileNumber() {
                 value={mobileNumber}
                 onChange={handleChange}
                 onBlur={() => setTouched(true)}
-                className={`w-full pl-12 pr-3 py-2 border rounded focus:outline-none ${
-                  touched && !isValid
-                    ? "border-red-500"
-                    : "border-gray-300 focus:border-indigo-500"
-                }`}
+                className={`w-full pl-12 pr-3 py-2 border rounded focus:outline-none ${touched && !isValid
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-indigo-500"
+                  }`}
               />
             </div>
             {touched && !isValid && (

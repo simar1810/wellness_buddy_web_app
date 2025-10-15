@@ -1,7 +1,7 @@
 import { getUserType } from "../permissions";
 
 export function withClientFilter(originalFetcher) {
-  return async function filteredFetcher(...args) {
+  return async function (...args) {
     try {
       const userType = getUserType();
 

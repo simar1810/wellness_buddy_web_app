@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { use } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata = {
   title: "Wellness Buddy",
@@ -30,16 +31,25 @@ export default function RootLayout({ children }) {
             {children}
           </SWRConfig>
         </GlobalStateProvider>
-        <p className="text-gray-600 text-sm sm:text-base font-bold text-center sm:text-left flex items-center justify-center sticky bottom-0 bg-white py-[4px] border-t-1">
-          Powered by&nbsp;
-          <Link
-            href="https://wellnessz.in/"
-            target="_blank"
-            className="font-semibold text-[#67BC2A]"
-          >
-            wellnessz.in
-          </Link>
-        </p>
+        <div className="w-full sticky bottom-0 flex flex-col sm:flex-row gap-1 sm:gap-2 justify-center sm:justify-center items-center h-auto py-2 bg-white border-t border-gray-200 px-3 sm:px-4">
+          <Image
+            src="/zw.png"
+            alt="Wellnessz Logo"
+            width={100}
+            height={56}
+            className="object-contain"
+          />
+          <p className="text-gray-600 text-sm sm:text-base font-medium text-center sm:text-left">
+            Powered by&nbsp;
+            <Link
+              href="https://ayushmanhealth.org/"
+              target="_blank"
+              className="font-semibold text-gray-800"
+            >
+              Wellnessz.in
+            </Link>
+          </p>
+        </div>
       </body>
     </html>
   );
