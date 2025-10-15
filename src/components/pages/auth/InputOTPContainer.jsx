@@ -44,8 +44,8 @@ export default function InputOTPContainer() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          refreshToken: user.webRefreshTokenList?.pop(), 
+        body: JSON.stringify({
+          refreshToken: user.webRefreshTokenList?.pop(),
           _id: user._id,
           userType: "coach"
         })
