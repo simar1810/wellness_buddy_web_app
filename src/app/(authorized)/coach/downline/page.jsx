@@ -1,5 +1,11 @@
 "use client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import React, { useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,12 +30,13 @@ import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TreeVisualizer from "@/components/pages/coach/downline/Visualizer";
 import HierarchicalCoachTable from "@/components/pages/coach/downline/HierarchicalCoachTable";
-import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Eye, ChevronDown } from "lucide-react";
 import { ManageCategoryModal } from "@/components/modals/coach/ManageCategoryModal";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useTabsContentNavigation } from "@/hooks/useTabsContentNavigation";
 import { SyncedCoachClientDetails } from "@/components/modals/coach/SyncedCoachesModal";
+import { cn } from "@/lib/utils";
 
 const categoriesFetcher = () =>
 	fetchData("app/coach-categories").then((res) => {
@@ -371,10 +378,7 @@ function CoachesList() {
 
 	const handleMakeTop = async (coachId) => {
 		try {
-			// This would be the API call to make a coach the top of hierarchy
-			// await sendData("app/downline/make-top", { coachId });
 			toast.info("Make Top functionality - API endpoint needs to be implemented");
-			// mutate(); // Refresh the data
 		} catch (error) {
 			toast.error(error.message);
 		}
@@ -453,69 +457,102 @@ function ActionOnRequest({
 		</AlertDialogTrigger>
 	</DualOptionActionModal>
 }
-const syncStatus = { 1: "Requested", 2: "Synced", 3: "Unsync" }
-const syncBadgeVariant = { 1: "primary", 2: "wz_fill", 3: "destructive" }
 
-function SyncCoachComponent({ coach }) {
-	const { clubType } = useAppSelector(state => state.coach.data)
-	if (!["Club Leader", "System Leader"].includes(clubType)) return <></>
-	return <div className="ml-auto flex items-center gap-2">
-		{coach.super_coach && <Badge
-			variant={syncBadgeVariant[coach.super_coach?.status]}
-		>
-			{syncStatus[coach.super_coach?.status]}
-		</Badge>}
-		<SyncCoachModal coachId={coach._id} />
-	</div>
+export function SyncCoachComponent({ coach }) {
+	const { clubType } = useAppSelector((state) => state.coach.data)
+	if (!["Club Leader", "System Leader"].includes(clubType)) return null
+
+	return (
+		<div className="flex items-center gap-2">
+			<SyncCoachDropdown
+				coachId={coach._id}
+				status={coach.super_coach?.status}
+			/>
+		</div>
+	)
 }
 
-function SyncCoachModal({ coachId }) {
-	const [loading, setLoading] = useState(false);
+function SyncCoachDropdown({ coachId, status }) {
+	const [loading, setLoading] = useState(false)
+	const [openModal, setOpenModal] = useState(false)
+	const [pendingStatus, setPendingStatus] = useState(null)
 
-	const closeBtnRef = useRef();
+	const currentStatus = status === 2 ? "Synced" : "Unsynced"
 
-	async function changeSyncStatus(status) {
+	async function handleSyncAction(setLoadingFn, closeRef) {
 		try {
-			setLoading(true);
-			const response = await sendData(`app/sync-coach/super`, { status, coachId });
-			if (response.status_code !== 200) throw new Error(response.message);
-			toast.success(response.message);
+			setLoadingFn(true)
+			const response = await sendData(`app/sync-coach/super`, {
+				status: pendingStatus,
+				coachId,
+			})
+			if (response.status_code !== 200) throw new Error(response.message)
+			toast.success(response.message)
 			location.reload()
-			closeBtnRef.current.click();
+			closeRef.current.click()
 		} catch (error) {
-			toast.error(error.message);
+			toast.error(error.message)
 		} finally {
-			setLoading(false);
+			setLoadingFn(false)
+			setOpenModal(false)
 		}
 	}
 
-	return <Dialog>
-		<DialogTrigger asChild>
-			<Button size="sm" variant="wz">Sync</Button>
-		</DialogTrigger>
-		<DialogContent className="!max-w-[500px] max-h-[70vh] overflow-y-auto gap-0 border-0 p-0">
-			<DialogHeader className="py-4 px-6 border-b">
-				<DialogTitle className="text-lg font-semibold">
-					Update The Club Sync Status
-				</DialogTitle>
-			</DialogHeader>
-			<div className="p-4">
-				<Button
-					onClick={() => changeSyncStatus(2)}
-					disabled={loading}
-					variant="wz"
-					className="mt-0 mr-4"
-				>Sync</Button>
-				<Button
-					onClick={() => changeSyncStatus(3)}
-					disabled={loading}
-					variant="destructive"
-					className="mt-0"
-				>Unsync</Button>
-				<DialogClose ref={closeBtnRef} />
-			</div>
-		</DialogContent>
-	</Dialog>
+	return (
+		<>
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button
+						size="sm"
+						variant={"icon"}
+						disabled={loading}
+						className={cn(
+							"h-auto py-[6px]",
+							currentStatus === "Synced"
+								? "bg-[var(--accent-1)] text-white font-bold text-[14px]"
+								: "bg-[var(--accent-2)] text-white font-bold text-[14px]"
+						)}
+					>
+						{currentStatus}
+						<ChevronDown className="h-[20px] w-[20px]" />
+					</Button>
+				</DropdownMenuTrigger>
+
+				<DropdownMenuContent align="end">
+					<DropdownMenuItem
+						onClick={() => {
+							setPendingStatus(2)
+							setOpenModal(true)
+						}}
+						disabled={loading || status === 2}
+					>
+						Sync
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={() => {
+							setPendingStatus(3)
+							setOpenModal(true)
+						}}
+						disabled={loading || status === 3}
+						className="text-destructive"
+					>
+						Unsync
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+
+			{/* Confirmation Modal */}
+			{openModal && (
+				<DualOptionActionModal
+					defaultOpen
+					description={`Are you sure you want to ${pendingStatus === 2 ? "sync" : "unsync"
+						} this coach?`}
+					action={handleSyncAction}
+					onClose={() => setOpenModal(false)}
+				/>
+			)}
+		</>
+	)
 }
 
 function DownlineClientList() {
