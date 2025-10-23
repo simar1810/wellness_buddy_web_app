@@ -24,6 +24,7 @@ import { SyncedCoachClientDetails } from "@/components/modals/coach/SyncedCoache
 import { useAppSelector } from "@/providers/global/hooks";
 import CreateSubscriptionDialog from "@/components/pages/coach/club/club-subscription/CreateClubSubscription";
 import SubscriptionsTable from "@/components/pages/coach/club/club-subscription/ListClubSubscriptions";
+import SelectControl from "@/components/Select";
 
 const tabItems = [
   {
@@ -559,6 +560,7 @@ function UpdateRollno({ rollno: defaultRollno, coachId }) {
 }
 
 function SubscriptionsTab({ coachId }) {
+  const [loading, setLoading] = useState(false);
   const { isLoading, error, data, mutate } = useSWR(
     `clubSubscription/${coachId}`,
     () => fetchClubSubscription(coachId)
@@ -574,9 +576,47 @@ function SubscriptionsTab({ coachId }) {
     <ContentError title={error?.message || data.message} />
   </div>
 
+  const { status } = data.data
+
+  const statusOptions = [
+    { id: 1, value: "Active", name: "Active" },
+    { id: 2, value: "In Active", name: "In Active" }
+  ];
+
+  async function handleStatusChange(e) {
+    const newStatus = e.target.value;
+    try {
+      setLoading(true);
+      const response = await sendData(`app/downline/subscription/status`, {
+        coachId,
+        status: newStatus
+      }, "PATCH");
+      if (response.status_code !== 200) throw new Error(response.message);
+      toast.success(response.message);
+      mutate();
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return <div>
-    <div className="flex items-center justify-between">
-      <h2>Subscription</h2>
+    <div className="flex items-center justify-between gap-4">
+      <h2 className="mr-auto">Subscription</h2>
+      <div className="relative">
+        <SelectControl
+          value={status}
+          onChange={handleStatusChange}
+          options={statusOptions}
+          className="w-40"
+          disabled={loading}
+          style={{
+            color: status === "Active" ? "#22c55e" : "#ef4444",
+            fontWeight: "600"
+          }}
+        />
+      </div>
       <CreateSubscriptionDialog
         coachId={coachId}
         onCreated={mutate}
