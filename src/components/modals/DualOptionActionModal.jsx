@@ -10,6 +10,7 @@ import { useRef, useState } from "react";
 
 export default function DualOptionActionModal({
   children,
+  title,
   description,
   action,
   onClose,
@@ -22,7 +23,9 @@ export default function DualOptionActionModal({
   return <AlertDialog defaultOpen={defaultOpen || false} {...props}>
     {children}
     <AlertDialogContent className="!max-w-[450px] text-center border-0 px-0 overflow-auto gap-0">
-      <AlertDialogTitle className="text-[24px]">Are you sure?</AlertDialogTitle>
+      <AlertDialogTitle className="text-[24px]">
+        {title || "Are you sure?"}
+      </AlertDialogTitle>
       {description && <AlertDialogDescription className="text-[var(--dark-1)]/50 mb-4">{description}</AlertDialogDescription>}
       <div>
         <AlertDialogCancel
