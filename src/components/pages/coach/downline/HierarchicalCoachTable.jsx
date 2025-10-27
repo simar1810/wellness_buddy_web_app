@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useRef } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ChevronRight, ChevronDown, RefreshCw, ChevronsDown, ChevronUp, Eye } from "lucide-react";
+import { ChevronRight, ChevronDown, RefreshCw, ChevronsDown, ChevronUp, Eye, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { SyncCoachComponent } from "@/app/(authorized)/coach/downline/page";
@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { sendData } from "@/lib/api";
 import { mutate } from "swr";
+import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
+import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 /**
  * HierarchicalCoachTable Component
@@ -189,10 +191,15 @@ function LevelTable({
                 <TableCell className="flex justify-center">
                   <SyncCoachComponent coach={coach} />
                 </TableCell>
-                <TableCell>
-                  <Link href={`/coach/downline/coach/${coach._id}`}>
-                    <Eye className="w-[20px] h-[20px] mx-auto" />
-                  </Link>
+                <TableCell className="">
+                  <div className="flex items-center justify-end gap-2 pr-8">
+                    <Link
+                      href={`/coach/downline/coach/${coach._id}`}
+                    >
+                      <Eye className="w-[20px] h-[20px] mx-auto" />
+                    </Link>
+                    <DeleteDownlineCoach coachId={coach._id} />
+                  </div>
                 </TableCell>
               </TableRow>
             );
@@ -291,4 +298,32 @@ function UpdateCoachClubType({ coach }) {
       </DialogContent>
     </Dialog>
   )
+}
+
+function DeleteDownlineCoach({ coachId }) {
+  async function deleteDownlineCoach(setLoading, btnRef) {
+    try {
+      setLoading(true)
+      const response = await sendData("app/downline/coach-manage", { coachId }, "DELETE")
+      if (response.status_code !== 200) throw new Error(response.message)
+      toast.success(response.message)
+      location.reload()
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+  return <DualOptionActionModal
+    title="Delete Coach"
+    description="Are you sure you want to delete this coach? This action cannot be undone."
+    action={(setLoading, btnRef) => deleteDownlineCoach(setLoading, btnRef)}
+  >
+    <AlertDialogTrigger asChild>
+      <Trash2
+        className="w-[16px] h-[16px] text-[var(--accent-2)] cursor-pointer"
+        strokeWidth={2.5}
+      />
+    </AlertDialogTrigger>
+  </DualOptionActionModal>
 }

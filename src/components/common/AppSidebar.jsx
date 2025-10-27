@@ -50,7 +50,7 @@ export default function AppSidebar() {
   // Wallet is now available for all organizations
   if (organisation !== "Herbalife") sidebarItems = sidebarItems.filter(item => item.id !== 7);
   if (!features.includes(4)) sidebarItems = sidebarItems.filter(item => item.id !== 6);
-  if (!["Club Leader", "Club Leader Jr"].includes(clubType)) {
+  if (!["System Leader", "Club Leader", "Club Leader Jr"].includes(clubType)) {
     sidebarItems = sidebarItems.filter(item => item.id !== 14);
   }
 

@@ -8,7 +8,7 @@ export default function Layout({ children }) {
   const { roles, clubType, _id } = useAppSelector(state => state.coach.data);
 
   const clubFeaturesPermitted = permit("club", roles);
-  if (!clubFeaturesPermitted && !["Club Leader"].includes(clubType)) return <div className="content-height-screen content-container">
+  if (!clubFeaturesPermitted && !["System Leader", "Club Leader"].includes(clubType)) return <div className="content-height-screen content-container">
     <div className="relative">
       <Image
         src="/illustrations/support.svg"

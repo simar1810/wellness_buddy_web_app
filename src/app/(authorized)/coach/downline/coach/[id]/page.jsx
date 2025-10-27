@@ -244,7 +244,7 @@ function TabsClients({ clients = [] }) {
                   <TableCell>{client.email || "-"}</TableCell>
                   <TableCell>{client.mobileNumber || "-"}</TableCell>
                   <TableCell>{client.city || "-"}</TableCell>
-                  {["Club Leader", "Club Leader Jr"].includes(clubType) && <TableCell onClick={e => e.stopPropagation()}>
+                  {["System Leader", "Club Leader", "Club Leader Jr"].includes(clubType) && <TableCell onClick={e => e.stopPropagation()}>
                     <SyncedCoachClientDetails
                       client={client}
                       onUpdate={() => location.reload()}
@@ -451,7 +451,7 @@ export function UpdateDetails({
     }
   }
 
-  if (!["Club Leader", "Club Leader Jr"].includes(clubType)) return <></>
+  if (!["System Leader", "Club Leader", "Club Leader Jr"].includes(clubType)) return <></>
 
   return <Dialog>
     <DialogTrigger className=" self-start">
@@ -528,7 +528,7 @@ function UpdateRollno({ rollno: defaultRollno, coachId }) {
     }
   }
 
-  if (!["Club Leader", "Club Leader Jr"].includes(clubType)) return <></>
+  if (!["System Leader", "Club Leader", "Club Leader Jr"].includes(clubType)) return <></>
 
   return <div className="flex items-center gap-3">
     {isUpdating
