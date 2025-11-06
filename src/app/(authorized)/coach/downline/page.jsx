@@ -695,6 +695,7 @@ function AddCoachInDownline() {
 }
 
 function SelectDownlineCoach({ onChange }) {
+	const [query, setQuery] = useState("")
 	const { isLoading, error, data, mutate } = useSWR(
 		"app/downline/coaches",
 		retrieveDownlineCoaches
@@ -704,7 +705,9 @@ function SelectDownlineCoach({ onChange }) {
 
 	if (error || data.status_code !== 200) return <ContentError title={error?.message || data.message} />
 
-	const coaches = data.data || [];
+	const coaches = data
+		.data
+		.filter(coach => new RegExp(query, "i").test(coach.name)) || [];
 
 	return <Select
 		onValueChange={value => onChange(value)}
@@ -712,7 +715,13 @@ function SelectDownlineCoach({ onChange }) {
 		<SelectTrigger className="w-full mb-4 py-2">
 			<SelectValue placeholder="Select Downline Coach" />
 		</SelectTrigger>
-		<SelectContent>
+		<SelectContent side="top" align="start">
+			<FormControl
+				value={query}
+				onChange={e => setQuery(replaceAll(e.target.value, ''))}
+				className="mb-2 block"
+				placeholder="Search by name..."
+			/>
 			{coaches.map(coach => <SelectItem
 				key={coach._id}
 				value={coach._id}
