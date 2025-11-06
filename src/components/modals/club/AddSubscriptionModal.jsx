@@ -9,6 +9,7 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { sendData } from "@/lib/api";
+import { addMonths, format, parse } from "date-fns";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
@@ -17,10 +18,13 @@ export default function AddSubscriptionModal({ _id, onSubmit }) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     amount: "",
-    endDate: "",
     invoice: "",
     paymentMode: "cash",
-    startDate: "",
+    startDate: format(new Date(), "yyyy-MM-dd"),
+    endDate: format(
+      addMonths(new Date(), 1),
+      "yyyy-MM-dd"
+    ),
     description: ""
   });
   const closeBtnRef = useRef(null);
@@ -58,7 +62,14 @@ export default function AddSubscriptionModal({ _id, onSubmit }) {
         />
         <FormControl
           value={formData.startDate}
-          onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+          onChange={(e) => setFormData({
+            ...formData,
+            startDate: e.target.value,
+            endDate: format(
+              addMonths(parse(e.target.value, "yyyy-MM-dd", new Date()), 1),
+              "yyyy-MM-dd"
+            )
+          })}
           label="Start Date"
           type="date"
           className="block mb-4"
