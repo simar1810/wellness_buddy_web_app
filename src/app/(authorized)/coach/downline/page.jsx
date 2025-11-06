@@ -37,6 +37,7 @@ import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTr
 import { useTabsContentNavigation } from "@/hooks/useTabsContentNavigation";
 import { SyncedCoachClientDetails } from "@/components/modals/coach/SyncedCoachesModal";
 import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const categoriesFetcher = () =>
 	fetchData("app/coach-categories").then((res) => {
@@ -79,7 +80,7 @@ export default function Page() {
 		}
 	};
 
-	if (!features?.includes(5) && ["Club Leader", "Club Leader Jr", "Club Captain"].includes(clubType)) {
+	if (!features?.includes(5) && ["System Leader", "Club Leader", "Club Leader Jr", "Club Captain"].includes(clubType)) {
 		return <ContentError title="This feature isn't enabled for you" />;
 	}
 
@@ -386,7 +387,10 @@ function CoachesList() {
 
 	return (
 		<div className="bg-[var(--comp-2)] px-4 py-8 rounded-[8px] space-y-4 border-1">
-			<h4 className="mb-4">Coaches under You ({allCoaches.length})</h4>
+			<div className="flex items-center justify-between">
+				<h4 className="mb-4">Coaches under You ({allCoaches.length})</h4>
+				<AddCoachInDownline />
+			</div>
 			<FormControl
 				value={query}
 				onChange={e => setQuery(e.target.value)}
@@ -612,4 +616,122 @@ function DownlineClientList() {
 			</TableBody>
 		</Table>
 	</div>
+}
+
+function AddCoachInDownline() {
+	const [formData, setFormData] = useState({
+		hid: "",
+		name: "",
+		city: "",
+		mobileNumber: "",
+		email: "",
+		downlineCoachId: ""
+	})
+
+	const handleChange = (e, name) => {
+		setFormData({ ...formData, [name]: e.target.value })
+	}
+
+	async function handleAddCoach() {
+		try {
+			const response = await sendData("app/downline/coach-manage", formData, "POST")
+			if (response.status_code !== 200) throw new Error(response.message)
+			toast.success(response.message)
+			location.reload()
+		} catch (error) {
+			toast.error(error.message)
+		}
+	}
+
+	return (
+		<Dialog>
+			<DialogTrigger asChild>
+				<Button variant="wz">Add Coach</Button>
+			</DialogTrigger>
+			<DialogContent className="max-w-[400px] p-0">
+				<DialogTitle className="p-4 border-b-1">Add Coach</DialogTitle>
+				<div className="p-4 pt-0">
+					<FormControl
+						placeholder="HID Of Coach"
+						value={formData.hid}
+						onChange={e => handleChange(e, "hid")}
+						className="block mb-4"
+					/>
+					<FormControl
+						placeholder="Name Of Coach"
+						value={formData.name}
+						onChange={e => handleChange(e, "name")}
+						className="block mb-4"
+					/>
+					<FormControl
+						placeholder="City"
+						value={formData.city}
+						onChange={e => handleChange(e, "city")}
+						className="block mb-4"
+					/>
+					<FormControl
+						placeholder="Mobile Number"
+						value={formData.mobileNumber}
+						onChange={e => handleChange(e, "mobileNumber")}
+						className="block mb-4"
+						type="number"
+					/>
+					<FormControl
+						placeholder="Email"
+						className="block mb-4"
+						value={formData.email}
+						onChange={e => handleChange(e, "email")}
+						type="email"
+					/>
+					<SelectDownlineCoach onChange={value => setFormData({
+						...formData,
+						downlineCoachId: value
+					})} />
+					<Button variant="wz" onClick={handleAddCoach}>Save</Button>
+				</div>
+			</DialogContent>
+		</Dialog>
+	)
+}
+
+function SelectDownlineCoach({ onChange }) {
+	const [query, setQuery] = useState("")
+	const { isLoading, error, data, mutate } = useSWR(
+		"app/downline/coaches",
+		retrieveDownlineCoaches
+	);
+
+	if (isLoading) return <ContentLoader />
+
+	if (error || data.status_code !== 200) return <ContentError title={error?.message || data.message} />
+
+	const coaches = data
+		.data
+		.filter(coach => new RegExp(query, "i").test(coach.name)) || [];
+
+	return <Select
+		onValueChange={value => onChange(value)}
+	>
+		<SelectTrigger className="w-full mb-4 py-2">
+			<SelectValue placeholder="Select Downline Coach" />
+		</SelectTrigger>
+		<SelectContent side="top" align="start">
+			<FormControl
+				value={query}
+				onChange={e => setQuery(replaceAll(e.target.value, ''))}
+				className="mb-2 block"
+				placeholder="Search by name..."
+			/>
+			{coaches.map(coach => <SelectItem
+				key={coach._id}
+				value={coach._id}
+			>
+				<Avatar>
+					<AvatarImage src={coach.profilePhoto} />
+					<AvatarFallback>{nameInitials(coach.name)}</AvatarFallback>
+				</Avatar>
+				{coach.name}
+			</SelectItem>)}
+		</SelectContent>
+	</Select>
 }

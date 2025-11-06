@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { format, parse } from "date-fns";
+import { addMonths, format, parse } from "date-fns";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -34,19 +34,29 @@ export default function CreateSubscriptionDialog({
   const [formData, setFormData] = useState({
     startDate: subscription.startDate
       ? format(new Date(subscription.startDate), "yyyy-MM-dd")
-      : "",
+      : format(new Date(), "yyyy-MM-dd"),
     endDate: subscription.endDate
       ? format(new Date(subscription.endDate), "yyyy-MM-dd")
-      : "",
+      : format(addMonths(new Date(), 1), "yyyy-MM-dd"),
     amount: subscription.amount ? subscription.amount : "",
-    paymentMode: subscription.paymentMode ? subscription.paymentMode : "",
+    paymentMode: subscription.paymentMode ? subscription.paymentMode : "Cash",
+    description: subscription.description || ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const closeRef = useRef()
 
   const handleChange = (field) => (e) => {
-    setFormData({ ...formData, [field]: e.target.value });
+    setFormData({
+      ...formData,
+      [field]: e.target.value,
+      ...(field === "startDate" && {
+        endDate: format(
+          addMonths(parse(e.target.value, "yyyy-MM-dd", new Date()), 1),
+          "yyyy-MM-dd"
+        )
+      })
+    });
   };
 
   const handleSelect = (field) => (value) => {
@@ -80,6 +90,7 @@ export default function CreateSubscriptionDialog({
         endDate: parse(formData.endDate, "yyyy-MM-dd", new Date()),
         amount: parseFloat(formData.amount),
         paymentMode: formData.paymentMode,
+        description: formData.description,
         coachId,
       };
 
@@ -115,7 +126,20 @@ export default function CreateSubscriptionDialog({
             </DialogTitle>
           </DialogHeader>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
+            {/* Amount */}
+            <div className="flex flex-col space-y-1">
+              <Label>Amount (INR)</Label>
+              <Input
+                type="number"
+                min={0}
+                step={0.01}
+                value={formData.amount}
+                onChange={handleChange("amount")}
+                required
+              />
+            </div>
+
             {/* Start Date */}
             <div className="flex flex-col space-y-1">
               <Label>Start Date</Label>
@@ -139,15 +163,12 @@ export default function CreateSubscriptionDialog({
               />
             </div>
 
-            {/* Amount */}
+            {/* Description */}
             <div className="flex flex-col space-y-1">
-              <Label>Amount (INR)</Label>
+              <Label>Description</Label>
               <Input
-                type="number"
-                min={0}
-                step={0.01}
-                value={formData.amount}
-                onChange={handleChange("amount")}
+                value={formData.description}
+                onChange={handleChange("description")}
                 required
               />
             </div>
@@ -163,8 +184,9 @@ export default function CreateSubscriptionDialog({
                   <SelectValue placeholder="Select mode" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Online">Online</SelectItem>
-                  <SelectItem value="Offline">Offline</SelectItem>
+                  <SelectItem value="Cash">Cash</SelectItem>
+                  <SelectItem value="UPI">UPI</SelectItem>
+                  <SelectItem value="Net Banking">Net Banking</SelectItem>
                 </SelectContent>
               </Select>
             </div>
