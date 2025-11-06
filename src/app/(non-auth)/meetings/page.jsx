@@ -89,7 +89,7 @@ function ListMeetings({ person, query }) {
       setLoading(true);
       const response = await sendData(
         "verifyClientMeeting?wellnessZLink=" + meeting.wellnessZLink,
-        { rollno: meeting.rollno, person }
+        { rollno: query, person }
       );
       if (!response.status) throw new Error(response.message);
       router.push(response.data)
