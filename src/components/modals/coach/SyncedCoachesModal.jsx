@@ -53,7 +53,7 @@ export function SyncedCoachClientDetails({
   const [formData, setFormData] = useState({ ...client, client_doc_id: client._id });
   const [loading, setLoading] = useState(false);
 
-  const clubSystem = useAppSelector(state => state.coach.data.clubSystem);
+  const { clubSystem, clubType } = useAppSelector(state => state.coach.data);
 
   const closeBtnRef = useRef()
 
@@ -78,6 +78,8 @@ export function SyncedCoachClientDetails({
       setLoading(false);
     }
   }
+
+  const isSystemLeader = ["System Leader"].includes(clubType)
 
   return <Dialog>
     {children}
@@ -142,8 +144,8 @@ export function SyncedCoachClientDetails({
           Save
         </Button>
       </div>
-      {[0, 1].includes(clubSystem) && <SubscriptionHistory _id={client._id} />}
-      {[2].includes(clubSystem) && <VolumePointHistory _id={client._id} />}
+      {[0, 1].includes(clubSystem) && isSystemLeader && <SubscriptionHistory _id={client._id} />}
+      {[2].includes(clubSystem) && isSystemLeader && <VolumePointHistory _id={client._id} />}
       <DialogClose ref={closeBtnRef} />
     </DialogContent>
   </Dialog>
