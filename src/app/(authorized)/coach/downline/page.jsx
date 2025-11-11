@@ -582,6 +582,7 @@ function DownlineClientList() {
 					<TableHead>Email</TableHead>
 					<TableHead>Mobile</TableHead>
 					<TableHead>City</TableHead>
+					<TableHead>Status</TableHead>
 					<TableHead />
 				</TableRow>
 			</TableHeader>
@@ -594,6 +595,9 @@ function DownlineClientList() {
 						<TableCell>{client.email || "-"}</TableCell>
 						<TableCell>{client.mobileNumber || "-"}</TableCell>
 						<TableCell>{client.city || "-"}</TableCell>
+						<TableCell>{client?.isActive
+							? <Badge variant="wz_fill">Active</Badge>
+							: <Badge variant="destructive">In active</Badge>}</TableCell>
 						{<TableCell onClick={e => e.stopPropagation()}>
 							<SyncedCoachClientDetails
 								client={client}

@@ -13,6 +13,7 @@ import { sendData } from "@/lib/api";
 import { mutate } from "swr";
 import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 
 /**
  * HierarchicalCoachTable Component
@@ -171,6 +172,7 @@ function LevelTable({
           <TableHead className="text-gray-800 font-bold py-3">Name</TableHead>
           <TableHead className="text-gray-800 font-bold text-center w-[180px] py-3">Club Type</TableHead>
           <TableHead className="text-gray-800 font-bold text-center w-[220px] py-3">Sync Status</TableHead>
+          <TableHead className="text-gray-800 font-bold text-center w-[220px] py-3">Subscription Status</TableHead>
           <TableHead className="text-gray-800 font-bold text-center w-[220px] py-3"></TableHead>
         </TableRow>
       </TableHeader>}
@@ -191,6 +193,11 @@ function LevelTable({
                 <TableCell className="flex justify-center">
                   <SyncCoachComponent coach={coach} />
                 </TableCell>
+                <TableCell className="text-center font-bold">
+                  {coach?.clubSubscription?.status === "Active"
+                    ? <Badge variant="wz_fill">Active</Badge>
+                    : <Badge variant="destructive">In Active</Badge>}
+                </TableCell>
                 <TableCell className="">
                   <div className="flex items-center justify-end gap-2 pr-8">
                     <Link
@@ -207,6 +214,7 @@ function LevelTable({
 
         {isExpanded && levelCoaches.length > 0 && (
           <TableRow className="bg-blue-50 font-semibold border-b-2 border-blue-200">
+            <TableCell />
             <TableCell colSpan={4} className="text-right py-2 text-blue-900">
               Level {level} Total:
             </TableCell>
