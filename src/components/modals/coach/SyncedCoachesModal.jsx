@@ -79,7 +79,7 @@ export function SyncedCoachClientDetails({
     }
   }
 
-  const isSystemLeader = ["System Leader"].includes(clubType)
+  const isSystemLeader = ["System Leader", "Club Leader"].includes(clubType)
 
   return <Dialog>
     {children}
