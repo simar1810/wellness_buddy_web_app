@@ -560,6 +560,8 @@ function SyncCoachDropdown({ coachId, status }) {
 }
 
 function DownlineClientList() {
+	const [query, setQuery] = useState("");
+	const regex = new RegExp(query, "i")
 	const { isLoading, error, data } = useSWR(
 		"downline-clients",
 		() => retrieveClientList()
@@ -569,11 +571,17 @@ function DownlineClientList() {
 
 	if (error || data.status_code !== 200) return <ContentError title={error?.message || data.message} />
 
-	const clients = data.data || [];
+	const clients = data.data.filter(client => regex.test(client.name)) || [];
 
 	return <div className="bg-[var(--comp-1)] p-4 rounded-[10px] border-1">
-		{/* <h2>Client List</h2> */}
-		<Table className="border-1">
+		{/* <h2>Client List</h2> */
+			<FormControl
+				value={query}
+				onChange={e => setQuery(e.target.value)}
+				className="[&_.input]:bg-white"
+				placeholder="search by name..."
+			/>}
+		<Table className="border-1 mt-4">
 			<TableHeader>
 				<TableRow className="bg-white [&_th]:font-bold">
 					<TableHead>Name</TableHead>
