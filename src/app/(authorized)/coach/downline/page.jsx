@@ -19,7 +19,7 @@ import { sendData, fetchData } from "@/lib/api";
 import { toast } from "sonner";
 import { useAppSelector } from "@/providers/global/hooks";
 import ContentError from "@/components/common/ContentError";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import ContentLoader from "@/components/common/ContentLoader";
 import {
 	retrieveClientList,
@@ -38,6 +38,7 @@ import { useTabsContentNavigation } from "@/hooks/useTabsContentNavigation";
 import { SyncedCoachClientDetails } from "@/components/modals/coach/SyncedCoachesModal";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import DeleteClientModal from "@/components/modals/client/DeleteClientModal";
 
 const categoriesFetcher = () =>
 	fetchData("app/coach-categories").then((res) => {
@@ -616,6 +617,13 @@ function DownlineClientList() {
 								</DialogTrigger>
 							</SyncedCoachClientDetails>
 						</TableCell>}
+						<DeleteClientModal
+							onClose={() => mutate("downline-clients")}
+							_id={client._id}
+							pushMandtory={false}
+						>
+							<Trash2 className="w-[18px] h-[18px] text-[var(--accent-2)]" />
+						</DeleteClientModal>
 					</TableRow>
 				))}
 				{clients.length === 0 && (
