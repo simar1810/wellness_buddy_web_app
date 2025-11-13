@@ -14,9 +14,11 @@ import { toast } from "sonner";
 import { mutate } from "swr";
 
 export default function DeleteClientModal({
+  children,
   _id,
   onClose,
   defaultOpen,
+  pushMandtory = false
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +33,7 @@ export default function DeleteClientModal({
       if (!response.status) throw new Error(response.error);
       toast.success(response.message);
       mutate((key) => typeof key === 'string' && key.startsWith('getAppClients'));
-      router.push("/coach/clients");
+      if (pushMandtory) router.push("/coach/clients");
       closeBtnRef.current.click();
     } catch (error) {
       toast.error(error.message);
@@ -41,10 +43,7 @@ export default function DeleteClientModal({
   }
 
   return <AlertDialog defaultOpen={defaultOpen}>
-    {!defaultOpen && <AlertDialogTrigger className="font-semibold text-[var(--accent-2)] px-2 flex items-center gap-2">
-      <Trash className="w-[16px] text-[var(--accent-2)]" />
-      Delete Client
-    </AlertDialogTrigger>}
+    {!defaultOpen && <Trigger children={children} />}
     <AlertDialogContent className="!max-w-[450px] text-center border-0 px-0 overflow-auto gap-0">
       <AlertDialogTitle className="text-[24px]">Are you sure?</AlertDialogTitle>
       <p className="text-[var(--dark-1)]/50 mb-4">You are deleting a client.</p>
@@ -60,4 +59,14 @@ export default function DeleteClientModal({
       </div>
     </AlertDialogContent>
   </AlertDialog>
+}
+
+function Trigger({ children }) {
+  if (children) return <AlertDialogTrigger className="flex items-center h-full mt-3">
+    {children}
+  </AlertDialogTrigger>
+  return <AlertDialogTrigger className="font-semibold text-[var(--accent-2)] px-2 flex items-center gap-2">
+    <Trash className="w-[16px] text-[var(--accent-2)]" />
+    Delete Client
+  </AlertDialogTrigger>
 }
