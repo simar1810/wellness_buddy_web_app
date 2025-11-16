@@ -106,13 +106,13 @@ export function subscriptionDaysRemaining(planCode, endDate) {
     case 0:
       return ({
         success: true,
-        planType: "Free Trial Plan",
+        planType: "Pro Plan",
         pendingDays
       });
     case 1:
       return ({
         success: true,
-        planType: "Basic Plan",
+        planType: "Pro Plan",
         pendingDays
       });
     case 2:
@@ -122,7 +122,9 @@ export function subscriptionDaysRemaining(planCode, endDate) {
         pendingDays
       });
     default:
-      return ({ success: false });
+      return ({  success: true,
+        planType: "Pro Plan",
+        pendingDays});
   }
 }
 
