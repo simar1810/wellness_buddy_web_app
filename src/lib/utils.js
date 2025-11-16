@@ -88,43 +88,10 @@ export function youtubeVideoId(url) {
 }
 
 export function subscriptionDaysRemaining(planCode, endDate) {
-  if (isNaN(planCode) || !endDate) {
-    return {
-      success: false,
-      message: "No subscription plan found."
-    };
-  }
-  const today = format(new Date(), 'dd-MM-yyyy');
-  const pendingDays = daysDifference__notification(today, endDate);
-  if (daysDifference__notification(today, endDate) <= 0) {
-    return {
-      success: false,
-      message: "Your subscription has expired. Please renew your subscription to continue using the features."
-    };
-  }
-  switch (planCode) {
-    case 0:
-      return ({
-        success: true,
-        planType: "Pro Plan",
-        pendingDays
-      });
-    case 1:
-      return ({
-        success: true,
-        planType: "Pro Plan",
-        pendingDays
-      });
-    case 2:
-      return ({
-        success: true,
-        planType: "Pro Plan",
-        pendingDays
-      });
-    default:
-      return ({  success: true,
-        planType: "Pro Plan",
-        pendingDays});
+  return {
+    success: true,
+    planType: "Pro Plan",
+    pendingDays: 30
   }
 }
 
