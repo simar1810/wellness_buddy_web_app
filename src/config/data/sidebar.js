@@ -66,6 +66,13 @@ export const sidebar__coachContent = [
     permission: null, // Always visible
   },
   {
+    id: 14,
+    icon: <Clock12 />,
+    title: "Downline",
+    url: "/coach/downline",
+    permission: null
+  },
+  {
     id: 3,
     title: "Clients",
     icon: <Users className="min-w-[20px] min-h-[20px]" />,
@@ -502,13 +509,6 @@ export const sidebar__coachContent = [
     //     url: "/coach/physical-club/qr-generate",
     //   }
     // ]
-  },
-  {
-    id: 14,
-    icon: <Clock12 />,
-    title: "Downline",
-    url: "/coach/downline",
-    permission: null
   }
 ];
 
