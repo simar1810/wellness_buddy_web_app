@@ -6,7 +6,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import React, { useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,7 +30,7 @@ import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TreeVisualizer from "@/components/pages/coach/downline/Visualizer";
 import HierarchicalCoachTable from "@/components/pages/coach/downline/HierarchicalCoachTable";
-import { PlusCircle, Edit, Trash2, Eye, ChevronDown, MoreVertical } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Eye, ChevronDown, MoreVertical, Plus } from "lucide-react";
 import { ManageCategoryModal } from "@/components/modals/coach/ManageCategoryModal";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -40,6 +40,7 @@ import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DeleteClientModal from "@/components/modals/client/DeleteClientModal";
 import ClientUpdateCategories from "@/components/pages/coach/client/ClientUpdateCategories";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const categoriesFetcher = () =>
 	fetchData("app/coach-categories").then((res) => {
@@ -621,6 +622,7 @@ function DownlineClientList() {
 			<TableHeader>
 				<TableRow className="bg-white [&_th]:font-bold">
 					<TableHead>Name</TableHead>
+					<TableHead>Categories</TableHead>
 					<TableHead>Coach</TableHead>
 					<TableHead>Client ID</TableHead>
 					<TableHead>Email</TableHead>
@@ -628,12 +630,14 @@ function DownlineClientList() {
 					<TableHead>City</TableHead>
 					<TableHead>Status</TableHead>
 					<TableHead />
+					<TableHead />
 				</TableRow>
 			</TableHeader>
 			<TableBody>
 				{clients.map((client) => (
 					<TableRow key={client._id}>
-						<TableCell className="font-medium">{client.name}</TableCell>
+						<TableCell className="font-medium max-w-[20ch]">{client.name}</TableCell>
+						<ClientCategoriesListing categories={client.categories} />
 						<TableCell>{client.coach}</TableCell>
 						<TableCell>{client.clientId}</TableCell>
 						<TableCell>{client.email || "-"}</TableCell>
@@ -747,7 +751,7 @@ function AddCoachInDownline() {
 
 function SelectDownlineCoach({ onChange }) {
 	const [query, setQuery] = useState("")
-	const { isLoading, error, data, mutate } = useSWR(
+	const { isLoading, error, data } = useSWR(
 		"app/downline/coaches",
 		retrieveDownlineCoaches
 	);
@@ -785,4 +789,50 @@ function SelectDownlineCoach({ onChange }) {
 			</SelectItem>)}
 		</SelectContent>
 	</Select>
+}
+
+function ClientCategoriesListing({ categories }) {
+	const { client_categories } = useAppSelector(state => state.coach.data)
+
+	const selectedCategories = useMemo(() => findClientCategories(categories, client_categories), [])
+
+	if (categories.length === 0) return <TableCell className="opacity-50">
+		-
+	</TableCell>
+
+	return <TableCell className="flex items-center gap-1">
+		{selectedCategories
+			.slice(0, 2)
+			.map(cat => <span
+				key={cat.id}
+				className="px-2 py-1 text-[12px] bg-[var(--accent-1)] rounded-full text-white"
+			>
+				{cat.name}
+			</span>)}
+		<Tooltip>
+			<TooltipTrigger className="px-2 py-1 text-[12px] bg-[var(--accent-1)] rounded-full text-white">
+				<Plus className="w-[16px] h-[16px]" />
+			</TooltipTrigger>
+			<TooltipContent className="w-[300px] bg-[var(--comp-1)] border-1 border-[#8080808D] shadow-xl p-4 flex gap-x-1 gap-y-2 flex-wrap">
+				{selectedCategories
+					.map(cat => <span
+						key={cat.id}
+						className="px-2 py-1 text-[12px] bg-[var(--accent-1)] rounded-full text-white font-bold"
+					>
+						{cat.name}
+					</span>)}
+			</TooltipContent>
+		</Tooltip>
+	</TableCell>
+}
+
+function findClientCategories(categories, coachCategories) {
+	const coachCategoryMap = new Map(
+		coachCategories.map(cat => [cat._id, cat.name])
+	)
+	return categories
+		.map(cat => ({
+			id: cat,
+			name: coachCategoryMap.get(cat)
+		}))
 }
