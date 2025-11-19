@@ -30,7 +30,7 @@ import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TreeVisualizer from "@/components/pages/coach/downline/Visualizer";
 import HierarchicalCoachTable from "@/components/pages/coach/downline/HierarchicalCoachTable";
-import { PlusCircle, Edit, Trash2, Eye, ChevronDown } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Eye, ChevronDown, MoreVertical } from "lucide-react";
 import { ManageCategoryModal } from "@/components/modals/coach/ManageCategoryModal";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -39,6 +39,7 @@ import { SyncedCoachClientDetails } from "@/components/modals/coach/SyncedCoache
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DeleteClientModal from "@/components/modals/client/DeleteClientModal";
+import ClientUpdateCategories from "@/components/pages/coach/client/ClientUpdateCategories";
 
 const categoriesFetcher = () =>
 	fetchData("app/coach-categories").then((res) => {
@@ -560,6 +561,40 @@ function SyncCoachDropdown({ coachId, status }) {
 	)
 }
 
+function ClientActionsDropdown({ client }) {
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button variant="ghost" size="icon">
+					<MoreVertical className="h-4 w-4" />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end" className="!gap-0 !space-y-0">
+				<ClientUpdateCategories clientData={client}>
+					<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+						<DialogTrigger asChild>
+							<span className="w-full cursor-pointer">Add Categories</span>
+						</DialogTrigger>
+					</DropdownMenuItem>
+				</ClientUpdateCategories>
+				<DeleteClientModal
+					onClose={() => mutate("downline-clients")}
+					_id={client._id}
+					pushMandtory={false}
+					className="w-full"
+				>
+					<DropdownMenuItem className="w-full" onSelect={(e) => e.preventDefault()}>
+						<div className="w-full cursor-pointer flex items-center gap-2">
+							<Trash2 className="w-4 h-4" />
+							Delete
+						</div>
+					</DropdownMenuItem>
+				</DeleteClientModal>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+}
+
 function DownlineClientList() {
 	const [query, setQuery] = useState("");
 	const regex = new RegExp(query, "i")
@@ -617,13 +652,9 @@ function DownlineClientList() {
 								</DialogTrigger>
 							</SyncedCoachClientDetails>
 						</TableCell>}
-						<DeleteClientModal
-							onClose={() => mutate("downline-clients")}
-							_id={client._id}
-							pushMandtory={false}
-						>
-							<Trash2 className="w-[18px] h-[18px] text-[var(--accent-2)]" />
-						</DeleteClientModal>
+						<TableCell onClick={e => e.stopPropagation()}>
+							<ClientActionsDropdown client={client} />
+						</TableCell>
 					</TableRow>
 				))}
 				{clients.length === 0 && (

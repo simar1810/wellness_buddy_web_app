@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { sendData } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -18,7 +19,8 @@ export default function DeleteClientModal({
   _id,
   onClose,
   defaultOpen,
-  pushMandtory = false
+  pushMandtory = false,
+  className = ""
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -43,7 +45,7 @@ export default function DeleteClientModal({
   }
 
   return <AlertDialog defaultOpen={defaultOpen}>
-    {!defaultOpen && <Trigger children={children} />}
+    {!defaultOpen && <Trigger children={children} className={className} />}
     <AlertDialogContent className="!max-w-[450px] text-center border-0 px-0 overflow-auto gap-0">
       <AlertDialogTitle className="text-[24px]">Are you sure?</AlertDialogTitle>
       <p className="text-[var(--dark-1)]/50 mb-4">You are deleting a client.</p>
@@ -61,11 +63,11 @@ export default function DeleteClientModal({
   </AlertDialog>
 }
 
-function Trigger({ children }) {
-  if (children) return <AlertDialogTrigger className="flex items-center h-full mt-3">
+function Trigger({ children, className = "" }) {
+  if (children) return <AlertDialogTrigger className={cn("flex items-center h-full mt-3", className)}>
     {children}
   </AlertDialogTrigger>
-  return <AlertDialogTrigger className="font-semibold text-[var(--accent-2)] px-2 flex items-center gap-2">
+  return <AlertDialogTrigger className={cn("font-semibold text-[var(--accent-2)] px-2 flex items-center gap-2", className)}>
     <Trash className="w-[16px] text-[var(--accent-2)]" />
     Delete Client
   </AlertDialogTrigger>
