@@ -768,15 +768,27 @@ function SelectDownlineCoach({ onChange }) {
 		onValueChange={value => onChange(value)}
 	>
 		<SelectTrigger className="w-full mb-4 py-2">
-			<SelectValue placeholder="Select Downline Coach" />
+			<SelectValue placeholder="Select Upline Coach" />
 		</SelectTrigger>
 		<SelectContent side="top" align="start">
-			<FormControl
-				value={query}
-				onChange={e => setQuery(replaceAll(e.target.value, ''))}
-				className="mb-2 block"
-				placeholder="Search by name..."
-			/>
+			<div
+				className="px-2 pb-2"
+				onKeyDown={(e) => e.stopPropagation()}
+				onKeyUp={(e) => e.stopPropagation()}
+				onKeyPress={(e) => e.stopPropagation()}
+			>
+				<FormControl
+					value={query}
+					onChange={e => setQuery((e.target.value))}
+					className="mb-2 block"
+					placeholder="Search by name..."
+				/>
+			</div>
+			{coaches.length === 0 && (
+				<div className="px-3 py-2 text-sm text-muted-foreground">
+					No results found
+				</div>
+			)}
 			{coaches.map(coach => <SelectItem
 				key={coach._id}
 				value={coach._id}
