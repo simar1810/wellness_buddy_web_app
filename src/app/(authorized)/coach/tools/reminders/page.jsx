@@ -71,11 +71,11 @@ function DatesListing({
     }
   }, []);
 
-  return <div ref={datesContainer} className="w-[calc(100vw-344px)] text-center overflow-auto no-scrollbar">
+  return <div ref={datesContainer} className="w-[80vw] md:w-[calc(100vw-344px)] text-center overflow-auto no-scrollbar">
     <div className="w-[calc(120px*30)] flex overflow-clip">
       {dates.map(date => <div
         key={date.id}
-        className={`w-[120px] px-1 py-1 rounded-[8px] cursor-pointer ${selectedDate === date.date && "bg-[var(--accent-1)] text-white font-semibold"} `}
+        className={`w-[120px] px-1 py-1 rounded-[8px] cursor-pointer ${selectedDate === date.date && "bg-[var(--accent-1)] text-white font-semibold"} ring-1 ring-[var(--accent-1)] mx-1 my-2`}
         onClick={() => setSelectedDate(date.date)}
       >
         <p>{date.date.split("-")[0]}</p>
