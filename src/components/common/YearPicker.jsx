@@ -28,7 +28,7 @@ export default function YearPicker({
     <div className="flex flex-col gap-2">
       {label && <Label htmlFor="year">{label}</Label>}
       <Select value={selectedYear.toString()} onValueChange={handleChange}>
-        <SelectTrigger id="year" className="w-[180px] bg-[var(--accent-1)] text-white font-bold">
+        <SelectTrigger id="year" className="w-40 md:w-[180px] bg-[var(--accent-1)] text-white font-bold">
           <SelectValue placeholder="Select year" />
         </SelectTrigger>
         <SelectContent>

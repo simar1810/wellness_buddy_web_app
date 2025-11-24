@@ -17,11 +17,11 @@ export default function MonthlyMealCreation() {
   const days = Object.keys(selectedPlans);
 
   return <>
-    <div className="flex items-center justify-between">
+    <div className="flex items-center mt-2 md:mt-0 justify-between">
       <h3 className="mt-4">Days</h3>
       <CopyMealPlanModal to={selectedPlan} />
     </div>
-    <div className="mt-4 flex gap-2 overflow-x-auto pb-4">
+    <div className="mt-4 flex w-[80vw] md:w-auto gap-2 overflow-x-auto pb-4">
       {days.length === 0 && <div className="bg-[var(--comp-1)] border-1 p-2 rounded-[6px] grow text-center mr-auto"
       >
         Please select a date

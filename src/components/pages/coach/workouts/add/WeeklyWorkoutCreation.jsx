@@ -6,8 +6,8 @@ export default function DailyWorkoutCreation() {
   const { dispatch, ...state } = useCurrentStateContext();
   const days = Object.keys(state.selectedPlans)
   return <>
-    <h3>Days</h3>
-    <div className="mt-4 flex gap-2 overflow-x-auto no-scrollbar">
+    <h3 className="mt-5">Days</h3>
+    <div className="mt-4 w-[80vw] md:w-auto flex gap-2 overflow-x-auto no-scrollbar">
       {days.map((day, index) => <Button
         key={index}
         variant={state.selectedPlan === day ? "wz" : "wz_outline"}

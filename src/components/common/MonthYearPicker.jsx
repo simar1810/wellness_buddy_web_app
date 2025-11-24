@@ -28,7 +28,7 @@ export default function MonthYearPicker({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-[200px] bg-[var(--accent-1)] text-white font-bold justify-center">
+        <Button variant="outline" className="w-40 md:w-[200px] bg-[var(--accent-1)] text-white font-bold justify-center">
           <CalendarRange /> {MONTHS[parseInt(month)]} {year}
         </Button>
       </PopoverTrigger>

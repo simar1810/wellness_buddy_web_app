@@ -36,7 +36,7 @@ export default function AddStoryModal() {
 
   return <Dialog>
     <DialogTrigger>
-      <div className="aspect-square bg-[var(--accent-1)] rounded-[10px] p-2">
+      <div className="aspect-square bg-[var(--accent-1)] w-full md:w-auto h-[20vh] md:h-auto rounded-[10px] p-2">
         <div className="w-[64px] h-[64px] border-2 bg-[var(--primary-1)] border-[var(--primary-1)] relative rounded-full">
           <Avatar className="w-full h-full p-3">
             <AvatarImage src="/logo.png" />

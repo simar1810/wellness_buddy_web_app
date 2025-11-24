@@ -80,7 +80,7 @@ function TabsHeader() {
     {tabItems.map(tab => <TabsTrigger
       key={tab.id}
       value={tab.value}
-      className="text-[16px] text-[var(--accent-1)] data-[state=active]:bg-[var(--accent-1)] 
+      className="text-[14px] md:text-[16px] text-[var(--accent-1)] data-[state=active]:bg-[var(--accent-1)] 
              data-[state=active]:text-[var(--comp-1)] border-1 rounded-[6px] border-[var(--accent-1)]
              bg-[var(--comp-2)] px-4 py-4 data-[state=active]:font-semibold"
     >

@@ -186,7 +186,7 @@ export default function DisplayClientQuestionaire({ data }) {
     return hasAnswer
   }
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
+    <div className="w-full max-w-[90vw] md:max-w-4xl mx-auto p-1 md:p-6">
       {/* <div className="mb-6">
         <h1 className="text-3xl font-bold text-center mb-2">Saved Answers</h1>
         <p className="text-muted-foreground text-center">Review your previously submitted responses</p>
@@ -198,9 +198,9 @@ export default function DisplayClientQuestionaire({ data }) {
           const completionPercentage = Math.round((answeredQuestions / totalQuestions) * 100)
           return (
             <AccordionItem key={sectionIndex} value={`section-${sectionIndex}`} className="mb-1 py-4 border-1 rounded-lg">
-              <AccordionTrigger className="px-6 py-0 hover:no-underline">
+              <AccordionTrigger className="px-6 py-0 mb-2 hover:no-underline">
                 <div className="flex items-center justify-between w-full mr-4">
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
                     <h3 className="text-lg font-semibold">{section.name}</h3>
                     <Badge variant={completionPercentage === 100 ? "default" : "secondary"}>
                       {answeredQuestions}/{totalQuestions} answered

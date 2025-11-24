@@ -33,7 +33,7 @@ export default function AssignMealModal({
       </DialogTrigger>
       <DialogContent className="!max-w-[650px] h-[70vh] border-0 p-0 overflow-auto block">
         <DialogHeader className="p-4 border-b-1">
-          <DialogTitle className="text-lg font-semibold">
+          <DialogTitle className="text-[10px] md:text-lg font-semibold">
             Assign Meal
           </DialogTitle>
         </DialogHeader>

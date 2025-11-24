@@ -11,16 +11,18 @@ import { useEffect, useRef, useState } from "react";
 export default function IdealWeightContainer() {
   return <div className="content-container">
     <h4>What&apos;s your Height?</h4>
-    <h2 className="text-[24px] text-center mt-10">Select your height</h2>
-    <GenderSelection />
-    <HeightScale />
+    <h2 className="text-[24px] text-left md:text-center mt-10">Select your height</h2>
+    <div className="flex flex-col gap-10 md:gap-0">
+      <GenderSelection />
+      <HeightScale />
+    </div>
   </div>
 }
 
 function GenderSelection() {
   const { gender, heightUnit, dispatch } = useCurrentStateContext();
 
-  return <div className="flex items-end justify-center gap-20">
+  return  <div className="flex items-end justify-start md:justify-center gap-4 md:gap-20">
     <RadioGroup value={gender} className="mt-4 flex items-center justify-center gap-4">
       <div className="flex items-center gap-1">
         <input
@@ -103,7 +105,7 @@ function HeightScale() {
   const slightOverWeight = (23 * (heightinMetres * heightinMetres)).toFixed(2);
   const highlyOverWeight = (25 * (heightinMetres * heightinMetres)).toFixed(2);
 
-  return <div className="h-96 mt-20 mb-10 flex items-center justify-center gap-10">
+  return <div className="md:h-96 mt-2 md:mt-20 mb-10 flex flex-col md:flex-row items-center justify-center gap-10">
     <AnatomyImage />
     <HeightDisplay height={height} />
     <div className="w-[120px] bg-[#F0F0F0] rounded-[8px] border-2 border-[var(--accent-1)] relative">

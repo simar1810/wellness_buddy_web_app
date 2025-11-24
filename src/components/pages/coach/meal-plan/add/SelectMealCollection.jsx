@@ -23,7 +23,7 @@ export default function SelectMealCollection({ children, index }) {
         <PlusCircle size={32} className="text-[var(--accent-1)]" />
       </div>
     </DialogTrigger>}
-    <DialogContent className="min-w-[850px] p-0 gap-0">
+    <DialogContent className="w-full md:min-w-[850px] p-0 gap-0">
       <DialogHeader className="p-4 border-b-1">
         <DialogTitle>Add Meals</DialogTitle>
       </DialogHeader>
@@ -61,12 +61,12 @@ function RecipeesContainer({ index }) {
       />
       {isLoading && <Loader />}
     </div>
-    <div className="mb-4 flex items-center justify-between gap-4">
+    <div className="mb-4 flex flex-col items-start md:flex-row md:items-center justify-between gap-2 md:gap-4">
       {/* <strong>{recipees.length} Results found</strong> */}
-      <p className="ml-auto text-black/70 text-sm font-bold">Can't find a Meal, Add your own</p>
+      <p className="md:ml-auto text-black/70 text-sm font-bold">Can't find a Meal, Add your own</p>
       <RecipeModal type="new" />
     </div>
-    <div className="max-h-[55vh] mb-4 overflow-y-auto grid grid-cols-2 gap-4 no-scrollbar">
+    <div className="max-h-[55vh] mb-4 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 no-scrollbar">
       {recipees.map((recipe, index) => <RecipeDeatils
         key={index}
         recipe={recipe}

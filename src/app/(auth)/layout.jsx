@@ -17,7 +17,7 @@ export default function layout({ children }) {
             height={450}
             width={380}
             alt="Wz - logo landscape"
-            className=""
+            className="hidden md:block"
           />
           {children}
         </div>

@@ -90,10 +90,10 @@ export default function UsersPage() {
 
   return (
     <div className="content-container content-height-screen">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-start mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Users Management</h1>
-          <p className="text-gray-600">Manage your users and their accounts</p>
+          <h1 className="text-base md:text-2xl font-bold text-gray-900 mb-2">Users Management</h1>
+          <p className="text-xs md:text-base text-gray-600">Manage your users and their accounts</p>
         </div>
         <Button
           onClick={() => setShowAddModal(true)}
@@ -122,8 +122,8 @@ export default function UsersPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredUsers.map((user) => (
             <Card key={user._id} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
+              <CardHeader className="pb-0 md:pb-3">
+                <div className="flex flex-col md:flex-row gap-4 md:gap-1 items-start md:items-center justify-center md:justify-between">
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={user.profilePhoto} />
@@ -134,7 +134,7 @@ export default function UsersPage() {
                       <p className="text-sm text-gray-600">ID: {user.userId}</p>
                     </div>
                   </div>
-                  <div className="flex space-x-1">
+                  <div className="flex md:space-x-1">
                     <Button
                       variant="ghost"
                       size="sm"

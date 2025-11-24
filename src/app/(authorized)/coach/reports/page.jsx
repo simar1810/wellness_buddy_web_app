@@ -43,7 +43,7 @@ export default function Page() {
       <Input
         value={query}
         onChange={e => setQuery(e.target.value)}
-        className="w-auto min-w-sm bg-[var(--comp-1)]"
+        className="w-40 md:min-w-sm bg-[var(--comp-1)]"
         placeholder="Search client name.."
       />
     </div>

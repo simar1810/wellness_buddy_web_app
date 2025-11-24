@@ -47,9 +47,9 @@ export default function AddPostModal() {
 
   return (
     <Dialog>
-      <DialogTrigger className="bg-[var(--accent-1)] text-white text-[14px] font-semibold ml-auto px-4 py-2 flex items-center gap-1 rounded-[8px]">
-        <Plus className="w-[16px]" />
-        New post
+      <DialogTrigger className="bg-transparent text-white text-[14px] font-semibold ml-auto px-4 py-2 flex items-center gap-1 rounded-[8px] ring-1 ring-[var(--accent-1)]">
+        <Plus className="w-[16px] text-[var(--accent-1)]" />
+        <p className="text-[var(--accent-1)]">New post</p>
       </DialogTrigger>
       <DialogContent className="!max-w-[500px] max-h-[75vh] p-0 overflow-y-auto">
         <DialogHeader className="px-5 !py-4 border-b-1">

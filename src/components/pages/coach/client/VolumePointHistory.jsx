@@ -47,7 +47,7 @@ export default function VolumePointHistory({ _id }) {
 
   if (error || !data.success) return <ContentError title={error || data?.message} />
 
-  return <div className="mb-8">
+  return <div className="mb-8 w-[87vw] overflow-x-auto no-scrollbar md:w-auto">
     <div className="flex items-center justify-between">
       <h5>Membership History</h5>
       <AddVolumePointsModal _id={_id} />

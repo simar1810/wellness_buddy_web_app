@@ -55,13 +55,13 @@ export default function Page() {
     clients = data.data || []
   }
 
-  return <div className="mt-8 content-container">
+  return <div className="mt-8 content-container w-[90vw] md:w-auto">
     <Header
       selectedCategories={selectedCategories}
       setSelectedCategories={setSelectedCategories}
       categories={client_categories}
     />
-    <div className="mt-8 grid grid-cols-2 gap-4 divide-y-1">
+    <div className="mt-8 grid md:grid-cols-2 gap-4 md:divide-y-1">
       {clients.map((client, index) => <ClientListItemStatus
         key={index}
         categories={categories}
@@ -102,7 +102,7 @@ function Header({
   }
 
   return (
-    <div className="w-full max-w-xs">
+    <div className="w-[80vw] md:w-full md:max-w-xs">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="w-full justify-between bg-transparent">

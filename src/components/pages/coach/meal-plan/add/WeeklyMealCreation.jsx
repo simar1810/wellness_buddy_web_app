@@ -7,11 +7,11 @@ export default function WeeklyMealCreation() {
   const { dispatch, selectedPlan, selectedPlans } = useCurrentStateContext();
   const days = Object.keys(selectedPlans)
   return <>
-    <div className="flex items-center justify-between">
+    <div className="flex items-center mt-2 md:mt-0 justify-between">
       <h3>Days</h3>
       <CopyMealPlanModal to={selectedPlan} />
     </div>
-    <div className="mt-4 flex gap-2 overflow-x-auto no-scrollbar">
+    <div className="mt-4 flex w-[80vw] md:w-auto gap-2 overflow-x-auto no-scrollbar">
       {days.map((day, index) => <Button
         key={index}
         variant={selectedPlan === day ? "wz" : "wz_outline"}

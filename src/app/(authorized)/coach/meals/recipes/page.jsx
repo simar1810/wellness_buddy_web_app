@@ -18,9 +18,9 @@ export default function Page() {
   if (error || !data.success) return <ContentError title={error || data.message} />
   const recipes = data.data.filter(recipe => recipe?.title?.toLowerCase()?.includes(query?.toLowerCase()));
 
-  return <div className="content-container mt-8">
+  return <div className="content-container mt-8 md:mt-0">
     <Header value={query} onChange={value => setQuery(value)} />
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-5">
       {recipes.map(plan => <RecipeDisplayCard
         key={plan._id}
         plan={plan}
@@ -30,10 +30,10 @@ export default function Page() {
 }
 
 function Header({ value, onChange }) {
-  return <div className="mb-4 pb-4 flex items-center gap-4 border-b-1">
+  return <div className="md:mb-4 pb-4 flex items-center justify-between gap-4 md:border-b-1">
     <h4>Recipes</h4>
     <FormControl
-      className="lg:min-w-[280px] [&_.input]:focus:shadow-2xl [&_.input]:bg-[var(--comp-1)] text-[12px] ml-auto"
+      className="hidden md:block lg:min-w-[280px] [&_.input]:focus:shadow-2xl [&_.input]:bg-[var(--comp-1)] text-[12px] ml-auto"
       placeholder="Search Recipe.."
       value={value}
       onChange={(e) => onChange(e.target.value)}

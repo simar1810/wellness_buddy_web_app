@@ -41,7 +41,7 @@ export default function Page() {
 }
 
 function ProgramList({ programs }) {
-  return <div className="grid grid-cols-4 gap-4">
+  return <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
     {programs.map((program, index) => <div
       key={index}
       className="bg-[var(--comp-1)] rounded-[10px] border-1 overflow-clip hover:[&_.actions]:opacity-100"
@@ -97,7 +97,7 @@ function ShufflePrograms({ programs, setIsBeingShuffled }) {
 
   return <DndContext onDragEnd={handleDragEnd}>
     <SortableContext items={programOrder}>
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {programOrder.map((id, index) => {
           const program = programs.find(p => p._id === id);
           return <SortableProgram key={id} program={program} index={index} />;

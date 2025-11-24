@@ -34,9 +34,9 @@ export default function first() {
           alt=""
           height={240}
           width={240}
-          className="object-contain mx-auto mt-24"
+          className="object-contain mx-auto mt-18 md:mt-24"
         />
-        <div className="mt-10 flex items-center justify-center gap-4">
+        <div className="mt-10 flex flex-col md:flex-row items-center justify-center gap-4">
           <ZoomMeetingOptions />
           <LinkGenerator>
             <DialogTrigger className="px-4 py-2 rounded-[8px] flex items-center gap-2 border-1 border-[var(--accent-1)]">
@@ -44,7 +44,7 @@ export default function first() {
                 <span>w</span>
                 <span className="text-[var(--accent-1)]">z</span>
               </span>
-              <span>Without Zoom Meetings</span>
+              <span className="text-base">Without Zoom Meetings</span>
             </DialogTrigger>
           </LinkGenerator>
         </div>
@@ -60,7 +60,7 @@ function ZoomMeetingOptions() {
     <LinkGenerator withZoom={true}>
       <DialogTrigger className="px-4 py-2 flex items-center gap-2 rounded-[8px]">
         <span className="w-[28px] min-h-[28px] bg-[#0B5CFF] text-[var(--primary-1)] text-[8px] text-center font-[500] leading-[28px] aspect-square rounded-full">zoom</span>
-        With Zoom Meeting
+        <span className="text-xs md:text-base">With Zoom Meeting</span> 
       </DialogTrigger>
       {Boolean(zoom_doc_id) && <DropdownMenu>
         <DropdownMenuTrigger asChild>

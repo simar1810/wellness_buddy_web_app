@@ -44,8 +44,9 @@ function Header() {
     toast.success("Link Copied")
   }
 
-  return <div className="pb-4 flex items-center gap-2 border-b-1">
+  return <div className="pb-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-2 border-b-1">
     <h4>Volume Point</h4>
+    <div className="flex items-center justify-start gap-2 md:gap-6">
     <Button
       className="ml-auto"
       size="sm"
@@ -53,8 +54,9 @@ function Header() {
       onClick={copyLink}
     >
       <Forward className="w-[16px]" />
-      Volume Point Form
+      <span className="text-xs md:text-sm">Volume Point Form</span>
     </Button>
-    <RequestedVPModal />
+      <RequestedVPModal />
+      </div>
   </div>
 }

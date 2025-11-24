@@ -10,7 +10,7 @@ import { toast } from "sonner";
 export default function CheckupStage1() {
   const { dispatch, ...state } = useCurrentStateContext();
   return <div className="py-6 pt-4">
-    <div className="flex items-center gap-6 mb-6">
+    <div className="flex flex-col items-start md:flex-row md:items-center gap-6 mb-6">
       <p className="font-semibold text-sm">Select Customer type</p>
       <div className="flex items-center gap-4">
         <RadioGroup
@@ -28,10 +28,10 @@ export default function CheckupStage1() {
           </div>
         </RadioGroup>
       </div>
-      <p className="ml-auto">Client ID - <strong>{state.clientId}</strong></p>
+      <p className="md:ml-auto">Client ID - <strong>{state.clientId}</strong></p>
     </div>
 
-    <div className="grid grid-cols-2 gap-y-10 gap-4 mb-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-10 gap-6 mb-4">
       <FormControl
         label="Client Name"
         type="text"
@@ -52,13 +52,19 @@ export default function CheckupStage1() {
         <div className="flex gap-4">
           <button
             onClick={() => dispatch(changeFieldvalue("gender", "male"))}
-            className={`flex-1 p-3 border rounded-[8px] border-[#D6D6D6] text-sm ${state.gender === "male" && "border-[var(--accent-1)] text-[var(--accent-1)]"}`}
+             className={`flex-1 p-3 border rounded-[8px] border-[#D6D6D6] text-sm ${
+              state.gender === "male" &&
+              "border-[var(--accent-1)] text-[var(--accent-1)]"
+            }`}
           >
             ♂ Male
           </button>
           <button
             onClick={() => dispatch(changeFieldvalue("gender", "female"))}
-            className={`flex-1 p-2 border rounded-[8px] border-[#D6D6D6] text-sm ${state.gender === "female" && "border-[var(--accent-1)] text-[var(--accent-1)]"}`}
+            className={`flex-1 p-3 border rounded-[8px] border-[#D6D6D6] text-sm ${
+              state.gender === "female" &&
+              "border-[var(--accent-1)] text-[var(--accent-1)]"
+            }`}
           >
             ♀ Female
           </button>
@@ -103,7 +109,7 @@ export default function CheckupStage1() {
       </div>
       <div>
         <div className="flex items-center justify-between">
-          <div className="label font-[600] block mb-2">Weight</div>
+          <div className="label font-[600] block mb-1">Weight</div>
           <div className="flex gap-3 text-sm mb-2">
             <label className="flex items-center gap-1">
               <input
@@ -139,14 +145,15 @@ export default function CheckupStage1() {
         value={state.age}
         onChange={e => dispatch(changeFieldvalue("age", e.target.value))}
       />
-      <div className="col-span-2">
-        <span className="label font-[600] block mb-2">
-          Body Composition
-        </span>
-        <div className="flex gap-2">
+      <div className="col-span-1 sm:col-span-2">
+        <span className="label font-[600] block mb-2">Body Composition</span>
+
+        <div className="flex flex-nowrap gap-4 overflow-x-auto pb-2">
           <div
             onClick={() => dispatch(changeFieldvalue("bodyComposition", "Slim"))}
-            className={`border rounded p-3 text-center cursor-pointer w-24 ${state.bodyComposition === "Slim" && "border-[var(--accent-1)]"}`}
+            className={`border rounded p-3 text-center cursor-pointer min-w-[100px] ${
+              state.bodyComposition === "Slim" && "border-[var(--accent-1)]"
+            }`}
           >
             <div className="w-[83px] h-[106px] mx-auto mb-1 flex items-center justify-center overflow-hidden">
               <Image
@@ -160,7 +167,9 @@ export default function CheckupStage1() {
           </div>
           <div
             onClick={() => dispatch(changeFieldvalue("bodyComposition", "Medium"))}
-            className={`border rounded p-3 text-center cursor-pointer w-24 ${state.bodyComposition === "Medium" && "border-[var(--accent-1)]"}`}
+            className={`border rounded p-3 text-center cursor-pointer min-w-[100px] ${
+              state.bodyComposition === "Medium" && "border-[var(--accent-1)]"
+            }`}
           >
             <div className="w-[83px] h-[106px] mx-auto mb-1 flex items-center justify-center overflow-hidden">
               <Image
@@ -176,7 +185,9 @@ export default function CheckupStage1() {
           {/* Fat */}
           <div
             onClick={() => dispatch(changeFieldvalue("bodyComposition", "Fat"))}
-            className={`border rounded p-3 text-center cursor-pointer w-24 ${state.bodyComposition === "Fat" && "border-[var(--accent-1)]"}`}
+            className={`border rounded p-3 text-center cursor-pointer min-w-[100px] ${
+              state.bodyComposition === "Fat" && "border-[var(--accent-1)]"
+            }`}
           >
             <div className="w-[83px] h-[106px] mx-auto mb-1 flex items-center justify-center overflow-hidden">
               <Image
@@ -198,7 +209,7 @@ export default function CheckupStage1() {
         if (!completed.success) toast.error("Please fill the field - " + completed.field)
         else dispatch(setCurrentStage(2))
       }}
-      className="bg-[var(--accent-1)] text-white font-bold w-full items-center text-center px-4 py-3 rounded-[4px] mt-6"
+      className="bg-[var(--accent-1)] text-white font-bold w-full text-center px-4 py-3 rounded-[4px] mt-6"
     >
       Next
     </button>

@@ -89,7 +89,7 @@ export default function ClientStatisticsData({ clientData }) {
     const weightDifference = Math.abs(Number(clientStats?.at(0)?.weight) - Number(clientStats?.at(1)?.weight))
 
     return <TabsContent value="statistics">
-      <div className="pb-4 flex items-center gap-2 border-b-1 overflow-x-auto pt-4">
+      <div className="pb-4 flex items-center gap-2 border-b-1 w-80 md:w-full no-scrollbar overflow-x-auto pt-4">
         {clientStats.map((stat, index) => <div key={index} className="relative">
           <Button
             variant={selectedDate === index ? "wz" : "outline"}
@@ -113,7 +113,7 @@ export default function ClientStatisticsData({ clientData }) {
         selectedDate={selectedDate}
       />
       {!isNaN(weightDifference) && <h5 className="text-[16px] my-4">Weight Difference Between Last Check-up: {weightDifference} KG</h5>}
-      <div className="mt-8 grid grid-cols-3 gap-5">
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
         <HealthMetrics
           onUpdate={onUpdateHealthMatrix}
           data={payload}

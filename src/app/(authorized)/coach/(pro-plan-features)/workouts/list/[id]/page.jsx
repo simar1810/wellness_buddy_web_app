@@ -23,7 +23,7 @@ export default function Page() {
   if (error || data?.status_code !== 200) return <ContentError title={error || data?.message} />
   const workoutDetails = data.data[0];
   return <div className="content-container">
-    <div className="p-4 grid grid-cols-2 divide-x-1">
+    <div className="p-4 grid grid-cols-1 md:grid-cols-2 md:divide-x-1">
       <WorkoutDetails workoutDetails={workoutDetails} />
       {workoutDetails.workouts.length > 0 && <WorkoutVideos workouts={workoutDetails.workouts} />}
     </div>
@@ -32,14 +32,18 @@ export default function Page() {
 
 function WorkoutDetails({ workoutDetails }) {
   const [open, setOpen] = useState(false);
-
+  const [expanded, setExpanded] = useState(false);
+  const MAX_LENGTH = 350;
   if (!Boolean(workoutDetails)) return <ContentError title="No Workout Details Found" />
-  return <div className="pr-10">
-    <div className="flex justify-between">
+  const instructions = workoutDetails.instructions || "";
+  const isLong = instructions.length > MAX_LENGTH;
+  const visibleText = expanded ? instructions : instructions.slice(0, MAX_LENGTH);
+  return <div className="md:pr-10 mb-5">
+    <div className="flex flex-col md:flex-row gap-2 md:gap-0 mb-2 md:mb-0 justify-between">
       <h4>{workoutDetails.title}</h4>
       <CreateWorkoutModal setModal={() => setOpen()} defaultOpen={open} data={workoutDetails}>
         <DialogTrigger
-          className="bg-[var(--accent-1)] text-white text-[14px] font-bold pl-4 pr-4 py-1 flex items-center gap-1 rounded-[8px]"
+          className="bg-[var(--accent-1)] text-white w-18 md:w-auto text-[14px] font-bold pl-4 pr-4 py-1 flex items-center gap-1 rounded-[8px]"
         >
           <Pencil className="w-[16px]" />
           Edit
@@ -55,7 +59,18 @@ function WorkoutDetails({ workoutDetails }) {
       className="w-full max-h-[300px] mt-4 object-cover border-1 rounded-[10px]"
     />
     <h4 className="!text-[28px] mt-6 mb-2">Instructions</h4>
-    <p className="text-[12px] leading-[1.4]">{workoutDetails.instructions}</p>
+      <p className="text-[12px] leading-[1.4]">
+        {visibleText}
+        {!expanded && isLong && "... "}
+        {isLong && (
+          <button
+            className="text-zinc-500 ml-1 underline"
+            onClick={() => setExpanded(!expanded)}
+          >
+            {expanded ? "Show Less" : "Read More"}
+          </button>
+        )}
+      </p>
     {/* <h4 className="!text-[28px] mt-6 mb-2">Related Videos</h4>
     <div className="w-full flex gap-4 overflow-x-auto">
       {workoutDetails.workouts.map(workout => <div className="min-w-[200px] border-1 rounded-[8px] overflow-clip" key={workout._id}>
@@ -82,7 +97,7 @@ function WorkoutVideos({ workouts }) {
     .filter(workout => Boolean(workout.video_link));
   const workoutVideo = filteredWorkouts[selected]
   if (filteredWorkouts.length <= 0) return <></>
-  return <div className="ml-10">
+  return <div className="md:ml-10">
     <h3 className="mb-4">{workoutVideo.title}</h3>
     <VideoPlayer
       src={workoutVideo.video_link}
@@ -96,13 +111,13 @@ function WorkoutVideos({ workouts }) {
     <div className="max-h-[60 0px] mt-10 overflow-y-auto">
       {filteredWorkouts
         .filter(workout => Boolean(workout.video_link))
-        .map((workout, index) => <div className="mb-4 flex items-start cursor-pointer" onClick={() => setSelected(index)} key={workout._id}>
+        .map((workout, index) => <div className="mb-4 flex flex-col md:flex-row items-start cursor-pointer" onClick={() => setSelected(index)} key={workout._id}>
           <Image
             src={workout.thumbnail.replaceAll(" ", "")}
             alt=""
             height={540}
             width={540}
-            className="w-[180px] h-[120px] border-1 object-cover"
+            className="w-full h-[200px] md:w-[180px] md:h-[120px] border-1 object-cover"
           />
           <div className="p-2">
             <h3 className="mb-1 leading-[1]">{workout.title}</h3>
@@ -152,15 +167,15 @@ export function VideoPlayer({
       <div className="mt-4 flex gap-4">
         {prev && <Button onClick={prev} variant="wz" className="grow">
           <SkipBack />
-          Previous
+         <span className="hidden md:block">Previous</span>
         </Button>}
         {togglePause && <Button onClick={togglePause} variant="wz" className="grow">
           <Pause />
-          Pause / Play
+          <span className="hidden md:block">Pause / Play</span>
         </Button>}
         {next && <Button onClick={() => next(true)} variant="wz" className="grow">
           <SkipForward />
-          Next
+          <span className="hidden md:block">Next</span>
         </Button>}
       </div>
     </div>

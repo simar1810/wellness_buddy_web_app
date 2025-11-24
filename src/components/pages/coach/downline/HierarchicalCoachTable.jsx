@@ -78,9 +78,10 @@ export default function HierarchicalCoachTable({ coaches = [], onMakeTop }) {
   return (
     <div className="space-y-4">
       {/* Legend Controls */}
-      <div className="flex items-center gap-3 p-3 bg-white border rounded-md shadow-sm">
+      <div className="flex flex-col items-start md:items-center gap-1 md:gap-3 p-3 bg-white border rounded-md shadow-sm">
         <span className="font-semibold text-sm text-gray-700">Legend</span>
-        <div className="flex items-center gap-2 ml-2">
+        <div className="flex flex-wrap items-center justify-start gap-1 md:gap-3">
+        <div className="flex items-center gap-2 md:ml-2">
           {/* <Checkbox className="w-3 h-3" /> */}
           <span className="text-xs text-gray-600">= Make Top</span>
         </div>
@@ -101,7 +102,8 @@ export default function HierarchicalCoachTable({ coaches = [], onMakeTop }) {
         >
           <ChevronUp className="w-3 h-3" />
           Show 1st Level Only
-        </Button>
+          </Button>
+          </div>
       </div>
 
       {/* Hierarchical Table */}

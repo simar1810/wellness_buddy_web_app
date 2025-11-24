@@ -18,7 +18,7 @@ export default function AttendanceRecord({ _id }) {
     <ContentError className="!min-h-[200px] mt-4 mb-8" title="This client has 0 attendance" />
   </div>
 
-  return <div className="mb-8">
+  return <div className="mb-8 w-[87vw] overflow-x-auto no-scrollbar md:w-auto">
     <h5>Attendance Record</h5>
     <Table className="bordered-table mt-4 [&_th]:font-bold">
       <TableHeader>

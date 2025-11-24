@@ -21,7 +21,7 @@ export default function ManualAttendance({
   const clients = manualAttendanceWithRange(data, range)
     .filter(client => new RegExp(query, "i").test(client?.name))
 
-  return (<TabsContent value="manual-attendance" className="flex gap-6">
+  return (<TabsContent value="manual-attendance" className="flex flex-wrap gap-6">
     <AttendanceClients clients={clients} />
     <div className="flex-1">
       <AttendanceCalendar
@@ -43,7 +43,7 @@ export function AttendanceClients({ clients }) {
       </div>
       <div className="space-y-3">
         {clients.map((client, i) => (
-          <div key={i} className="flex justify-between items-center border-b pb-2">
+          <div key={i} className="flex justify-between gap-4 md:gap-0 items-center border-b pb-2">
             <div className="flex items-center gap-3">
               <Avatar>
                 <AvatarImage src={client.profilePhoto} />
@@ -52,7 +52,7 @@ export function AttendanceClients({ clients }) {
               <Link href={`/coach/clients/${client.clientId}?tab=physical-club`}>{client.name}</Link>
               <span className="text-[12px] mt-1">{format(client.date, "dd-MM-yyyy")}</span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
               <ChangeClientAttendanceStatus
                 clientId={client.clientId}
                 date={client.date}

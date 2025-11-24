@@ -98,7 +98,7 @@ function CoachAwards({ awards }) {
       <h4>{awards.length} Awards Available</h4>
       <UpdateCoachAwardModal />
     </div>
-    <div className="mt-4 grid grid-cols-2 gap-y-2 gap-x-4">
+    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4">
       {awards.map(award => <div key={award._id} className="flex items-center gap-4 relative">
         <Image
           src={award.image || "/illustrations/award.png"}

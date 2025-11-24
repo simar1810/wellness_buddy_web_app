@@ -29,7 +29,7 @@ export default function Page() {
   if (error || data.status_code !== 200) return <ContentError title={error || data.message} />
   const marathons = data.data;
 
-  return <div className="grid grid-cols-2 items-start gap-8">
+  return <div className="grid md:grid-cols-2 items-start md:gap-8">
     {!Boolean(selectedMarathonId) && <ListMarathons
       setSelectedMarathonId={setSelectedMarathonId}
       marathons={marathons}

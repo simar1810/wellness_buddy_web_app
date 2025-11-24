@@ -38,7 +38,7 @@ export default function ActivityTool({ activities }) {
     return () => clearInterval(interval);
   }, [api])
 
-  return <Card className="grow relative !bg-transparent py-0 border-0 shadow-none mb-8">
+  return <Card className="grow relative !bg-transparent py-0 border-0 shadow-none mb-4 md:mb-8">
     <CardHeader className="w-full absolute top-0 px-0 flex translate-y-[-105%] items-center justify-between">
       {/* <CardTitle>Programs</CardTitle> */}
       {/* <Button variant="wz">+ Add</Button> */}
