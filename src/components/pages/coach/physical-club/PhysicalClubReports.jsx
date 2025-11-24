@@ -17,7 +17,7 @@ export default function PhysicalClubReports({
 
   return (
     <TabsContent value="reports" className="border-1 shadow-none rounded-[10px]">
-      <div className="bg-[var(--comp-1)] p-4 grid grid-cols-2 gap-8">
+      <div className="bg-[var(--comp-1)] p-4 grid grid-cols-1 md:grid-cols-2 gap-8">
         <MonthlyCalender allData={data} />
         <YearlyCalender allData={data} />
       </div>

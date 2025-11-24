@@ -28,7 +28,7 @@ export default function Page() {
         Add
       </Link>}
     </div>
-    <div className="mt-6 grid grid-cols-4 gap-4">
+    <div className="mt-6 grid md:grid-cols-4 gap-4">
       {filteredMealPlansmeals.map(meal => <div
         key={meal._id}
         className="bg-[var(--comp-2)] flex flex-col rounded-[12px] border-1 overflow-clip relative"

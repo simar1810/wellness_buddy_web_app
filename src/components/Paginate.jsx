@@ -58,7 +58,7 @@ export default function Paginate({
   }
 
   return (
-    <div className="flex items-end justify-between gap-2 p-4 border rounded-xl">
+    <div className="flex flex-col md:flex-row items-end justify-between gap-2 p-4 border rounded-xl">
       <Pagination>
         <PaginationContent className="mr-auto">
           <PaginationItem>

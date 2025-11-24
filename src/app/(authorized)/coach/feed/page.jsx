@@ -25,14 +25,14 @@ export default function Page() {
 function Header() {
   const { dispatch, type } = useCurrentStateContext();
 
-  return <div className="flex items-center gap-4">
+  return <div className="flex items-center gap-4 pb-4 border-b">
     <Button
       className={`text-[12px] font-bold hover:bg-[var(--accent-1)] hover:text-white rounded-[16px] 
         ${type === "our" ? "bg-[var(--accent-1)] text-white" : "bg-[var(--dark-1)]/10 text-[var(--dark-2)]"}`}
       onClick={() => dispatch(changeFeedType("our"))}
     >
       <Users />
-      My Community
+      <p className="hidden md:block">My Community</p>
     </Button>
     <Button
       className={`text-[12px] font-bold hover:bg-[var(--accent-1)] hover:text-white rounded-[16px] 
@@ -40,7 +40,7 @@ function Header() {
       onClick={() => dispatch(changeFeedType("global"))}
     >
       <Globe />
-      Global Community
+       <p className="hidden md:block">Global Community</p>
     </Button>
     <Button
       className={`text-[12px] font-bold hover:bg-[var(--accent-1)] hover:text-white rounded-[16px] 
@@ -48,7 +48,7 @@ function Header() {
       onClick={() => dispatch(changeFeedType("mine"))}
     >
       <CircleUserRound />
-      My Posts
+      <p className="hidden md:block">My Posts</p>
     </Button>
     <AddPostModal />
   </div>

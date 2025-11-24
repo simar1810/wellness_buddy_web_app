@@ -52,7 +52,7 @@ export default function EditSelectedMealDetails({
           width={100}
           className="rounded-lg max-h-[100px] bg-[var(--comp-1)] object-contain border-1"
         />
-        <div className="text-left">
+        <div className="text-left text-sm md:text-base">
           <h3>{recipe.dish_name || recipe.title}</h3>
           <p>{recipe.meal_time}</p>
           <div className="mt-2 flex flex-wrap gap-1 overflow-x-auto no-scrollbar">
@@ -161,20 +161,20 @@ export default function EditSelectedMealDetails({
 }
 
 function MealCalories({ recipe }) {
-  return <>
+  return <div className="flex flex-row flex-wrap gap-1">
     <Badge className="bg-[#EFEFEF] text-black"><span className="text-black/40">Serving Size -</span>{recipe?.serving_size}</Badge>
     <Badge className="bg-[#EFEFEF] text-black"><span className="text-black/40">Kcal -</span>{recipe?.calories}</Badge>
     <Badge className="bg-[#EFEFEF] text-black"><span className="text-black/40">Protien -</span> {recipe.protein}</Badge>
     <Badge className="bg-[#EFEFEF] text-black"><span className="text-black/40">Carbs -</span> {recipe.carbohydrates}</Badge>
     <Badge className="bg-[#EFEFEF] text-black"><span className="text-black/40">Fats -</span> {recipe.fats}</Badge>
-  </>
+  </div>
 }
 
 function RecipeCalories({ recipe }) {
-  return <>
+  return <div className="flex flex-row flex-wrap gap-1">
     <Badge className="bg-[#EFEFEF] text-black"><span className="text-black/40">Protien -</span> {recipe?.calories?.proteins}</Badge>
     <Badge className="bg-[#EFEFEF] text-black"><span className="text-black/40">Carbs -</span> {recipe?.calories?.carbs}</Badge>
     <Badge className="bg-[#EFEFEF] text-black"><span className="text-black/40">Fats -</span> {recipe?.calories?.fats}</Badge>
     <Badge className="bg-[#EFEFEF] text-black"><span className="text-black/40">Kcal -</span>{recipe?.calories?.total}</Badge>
-  </>
+  </div>
 }

@@ -20,7 +20,7 @@ export default function Page() {
   if (isLoading) return <ContentLoader />
 
   if (!allData.status || error) return <div className="content-container">
-    {allData.message === "No meetings found for the given coach." && <div className="mb-8 flex items-center justify-between gap-4">
+    {allData.message === "No meetings found for the given coach." && <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <h4>Meeting Details</h4>
       <ClubSystemOptions />
     </div>}
@@ -32,7 +32,7 @@ export default function Page() {
   const data = allData.data;
 
   return <div className="content-container">
-    <div className="mb-8 flex items-center justify-between gap-4">
+    <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <h4>Meeting Details</h4>
       <ClubSystemOptions />
     </div>

@@ -69,11 +69,11 @@ export default function Page() {
 
 function RetailStatisticsCards({ totalSales, totalOrders }) {
   const [hide, setHide] = useState(true);
-  return <div className="grid grid-cols-3 gap-4">
+  return <div className="grid grid-cols-3 gap-1 md:gap-4">
     <Card className="bg-linear-to-tr from-[var(--accent-1)] to-[#04BE51] p-4 rounded-[10px]">
       <CardHeader className="text-white p-0 mb-0">
         <CardTitle className="">
-          <span className="w-full">Total Sales</span>
+          <span className="w-full text-base md:text-lg mr-2">Total Sales</span>
           {hide
             ? <EyeClosed
               className="w-[16px] h-[16px] cursor-pointer inline-block ml-auto"
@@ -86,15 +86,15 @@ function RetailStatisticsCards({ totalSales, totalOrders }) {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <h4 className={cn("text-white !text-[28px]", hide && "text-transparent")}>₹ {totalSales}</h4>
+        <h4 className={cn("text-white text-sm md:!text-[28px]", hide && "text-transparent")}>₹ {totalSales}</h4>
       </CardContent>
     </Card>
     <Card className="p-4 rounded-[10px] shadow-none">
       <CardHeader className="p-0 mb-0">
-        <CardTitle>Total Orders</CardTitle>
+        <CardTitle className={"text-base md:text-lg mr-2"}>Total Orders</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <h4 className="!text-[28px]">₹ {totalOrders}</h4>
+        <h4 className="text-base md:!text-[28px]">{totalOrders}</h4>
       </CardContent>
     </Card>
   </div>
@@ -104,16 +104,16 @@ function RetailContainer({ orders, retails }) {
   return <Tabs defaultValue="brands">
     <TabsList className="w-full bg-transparent p-0 mb-4 flex justify-start gap-4 border-b-2 rounded-none">
       <TabsTrigger
-        className="pb-4 px-4 font-semibold rounded-none data-[state=active]:bg-transparent data-[state=active]:text-[var(--accent-1)] data-[state=active]:shadow-none data-[state=active]:!border-b-2 data-[state=active]:border-b-[var(--accent-1)]"
+        className="pb-4 md:pb-2 px-2 font-semibold rounded-none data-[state=active]:bg-transparent data-[state=active]:text-[var(--accent-1)] data-[state=active]:shadow-none data-[state=active]:!border-b-2 data-[state=active]:border-b-[var(--accent-1)]"
         value="brands"
       >
-        New Order
+        <p className="text-sm md:text-lg">New Order</p>
       </TabsTrigger>
       <TabsTrigger
-        className="pb-4 px-4 font-semibold rounded-none data-[state=active]:bg-transparent data-[state=active]:text-[var(--accent-1)] data-[state=active]:shadow-none data-[state=active]:!border-b-2 data-[state=active]:border-b-[var(--accent-1)]"
+        className="pb-4 md:pb-2 px-2 font-semibold rounded-none data-[state=active]:bg-transparent data-[state=active]:text-[var(--accent-1)] data-[state=active]:shadow-none data-[state=active]:!border-b-2 data-[state=active]:border-b-[var(--accent-1)]"
         value="order-history"
       >
-        Order History
+        <p className="text-sm md:text-lg">Order History</p>
       </TabsTrigger>
     </TabsList>
     <Brands brands={retails.brands} />
@@ -130,7 +130,7 @@ function Brands({ brands }) {
         Add New Kit
       </Button> */}
     </div>
-    <div className="mt-4 grid grid-cols-6">
+    <div className="mt-4 grid grid-cols-1 md:grid-cols-6">
       {brands.map(brand => <Brand key={brand._id} brand={brand} />)}
     </div>
   </TabsContent>
@@ -179,7 +179,7 @@ function Orders({ orders }) {
 
   return <TabsContent value="order-history">
     <ExportOrdersoExcel orders={orders} />
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {myOrders.map(order => <Order key={order._id} order={order} />)}
     </div>
   </TabsContent>
@@ -286,7 +286,7 @@ function ExportOrdersoExcel({ orders }) {
     <DialogContent className="p-0">
       <DialogTitle className="p-4 border-b-1">Export Orders Via Excel</DialogTitle>
       <div className="p-4 gap-0">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormControl
             type="date"
             label="Start Date"

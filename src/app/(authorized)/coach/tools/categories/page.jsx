@@ -110,7 +110,7 @@ export default function CategoriesPage() {
                   <div className="p-2 bg-primary/5 rounded-lg">
                     <FolderOpen className="h-5 w-5 text-primary/70" />
                   </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                     <Button
                       variant="ghost"
                       size="sm"

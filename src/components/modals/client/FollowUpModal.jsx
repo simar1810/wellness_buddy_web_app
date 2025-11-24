@@ -86,7 +86,7 @@ function Stage1({ clientData }) {
       onChange={e => dispatch(changeFieldvalue("date", e.target.value))}
     />
     {latestOldWeight && <h3 className="mt-4">Latest Old Weight {latestOldWeight}</h3>}
-    <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-4">
+    <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
       <div>
         <div className="pr-2 flex items-center gap-2 justify-between">
           <p>Current Weight</p>
@@ -248,7 +248,7 @@ function SelectBodyComposition() {
   return (
     <div className="mt-4 col-span-2">
       <span className="label font-[600] block mb-2">Body Composition</span>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
         <div
           onClick={() => dispatch(changeFieldvalue("body_composition", "Slim"))}
           className={`border rounded p-3 text-center cursor-pointer w-24 ${healthMatrix.body_composition === "Slim" &&

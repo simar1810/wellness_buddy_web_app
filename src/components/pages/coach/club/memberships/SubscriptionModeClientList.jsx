@@ -19,7 +19,7 @@ export default function SubscriptionModeClientList() {
 
   return <div className="content-container">
     <Header />
-    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-x-4 divide-y-1">
+    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-x-4 md:divide-y-1">
       {subscriptions.map(subscription => <ClientListSubscription
         subscription={subscription}
         key={subscription._id}
@@ -33,12 +33,14 @@ function Header() {
     copyText(process.env.NEXT_PUBLIC_CLIENT_ENDPOINT + "/request-subscription")
     toast.success("Link Copied")
   }
-  return <div className="pb-4 flex items-center gap-2 border-b-1">
+  return <div className="pb-4 flex flex-wrap items-center gap-2 border-b-1">
     <h4>Subscription</h4>
+     <div className="flex gap-2">
     <Button onClick={copyLink} className="ml-auto" size="sm" variant="wz_outline">
       <Forward className="w-[16px]" />
-      Membership Form
+      <p className="text-[10px] md:text-[14px]">Membership Form</p>
     </Button>
-    <RequestedSubscriptionModal />
+      <RequestedSubscriptionModal />
+      </div>
   </div>
 }

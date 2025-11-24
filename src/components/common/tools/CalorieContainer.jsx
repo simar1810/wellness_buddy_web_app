@@ -34,7 +34,7 @@ export default function CalorieContainer() {
     />
     {query.length === 0 && !dishesData
       ? <ContentError title="Please search for a recipe" />
-      : <div className="mt-4 grid grid-cols-3 items-start gap-4">
+      : <div className="mt-4 grid grid-cols-1 md:grid-cols-3 items-start gap-4">
         <RecipesSearchResults fetchDishedData={fetchDishedData} />
         <CalorieResult />
       </div>
@@ -71,7 +71,7 @@ function RecipesSearchResults({ fetchDishedData }) {
   if (data?.status_code !== 200) return <ContentError className="mt-0" title={data?.message} />
   const dishes = data?.data;
   if (dishes.length === 0) return <ContentError className="mt-0" title={"No recipes found for this query!"} />
-  return <div className="sticky top-20">
+  return <div className="md:sticky top-20">
     <div className="bg-white p-4 rounded-[8px] border-1 h-[60vh] overflow-y-auto">
       {dishes.map((item, index) => <div
         key={index}

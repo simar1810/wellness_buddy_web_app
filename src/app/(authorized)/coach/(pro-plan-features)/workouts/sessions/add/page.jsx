@@ -136,7 +136,7 @@ export default function SessionsPage() {
             />
           </div>
 
-          <div className="gap-4 grid grid-cols-2">
+          <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="workoutType">Workout Type</Label>
               <Select

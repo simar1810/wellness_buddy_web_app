@@ -24,7 +24,7 @@ export default function SelectMeals() {
     : mealTypes?.length === 0 && "Please select a Type!"
 
   return <div>
-    <div className="pt-4 flex gap-4 overflow-x-auto pb-4">
+    <div className="pt-4 flex w-[80vw] md:w-auto gap-4 overflow-x-auto pb-4">
       {(!mealTypes || mealTypes?.length === 0) && <div className="bg-[var(--comp-1)] border-1 p-2 rounded-[6px] grow text-center mr-auto"
       >
         {errorMessage}

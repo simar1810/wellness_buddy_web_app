@@ -32,7 +32,7 @@ export default function RecipeModal({ type, recipe }) {
   return (
     <Dialog>
       {type === "new"
-        ? <DialogTrigger className="bg-[var(--accent-1)] text-[var(--primary-1)] text-[14px] font-[600] px-4 py-2 rounded-[8px]">
+        ? <DialogTrigger className="bg-[var(--accent-1)] text-[var(--primary-1)] text-xs md:text-[14px] font-[600] px-4 py-2 rounded-[8px]">
           Add New Recipe
         </DialogTrigger>
         : <DialogTrigger className="text-[12px] font-[ 400] px-2">

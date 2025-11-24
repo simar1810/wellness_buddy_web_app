@@ -54,7 +54,7 @@ export default function UserLoginForm() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4">
+    <div className="max-w-md md:mx-auto md:p-4">
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="flex items-center justify-center gap-2">

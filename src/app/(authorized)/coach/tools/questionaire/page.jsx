@@ -25,8 +25,8 @@ export default function Page() {
   const sections = data.data.sections || []
 
   return <div className="content-container content-height-screen">
-    <div className="flex items-center justify-between">
-      <h4>Onboarding Questions</h4>
+    <div className="flex items-center justify-between gap-5 md:gap-0">
+      <h4 className="text-xs md:text-base">Onboarding Questions</h4>
       <Link
         className="px-4 py-2 font-bold bg-[var(--accent-1)] text-white rounded-[8px]"
         href="/coach/tools/questionaire/edit"
@@ -40,7 +40,7 @@ export default function Page() {
 }
 
 export function OnboardingQuestionContainer({ sections }) {
-  return <div className="mt-10 grid grid-cols-2 gap-4">
+  return <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
     {sections.map(section => <Collapsible key={section._id}>
       <CollapsibleTrigger className="w-full text-left font-bold bg-[var(--comp-1)] px-4 py-2 border-1">
         {section.name}

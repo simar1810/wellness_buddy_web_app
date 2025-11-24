@@ -19,7 +19,7 @@ export default function ClientListVolumePoint({
       </AvatarFallback>
     </Avatar>
     <div className="grow">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col items-start md:flex-row md:items-center gap-2">
         <p className="text-[14px] font-semibold">{client.name}</p>
         {daysRemaining > 5
           ? <div className="text-[10px] font-semibold text-[var(--accent-1)]">

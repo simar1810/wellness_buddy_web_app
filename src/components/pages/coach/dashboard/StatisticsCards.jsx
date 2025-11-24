@@ -26,7 +26,7 @@ export default function StatisticsCards() {
     : dashboardCards.app
   return <>
     <h4 className="mb-4">Overview</h4>
-    <div className="grid grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
       {organisation !== "Herbalife" && <DashboardInfoCard
         trendUp={Math.random() > 0.5}
         quantity={statistics.clients - statistics.members}

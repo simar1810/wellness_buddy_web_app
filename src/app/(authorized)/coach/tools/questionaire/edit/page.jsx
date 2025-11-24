@@ -106,7 +106,7 @@ function SectionList() {
   const { sections } = useCurrentStateContext();
 
   return (
-    <div className="mt-10 grid grid-cols-2 gap-4">
+    <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
       {Object.keys(sections).map((section) => (
         <SectionDetails key={section} sectionKey={section} />
       ))}

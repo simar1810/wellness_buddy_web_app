@@ -336,29 +336,31 @@ export function ClientSearchBar({ setModal }) {
   return (
     <div
       ref={containerRef}
-      className="min-w-80 pr-4 mx-auto absolute top-4 left-1/2 translate-x-[-50%]"
+      className="relative w-full md:min-w-80 md:max-w-[250px] px-4 md:mt-0 z-[50]"
     >
-      <Search className="w-[18px] h-[18px] bg-[var(--primary-1)] text-[#808080] absolute left-2 top-1/2 translate-y-[-60%]" />
+      <div className="relative flex items-center">
+      <Search className="w-[16px] h-[16px] text-[#808080] absolute left-3 top-1/2 -translate-y-1/2" />
       <Input
         placeholder="Search Client..."
         onFocus={() => setOpen(true)}
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="bg-[var(--primary-1)] w-full md:max-w-[650px] pl-8 border-1 !focus:outline-none"
-      />
-      {open && (
-        <div className="w-[calc(100%-16px)] bg-[var(--primary-1)] absolute top-12 left-0 px-2 py-2 rounded-[8px] z-[100] border-1">
-          <SearchedResults
-            query={searchQuery}
-            setQuery={setSearchQuery}
-            setModal={setModal}
-            loading={loading}
-            data={data}
-          />
+         className="bg-[var(--primary-1)] w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm text-[var(--dark-1)] focus:ring-1 focus:ring-[var(--accent-1)] focus:outline-none"
+        />
         </div>
-      )}
-    </div>
-  );
+    {open && (
+      <div className="absolute top-12 left-0 w-full bg-[var(--primary-1)] rounded-md shadow-lg z-[100] border border-gray-300">
+        <SearchedResults
+          query={searchQuery}
+          setQuery={setSearchQuery}
+          setModal={setModal}
+          loading={loading}
+          data={data}
+        />
+      </div>
+    )}
+  </div>
+);
 }
 
 function SearchedResults({ setModal, loading, data, query, setQuery }) {

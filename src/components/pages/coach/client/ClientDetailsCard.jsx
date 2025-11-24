@@ -74,7 +74,7 @@ function ClientDetails({ clientData }) {
     ? false
     : (generateWeightStandard(clienthealthMatrix?.at(0)) - generateWeightStandard(clienthealthMatrix?.at(healthMatricesLength - 1)))
       .toFixed(2)
-  return <Card className="bg-white rounded-[18px] shadow-none">
+  return <Card className="bg-white rounded-[18px] shadow-none w-[90vw] md:w-auto">
     <Header clientData={clientData} />
     <CardContent>
       <div className="flex items-center justify-between">
@@ -96,7 +96,7 @@ function ClientDetails({ clientData }) {
       <p className="text-[14px] text-[var(--dark-2)] leading-[1.3] mt-2">{clientData.notes}</p>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <FollowUpModal clientData={clientData} />
-        <Button onClick={sendAnalysis} variant="wz" className="w-full mx-auto block">Analysis Reminder</Button>
+        <Button onClick={sendAnalysis} variant="wz" className="w-full mx-auto block text-xs">Analysis Reminder</Button>
       </div>
       {Boolean(activities) && <ClientActivities activities={activities} />}
       <div className="mt-4 flex items-center justify-between">
@@ -171,13 +171,13 @@ function Header({ clientData }) {
   }
 
   return <CardHeader className="relative flex items-center gap-4 md:gap-8">
-    <Avatar className="w-[100px] h-[100px]">
+    <Avatar className="w-[80px] h-[80px] md:w-[100px] md:h-[100px]">
       <AvatarImage src={clientData.profilePhoto} />
       <AvatarFallback>{nameInitials(clientData.name)}</AvatarFallback>
     </Avatar>
     <div>
       <h3 className="mb-2">{clientData.name}</h3>
-      <div className="mb-2 flex items-center gap-2">
+      <div className="mb-2 flex flex-wrap items-center gap-2">
         <p className="text-[14px] text-[var(--dark-2)] font-semibold leading-[1]">ID #{clientData.clientId}</p>
         <div className="w-1 h-full bg-[var(--dark-1)]/50"></div>
         {clientData.rollno && permit("club", roles) && <EditClientRollnoModal
@@ -254,7 +254,7 @@ function ClientStatus({
   }
   return <Menubar className="p-0 border-0 shadow-none">
     <MenubarMenu className="p-0">
-      <MenubarTrigger className={`${status ? "bg-[var(--accent-1)] hover:bg-[var(--accent-1)]" : "bg-[var(--accent-2)] hover:bg-[var(--accent-2)]"} text-white font-bold py-[2px] px-2  text-[12px] gap-1`}>
+      <MenubarTrigger className={`${status ? "bg-[var(--accent-1)] hover:bg-[var(--accent-1)]" : "bg-[var(--accent-2)] hover:bg-[var(--accent-2)]"} text-white font-bold py-[4px] md:py-[2px] px-2 text-[10px] md:text-[12px] gap-1`}>
         {status ? <>Active</> : <>In Active</>}
         <ChevronDown className="w-[18px]" />
       </MenubarTrigger>
@@ -303,7 +303,7 @@ function ClientClubStatus({
 
   return <Menubar className="p-0 border-0 shadow-none">
     <MenubarMenu className="p-0">
-      <MenubarTrigger className={`${status ? "bg-[var(--accent-1)] hover:bg-[var(--accent-1)]" : "bg-[var(--accent-2)] hover:bg-[var(--accent-2)]"} text-white font-bold py-[2px] px-2  text-[12px] gap-1`}>
+      <MenubarTrigger className={`${status ? "bg-[var(--accent-1)] hover:bg-[var(--accent-1)]" : "bg-[var(--accent-2)] hover:bg-[var(--accent-2)]"} text-white font-bold py-[4px] md:py-[2px] px-2 text-[10px]  md:text-[12px] gap-1`}>
         {status ? <>Membership On</> : <>Membership Off</>}
         <ChevronDown className="w-[18px]" />
       </MenubarTrigger>
@@ -335,7 +335,7 @@ function ClientCategoriesList({ clientData }) {
       <h4>Categories</h4>
       <ClientUpdateCategories clientData={clientData} />
     </div>
-    <div className="mt-2 flex items-center gap-1">
+    <div className="mt-2 flex flex-wrap items-center gap-1">
       {selectedCategories.map((category, index) => <Badge
         key={category._id}
         style={{

@@ -52,7 +52,7 @@ export default function ClientReports() {
         <UploadReport clientId={id} />
       </div>
       {report.reports.length === 0 && <div>No reports found</div>}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {report?.reports?.map((item, index) =>
           <div key={index} className="min-h-[400px]">
             {item.file_type === "image"
@@ -137,7 +137,7 @@ export default function ClientReports() {
 function PreviewDialog({ previewReport, setPreviewReport }) {
   return (
     <Dialog open={!!previewReport} onOpenChange={() => setPreviewReport(null)}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto">
+      <DialogContent className="max-w-[90vw] md:max-w-4xl max-h-[80vh] overflow-auto">
         <DialogTitle>{previewReport?.title}</DialogTitle>
 
         {previewReport?.file_type === "image" ? (

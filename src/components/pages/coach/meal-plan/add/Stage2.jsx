@@ -175,9 +175,9 @@ export default function Stage2() {
 	return (
 		<div>
 			<div className="flex flex-col gap-y-4">
-				<div className="grid grid-cols-2 divide-x-2">
+				<div className="grid md:grid-cols-2 md:divide-x-2">
 					<CustomMealMetaData />
-					<div className="pl-8">
+					<div className="md:pl-8">
 						{component}
 						<SelectMeals
 							key={`${state.selectedPlan}${state.selectedMealType}`}

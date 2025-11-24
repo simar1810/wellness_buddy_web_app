@@ -168,7 +168,7 @@ export function CustomCalendar({
 
   return (
     <div onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
-      <Card className={cn("p-6 shadow-none max-w-4xl w-full mx-auto gap-0", className)}>
+      <Card className={cn("py-6 px-4 md:p-6 shadow-none max-w-4xl w-full mx-auto gap-0", className)}>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
             {MONTHS[month]}, {year}
@@ -184,17 +184,17 @@ export function CustomCalendar({
         </div>
 
         <div>
-          <div className="grid grid-cols-7 mb-0 gap-1">
+          <div className="grid grid-cols-7 mb-0 gap-2 md:gap-1">
             {DAYS_OF_WEEK.map((day, index) => (
-              <div key={day} className="p-2 text-center">
-                <span className={cn("text-xs font-bold", index === 0 || index === 6 ? "text-gray-900" : "text-gray-400")}>
+              <div key={day} className="md:p-2 text-center">
+                <span className={cn("text-[7px] md:text-xs font-bold", index === 0 || index === 6 ? "text-gray-900" : "text-gray-400")}>
                   {day}
                 </span>
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-1">{renderCalendarDays()}</div>
+          <div className="grid grid-cols-7 gap-2 md:gap-1">{renderCalendarDays()}</div>
         </div>
 
         {selectedRange.from && selectedRange.to && (

@@ -22,7 +22,7 @@ export default function RequestedSubscriptionModal({ _id }) {
   const requestedSubscriptions = data.data;
 
   return <Dialog>
-    <DialogTrigger className="h-8 px-4 py-2 text-[14px] has-[>svg]:px-3 bg-[var(--accent-1)] text-white hover:bg-[var(--accent-1)] font-semibold rounded-[8px]">
+     <DialogTrigger className="h-8 px-4 py-2 text-[10px] md:text-[14px] has-[>svg]:px-3 bg-[var(--accent-1)] text-white hover:bg-[var(--accent-1)] font-semibold rounded-[8px]">
       Requested Subscriptions
     </DialogTrigger>
     <DialogContent className="!max-w-[450px] max-h-[65vh] text-center border-0 px-0 overflow-auto gap-0">

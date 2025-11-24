@@ -197,7 +197,7 @@ export function MetricProgress({
     return "#01a809";
   }
   return (
-    <Card className={cn("max-w-xs shadow-none relative", className)}>
+    <Card className={cn("w-full md:max-w-xs shadow-none relative", className)}>
       <CardHeader className="pb-2">
         <div className="flex items-center gap-4">
           <Image

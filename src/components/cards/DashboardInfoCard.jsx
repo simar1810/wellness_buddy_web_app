@@ -22,19 +22,21 @@ export default function DashboardInfoCard({
     onClick={() => router.push(link)}
     className="relative overflow-clip border-1 rounded-[10px] cursor-pointer"
   >
-    <Card className="px-0 py-4 shadow-none gap-2 rounded-[10px] border-0">
+    <Card className="py-4 shadow-none gap-2 rounded-[10px] border-0">
+      <div className="flex gap-2 md:gap-4">
       <CardHeader className="flex flex-row items-center justify-between">
-        <Avatar className="w-[40px] h-[40px] rounded-none">
+        <Avatar className="w-[50px] h-[50px] md:w-[40px] md:h-[40px] rounded-none">
           <AvatarImage
             src={icon}
-            className="w-[40px] h-[40px] !rounded-none"
+            className="w-[50px] h-[50px] md:w-[40px] md:h-[40px] !rounded-none"
           />
         </Avatar>
       </CardHeader>
       <CardContent>
-        <div className="text-[20px] font-bold">{quantity}</div>
-        <p className="text-[11px] font-[600] text-[var(--dark-2)]">{title}</p>
-      </CardContent>
+        <div className="text-base md:text-[20px] font-bold">{quantity}</div>
+        <p className="text-[9.9px] md:text-[11px] font-[600] text-[var(--dark-2)]">{title}</p>
+        </CardContent>
+        </div>
     </Card>
     {isSubscribed && <LockedFeature />}
   </div>

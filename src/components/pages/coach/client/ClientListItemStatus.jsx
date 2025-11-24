@@ -33,8 +33,19 @@ export default function ClientListItemStatus({
   const [modal, setModal] = useState();
   const [modalOpened, setModalOpened] = useState(false);
 
-  return <div className="mb-1 px-4 py-2 flex items-center gap-4">
+  return <div className="mb-1 px-1 md:px-4 py-2 flex flex-col-reverse items-start">
     {modal}
+    <div className="flex md:hidden flex-wrap items-center gap-1 mt-2">
+      {client.categories
+        .filter(category => categories.has(category))
+        .map(category => <Badge
+          key={category}
+          className="text-[8px] font-bold"
+        >
+          {categories.get(category)}
+        </Badge>)}
+    </div>
+    <div className="flex gap-4 items-center w-full">
     {client.isVerified
       ? <Link className="grow flex items-center gap-4" href={`/coach/clients/${client._id}`}>
         <Avatar className="w-[36px] h-[36px] !rounded-[8px]">
@@ -58,7 +69,7 @@ export default function ClientListItemStatus({
       data={client}
       setModal={setModalOpened}
     />}
-    <div className="flex items-center gap-1">
+    <div className="hidden md:flex flex-wrap items-center gap-1">
       {client.categories
         .filter(category => categories.has(category))
         .map(category => <Badge
@@ -138,7 +149,8 @@ export default function ClientListItemStatus({
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu>
+      </DropdownMenu>
+    </div>
   </div>
 }
 

@@ -25,8 +25,8 @@ export default function Page() {
 function ChatContainer() {
   const { currentChat } = useChatSocketContext();
 
-  return <div className="mt-4 flex">
-    <div className="w-[400px] pr-10">
+  return <div className="mt-4 flex flex-col gap-10 md:gap-0 md:flex-row">
+    <div className="md:w-[400px] md:pr-10">
       {/* <div className="pb-4 flex items-center gap-2 border-b-1">
         <Button variant="wz" size="sm" className="rounded-full">All Chats</Button>
         <Button variant="wz" size="sm" className="rounded-full">Personal</Button>
@@ -48,17 +48,17 @@ function AllChatListings() {
 
   const selectedChats = useMemo(() => chats.filter(chat => chat.name.toLowerCase().includes(debouncedQuery.toLowerCase())));
 
-  return <>
+  return <div className="w-full">
     <div className="mb-4 relative">
       <Input
         placeholder="Search messages"
-        className="bg-[#F4F4F4]/25"
+        className="w-full bg-[#F4F4F4]/25"
         value={query}
         onChange={e => setQuery(e.target.value)}
       />
       {debouncedQuery !== query && <Loader className="!w-6 absolute right-2 top-1/2 translate-y-[-50%]" />}
     </div>
-    <div className="pb-4 h-[450px] divide-y-2 divide-[var(--comp-1)] overflow-y-auto">
+    <div className="w-full pb-4 h-[450px] divide-y-2 divide-[var(--comp-1)] overflow-y-auto">
       {selectedChats.map(chat => <ChatPersonCard
         key={chat._id}
         chat={chat}
@@ -66,7 +66,7 @@ function AllChatListings() {
       />)}
       {selectedChats.length === 0 && <div className="min-h-[400px] leading-[400px] font-bold text-center">No Chats Found!</div>}
     </div>
-  </>
+  </div>
 }
 
 function ChatPersonCard({ chat, selectedId }) {
@@ -103,7 +103,7 @@ function SelectedChat() {
     <h4>Please Wait Opening Chat 😊</h4>
   </div>
 
-  return <div className="relative grow w-[200px] flex flex-col border-1 overflow-x-clip">
+  return <div className="relative grow md:w-[200px] flex flex-col border-1 overflow-x-clip">
     <CurrentChatHeader />
     <div className="text-[12px] font-semibold py-2 px-6">
       <ChatMessages />
@@ -114,7 +114,7 @@ function SelectedChat() {
 
 function CurrentChatHeader() {
   const { currentChat } = useChatSocketContext();
-  return <div className="bg-[var(--primary-1)] px-4 py-4 flex items-center gap-4 sticky top-0 z-[100] border-b-1">
+  return <div className="bg-[var(--primary-1)] px-4 py-4 flex items-center gap-4 sticky top-0 z-[10] border-b-1">
     <Avatar className="h-[48px] w-[48px] rounded-[4px]">
       <AvatarImage src={currentChat.profilePhoto || "/"} className="rounded-[8px]" />
       <AvatarFallback className="bg-gray-200 rounded-[8px]">{nameInitials(currentChat.name)}</AvatarFallback>

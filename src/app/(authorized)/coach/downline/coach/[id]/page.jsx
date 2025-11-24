@@ -113,7 +113,7 @@ function TabsHeader() {
       .map(tab => <TabsTrigger
         key={tab.id}
         value={tab.value}
-        className="text-[16px] text-[var(--accent-1)] data-[state=active]:bg-[var(--accent-1)] 
+        className="text-[14px] md:text-[16px] text-[var(--accent-1)] data-[state=active]:bg-[var(--accent-1)] 
              data-[state=active]:text-[var(--comp-1)] border-1 rounded-[6px] border-[var(--accent-1)]
              bg-[var(--comp-2)] px-4 py-4 data-[state=active]:font-semibold"
       >
@@ -457,7 +457,7 @@ export function UpdateDetails({
     <DialogTrigger className=" self-start">
       <Pen className="w-[14px] h-[14px] mt-2 text-[var(--accent-1)]" />
     </DialogTrigger>
-    <DialogContent className="max-w-[100px] w-full gap-0 p-0">
+    <DialogContent className="max-w-[100vw] md:max-w-[100px] w-full gap-0 p-0">
       <DialogTitle className="p-4 border-b-1">{title}</DialogTitle>
       <div className="p-4">
         <FormControl

@@ -96,7 +96,7 @@ export default function CheckupStage2() {
       </div>
     </div>
     <h3 className="font-semibold my-4">Statistics</h3>
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <HealthMetrics
         onUpdate={(payload, fieldName, closeBtnRef) => {
           dispatch(changeFieldvalue(fieldName, payload[fieldName]));

@@ -34,7 +34,7 @@ function WorkoutDetailsContainer({ id }) {
   />
   const [customPlan] = data.data || [];
   return <main className="content-container">
-    <div className="content-height-screen grid grid-cols-2 divide-x-1">
+    <div className="content-height-screen grid grid-cols-1 md:grid-cols-2 md:divide-x-1">
       <WorkoutMetaData customPlan={customPlan} />
       <WorkoutsListing customPlan={customPlan} />
     </div>
@@ -43,11 +43,11 @@ function WorkoutDetailsContainer({ id }) {
 
 function WorkoutMetaData({ customPlan }) {
   return <div className="p-4 pr-8">
-    <div className="mb-2 flex items-center gap-2">
+    <div className="mb-4 md:mb-2 flex items-center gap-2">
       <h4 className="mr-auto">{customPlan.title}</h4>
       <Link
         href={`/coach/workouts/add?creationType=copy_edit&mode=${customPlan.mode}&workoutId=${customPlan._id}`}
-        className="px-4 py-2 rounded-[10px] border-1 border-[var(--accent-1)] text-[var(--accent-1)] font-bold leading-[1] text-[14px]"
+        className="hidden md:block px-4 py-2 rounded-[10px] border-1 border-[var(--accent-1)] text-[var(--accent-1)] font-bold leading-[1] text-[14px]"
         variant="wz"
       >
         Copy & Edit
@@ -55,7 +55,7 @@ function WorkoutMetaData({ customPlan }) {
       {!customPlan.isAdmin && <>
         <Link
           href={`/coach/workouts/add?creationType=edit&mode=${customPlan.mode}&workoutId=${customPlan._id}`}
-          className="px-4 py-2 rounded-[10px] bg-[var(--accent-1)] text-white font-bold leading-[1] text-[14px]"
+          className="hidden md:block px-4 py-2 rounded-[10px] bg-[var(--accent-1)] text-white font-bold leading-[1] text-[14px]"
           variant="wz_outline"
         >
           Edit
@@ -63,10 +63,27 @@ function WorkoutMetaData({ customPlan }) {
         <DeleteCustomWorkoutPlan id={customPlan._id} />
       </>}
     </div>
+    <div className="flex items-center justify-start gap-2">
     <AssignWorkoutModal
       type="custom"
       workoutId={customPlan._id}
-    />
+      />
+          <Link
+        href={`/coach/workouts/add?creationType=copy_edit&mode=${customPlan.mode}&workoutId=${customPlan._id}`}
+        className="md:hidden px-4 py-2 rounded-[10px] border-1 border-[var(--accent-1)] text-[var(--accent-1)] font-bold leading-[1] text-[14px]"
+        variant="wz"
+      >
+        Copy & Edit
+      </Link>
+      {!customPlan.isAdmin && <>
+        <Link
+          href={`/coach/workouts/add?creationType=edit&mode=${customPlan.mode}&workoutId=${customPlan._id}`}
+          className="md:hidden px-4 py-2 rounded-[10px] bg-[var(--accent-1)] text-white font-bold leading-[1] text-[14px]"
+          variant="wz_outline"
+        >
+          Edit
+        </Link></>}
+    </div>
     <Image
       alt=""
       src={customPlan.image?.trim() || "/not-found.png"}
@@ -85,8 +102,8 @@ function WorkoutsListing({ customPlan }) {
 
   const selectedPlanWorkouts = customPlan.plans[selectedPlan]?.workouts || [];
 
-  return <div className="p-4 pl-8">
-    <div className="flex gap-4 mb-8">
+  return <div className="p-4 md:pl-8">
+    <div className="flex gap-4 mb-4 md:mb-8">
       {days.map(day => <Button
         key={day}
         variant={day === selectedPlan ? "wz" : "wz_outline"}
@@ -96,7 +113,7 @@ function WorkoutsListing({ customPlan }) {
       </Button>)}
     </div>
     <Separator />
-    <div className="mt-8 grid grid-cols-2 gap-4">
+    <div className="mt-4 md:mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
       {selectedPlanWorkouts.map((exercise, index) => <WorkoutExercise
         key={index}
         exercise={exercise}

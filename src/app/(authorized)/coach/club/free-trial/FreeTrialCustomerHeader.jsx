@@ -36,8 +36,9 @@ export default function FreeTrialCustomerHeader() {
   }
 
   return <>
-    <div className="mb-4 flex items-center gap-4">
+    <div className="mb-4 flex flex-col items-start md:justify-between md:flex-row md:items-center gap-2 md:gap-4">
       <h4>Free Trial</h4>
+      <div className="flex gap-2 md:gap-6 items-center justify-start">
       <FormControl
         className="lg:min-w-[280px] [&_.input]:focus:shadow-2xl [&_.input]:bg-[var(--comp-1)] text-[12px] ml-auto"
         placeholder="Search Client.."
@@ -52,7 +53,8 @@ export default function FreeTrialCustomerHeader() {
       >
         <Forward />
         Onboarding Form
-      </Button>
+        </Button>
+        </div>
     </div>
     <div className="py-4 flex items-center justify-end gap-2 border-t-1">
       {/* <Button size="sm" variant="wz_outline">

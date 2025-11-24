@@ -10,7 +10,7 @@ import { useRef } from "react";
 export default function WorkoutMetaData() {
   const { dispatch, title, description, ...state } = useCurrentStateContext()
   const fileRef = useRef();
-  return <div className="flex flex-col gap-y-4 pr-8">
+  return <div className="flex flex-col gap-y-4 md:pr-8">
     <FormControl
       value={title}
       onChange={e => dispatch(customWorkoutUpdateField("title", e.target.value))}
