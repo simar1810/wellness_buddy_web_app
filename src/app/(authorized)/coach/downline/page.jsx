@@ -30,7 +30,7 @@ import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TreeVisualizer from "@/components/pages/coach/downline/Visualizer";
 import HierarchicalCoachTable from "@/components/pages/coach/downline/HierarchicalCoachTable";
-import { PlusCircle, Edit, Trash2, Eye, ChevronDown, MoreVertical, Plus, FileSpreadsheet } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Eye, ChevronDown, MoreVertical, Plus, FileSpreadsheet, Check } from "lucide-react";
 import { ManageCategoryModal } from "@/components/modals/coach/ManageCategoryModal";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -854,9 +854,9 @@ function findClientCategories(categories, coachCategories) {
 function DownlineIncrement() {
 	return <Dialog>
 		<DialogTrigger asChild>
-			<Button variant="wz">Downline Increment</Button>
+			<Button variant="wz">Qualifications</Button>
 		</DialogTrigger>
-		<DialogContent className="p-0 gap-0">
+		<DialogContent className="!max-w-[550px] w-full p-0 gap-0">
 			<DownlineCoachIncrementContainer />
 		</DialogContent>
 	</Dialog>
@@ -877,50 +877,87 @@ function DownlineCoachIncrementContainer() {
 		{error || data?.message || "Something went wrong"}
 	</div>
 	const coaches = Object
-		.entries(data.data)
-		.map(([clubType, coaches]) => {
-			return coaches.map(coach => ({
-				...coach,
-				clubType
-			}))
-		})
+		.entries(data?.data || [])
+		.map(([_, coaches]) => coaches)
 		.flatMap(coach => coach)
 
 	function exportCoachData() {
 		const excelData = coaches.map(coach => ({
-			"Club Type": coach.clubType,
 			"Coach Name": coach.coach,
 			"Mobile Number": coach.mobileNumber,
+			"Club Type": coach.clubType,
+			"Qualified For": coach.qualifiedClubType
 		}))
 		exportToExcel(excelData)
 	}
 
 	return <div className="overflow-clip">
 		<DialogTitle className="p-4 border-b-1 flex items-center justify-between">
-			Downline Increment
-			<Button className="mr-4 bg-[var(--accent-1)] text-white" variant="icon" size="sm" onClick={exportCoachData}>
+			Qualifications
+			{coaches.length > 0 && <Button className="mr-4 bg-[var(--accent-1)] text-white" variant="icon" size="sm" onClick={exportCoachData}>
+				Download
 				<FileSpreadsheet />
-			</Button>
+			</Button>}
 		</DialogTitle>
 		<Table className="bg-[var(--comp-1)] rounded-md">
 			<TableHeader className="[&_th]:font-bold">
 				<TableRow>
-					<TableHead>Club Type</TableHead>
 					<TableHead>Coach Name</TableHead>
 					<TableHead>Mobile Number</TableHead>
-					<TableHead>ID</TableHead>
+					<TableHead>Club Type</TableHead>
+					<TableHead>Qualified Club Type</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
 				{coaches.map(coach => (
 					<TableRow key={coach._id}>
-						<TableCell>{coach.clubType}</TableCell>
 						<TableCell>{coach.coach}</TableCell>
 						<TableCell>{coach.mobileNumber}</TableCell>
-						<TableCell>{coach._id}</TableCell>
+						<TableCell>{coach.clubType}</TableCell>
+						<TableCell className="flex items-center gap-1">
+							{coach.qualifiedClubType}
+							<QualifyCoachClubType
+								mutate={mutate}
+								coachId={coach._id}
+								clubType={coach.qualifiedClubType}
+							/>
+						</TableCell>
 					</TableRow>
 				))}
 			</TableBody>
 		</Table>
+		{coaches.length === 0 && <div className="h-[200px] flex items-center justify-center">
+			No coaches found that are qualified
+		</div>}
 	</div>
+}
+
+
+function QualifyCoachClubType({ mutate, coachId, clubType }) {
+	async function qualifyCoach(setLoading, closeBtnRef) {
+		try {
+			setLoading(true);
+			const formData = {
+				coachId,
+				clubType
+			}
+			const response = await sendData("way-to-wellness/increment", formData, "POST");
+			if (response.status_code !== 200) throw new Error(response.message);
+			toast.success(response.message);
+			mutate()
+			closeBtnRef.current.click();
+		} catch (error) {
+			toast.error(error.message);
+		} finally {
+			setLoading(false);
+		}
+	}
+	return <DualOptionActionModal
+		description={`Are you sure of qualifying this coach for ${clubType}!`}
+		action={(setLoading, btnRef) => qualifyCoach(setLoading, btnRef)}
+	>
+		<AlertDialogTrigger>
+			<Check className="w-[28px] h-[28px] text-white bg-[var(--accent-1)] p-[6px] rounded-full" />
+		</AlertDialogTrigger>
+	</DualOptionActionModal>
 }
