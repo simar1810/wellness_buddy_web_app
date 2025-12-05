@@ -30,7 +30,7 @@ import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TreeVisualizer from "@/components/pages/coach/downline/Visualizer";
 import HierarchicalCoachTable from "@/components/pages/coach/downline/HierarchicalCoachTable";
-import { PlusCircle, Edit, Trash2, Eye, ChevronDown, MoreVertical, Plus } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Eye, ChevronDown, MoreVertical, Plus, FileSpreadsheet } from "lucide-react";
 import { ManageCategoryModal } from "@/components/modals/coach/ManageCategoryModal";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -41,6 +41,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import DeleteClientModal from "@/components/modals/client/DeleteClientModal";
 import ClientUpdateCategories from "@/components/pages/coach/client/ClientUpdateCategories";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import Loader from "@/components/common/Loader";
+import { exportToExcel } from "@/lib/excel";
 
 const categoriesFetcher = () =>
 	fetchData("app/coach-categories").then((res) => {
@@ -118,14 +120,14 @@ export default function Page() {
 					onValueChange={tabChange}
 					className="w-full"
 				>
-					<TabsList className="grid w-full max-w-lg mx-auto mb-4 grid-cols-3">
-						<TabsTrigger value="list">List View</TabsTrigger>
-						<TabsTrigger value="visualizer">Visualizer</TabsTrigger>
-						{/* <TabsTrigger value="manageCategories">
-							Manage Categories
-						</TabsTrigger> */}
-						<TabsTrigger value="clients">Clients</TabsTrigger>
-					</TabsList>
+					<div className="flex">
+						<TabsList className="grid w-full max-w-lg mx-auto mb-4 grid-cols-3">
+							<TabsTrigger value="list">List View</TabsTrigger>
+							<TabsTrigger value="visualizer">Visualizer</TabsTrigger>
+							<TabsTrigger value="clients">Clients</TabsTrigger>
+						</TabsList>
+						{coachData.clubType === "System Leader" && <DownlineIncrement />}
+					</div>
 
 					<TabsContent value="list">
 						<div className="flex flex-col gap-4">
@@ -847,4 +849,78 @@ function findClientCategories(categories, coachCategories) {
 			id: cat,
 			name: coachCategoryMap.get(cat)
 		}))
+}
+
+function DownlineIncrement() {
+	return <Dialog>
+		<DialogTrigger asChild>
+			<Button variant="wz">Downline Increment</Button>
+		</DialogTrigger>
+		<DialogContent className="p-0 gap-0">
+			<DownlineCoachIncrementContainer />
+		</DialogContent>
+	</Dialog>
+}
+
+function DownlineCoachIncrementContainer() {
+	const { _id: coachId } = useAppSelector(state => state.coach.data)
+	const { isLoading, error, data, mutate } = useSWR(
+		"way-to-wellness/increment",
+		() => fetchData(`way-to-wellness/increment?coachId=${coachId}`)
+	)
+
+	if (isLoading) return <div className="min-h-[200px] flex items-center justify-center">
+		<Loader />
+	</div>
+
+	if (error || data?.status_code !== 200) return <div className="min-h-[200px] flex items-center justify-center">
+		{error || data?.message || "Something went wrong"}
+	</div>
+	const coaches = Object
+		.entries(data.data)
+		.map(([clubType, coaches]) => {
+			return coaches.map(coach => ({
+				...coach,
+				clubType
+			}))
+		})
+		.flatMap(coach => coach)
+
+	function exportCoachData() {
+		const excelData = coaches.map(coach => ({
+			"Club Type": coach.clubType,
+			"Coach Name": coach.coach,
+			"Mobile Number": coach.mobileNumber,
+		}))
+		exportToExcel(excelData)
+	}
+
+	return <div className="overflow-clip">
+		<DialogTitle className="p-4 border-b-1 flex items-center justify-between">
+			Downline Increment
+			<Button className="mr-4 bg-[var(--accent-1)] text-white" variant="icon" size="sm" onClick={exportCoachData}>
+				<FileSpreadsheet />
+			</Button>
+		</DialogTitle>
+		<Table className="bg-[var(--comp-1)] rounded-md">
+			<TableHeader className="[&_th]:font-bold">
+				<TableRow>
+					<TableHead>Club Type</TableHead>
+					<TableHead>Coach Name</TableHead>
+					<TableHead>Mobile Number</TableHead>
+					<TableHead>ID</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				{coaches.map(coach => (
+					<TableRow key={coach._id}>
+						<TableCell>{coach.clubType}</TableCell>
+						<TableCell>{coach.coach}</TableCell>
+						<TableCell>{coach.mobileNumber}</TableCell>
+						<TableCell>{coach._id}</TableCell>
+					</TableRow>
+				))}
+			</TableBody>
+		</Table>
+	</div>
 }

@@ -2,12 +2,15 @@ import ContentError from "@/components/common/ContentError";
 import Loader from "@/components/common/Loader";
 import FormControl from "@/components/FormControl";
 import AddSubscriptionModal from "@/components/modals/club/AddSubscriptionModal";
+import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
 import SelectControl from "@/components/Select";
+import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { sendData } from "@/lib/api";
 import { getClientSubscriptions } from "@/lib/fetchers/club";
+import { Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
@@ -24,7 +27,7 @@ export default function SubscriptionHistory({ _id }) {
   if (subscriptions.length === 0) return <div className="mb-8">
     <div className="flex items-center justify-between">
       <h5>Membership History</h5>
-      <AddSubscriptionModal _id={_id} />
+      {/* <AddSubscriptionModal _id={_id} /> */}
     </div>
     <ContentError className="!min-h-[200px] mt-4 mb-8" title="This client has 0 subscriptions" />
   </div>
@@ -54,11 +57,12 @@ export default function SubscriptionHistory({ _id }) {
           <TableCell>{subscription.paymentMode}</TableCell>
           <TableCell>{subscription.amount}</TableCell>
           <TableCell>{subscription.description}</TableCell>
-          <TableCell>
+          <TableCell className="flex items-center gap-2">
             <UpdateSubscription
               subscription={subscription}
               _id={_id}
             />
+            <DeleteSubscription clientId={_id} subscriptionId={subscription._id} />
           </TableCell>
         </TableRow>)}
       </TableBody>
@@ -150,4 +154,33 @@ function UpdateSubscription({ subscription = {}, _id }) {
       </div>
     </DialogContent>
   </Dialog>
+}
+
+function DeleteSubscription({ clientId, subscriptionId }) {
+  async function deleteSubscription(setLoading, closeBtnRef) {
+    try {
+      setLoading(true);
+      const payload = {
+        clientId,
+        subscriptionId
+      }
+      const response = await sendData("delete-notification", payload, "DELETE");
+      if (response.status_code !== 200) throw new Error(response.message);
+      toast.success(response.message);
+      mutate(`getClientSubscriptions/${clientId}`)
+      closeBtnRef.current.click();
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+  return <DualOptionActionModal
+    description="Are you sure of deleting this subscription!"
+    action={(setLoading, btnRef) => deleteSubscription(setLoading, btnRef)}
+  >
+    <AlertDialogTrigger>
+      <Trash2 className="w-[28px] h-[28px] text-white bg-[var(--accent-2)] p-[6px] rounded-[4px]" />
+    </AlertDialogTrigger>
+  </DualOptionActionModal>
 }
