@@ -369,6 +369,7 @@ function CreateInvitation() {
 
 function CoachesList() {
 	const [query, setQuery] = useState("")
+	const { clubType } = useAppSelector(state => state.coach.data)
 	const { isLoading, error, data, mutate } = useSWR(
 		"app/downline/coaches",
 		retrieveDownlineCoaches
@@ -390,11 +391,13 @@ function CoachesList() {
 		}
 	};
 
+	const canAddCoach = ["Club Captain", "Club Leader", "System Leader"].includes(clubType);
+
 	return (
 		<div className="bg-[var(--comp-2)] px-4 py-8 rounded-[8px] space-y-4 border-1">
 			<div className="flex items-center justify-between">
 				<h4 className="mb-4">Coaches under You ({allCoaches.length})</h4>
-				<AddCoachInDownline />
+				{canAddCoach && <AddCoachInDownline />}
 			</div>
 			<FormControl
 				value={query}
