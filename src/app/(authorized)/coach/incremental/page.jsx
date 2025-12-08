@@ -1,7 +1,7 @@
 "use client";
 import useSWR, { mutate } from "swr";
 import { useState } from "react";
-import toast from "sonner"
+import { toast } from "sonner"
 import { sendData } from "@/lib/api";
 import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
 import { retrieveIncrement } from "@/lib/fetchers/app";
