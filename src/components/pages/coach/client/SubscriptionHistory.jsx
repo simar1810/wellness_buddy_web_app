@@ -27,7 +27,7 @@ export default function SubscriptionHistory({ _id }) {
   if (subscriptions.length === 0) return <div className="mb-8">
     <div className="flex items-center justify-between">
       <h5>Membership History</h5>
-      {/* <AddSubscriptionModal _id={_id} /> */}
+      <AddSubscriptionModal _id={_id} />
     </div>
     <ContentError className="!min-h-[200px] mt-4 mb-8" title="This client has 0 subscriptions" />
   </div>
