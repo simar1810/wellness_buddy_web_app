@@ -755,6 +755,7 @@ function AddCoachInDownline() {
 }
 
 function SelectDownlineCoach({ onChange }) {
+	const coach = useAppSelector(state => state.coach.data)
 	const [query, setQuery] = useState("")
 	const { isLoading, error, data } = useSWR(
 		"app/downline/coaches",
@@ -765,8 +766,12 @@ function SelectDownlineCoach({ onChange }) {
 
 	if (error || data.status_code !== 200) return <ContentError title={error?.message || data.message} />
 
-	const coaches = data
-		.data
+	const allDownlineCoaches = useMemo(() => [
+		coach,
+		...data.data,
+	], [])
+
+	const coaches = allDownlineCoaches
 		.filter(coach => new RegExp(query, "i").test(coach.name)) || [];
 
 	return <Select
