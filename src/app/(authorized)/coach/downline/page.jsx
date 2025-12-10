@@ -30,7 +30,7 @@ import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TreeVisualizer from "@/components/pages/coach/downline/Visualizer";
 import HierarchicalCoachTable from "@/components/pages/coach/downline/HierarchicalCoachTable";
-import { PlusCircle, Edit, Trash2, Eye, ChevronDown, MoreVertical, Plus, FileSpreadsheet, Check } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Eye, ChevronDown, MoreVertical, Plus, FileSpreadsheet, Check, Cog } from "lucide-react";
 import { ManageCategoryModal } from "@/components/modals/coach/ManageCategoryModal";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -616,13 +616,12 @@ function DownlineClientList() {
 	const clients = data.data.filter(client => regex.test(client.name)) || [];
 
 	return <div className="bg-[var(--comp-1)] p-4 rounded-[10px] border-1">
-		{/* <h2>Client List</h2> */
-			<FormControl
-				value={query}
-				onChange={e => setQuery(e.target.value)}
-				className="[&_.input]:bg-white"
-				placeholder="search by name..."
-			/>}
+		<FormControl
+			value={query}
+			onChange={e => setQuery(e.target.value)}
+			className="[&_.input]:bg-white"
+			placeholder="search by name..."
+		/>
 		<Table className="border-1 mt-4">
 			<TableHeader>
 				<TableRow className="bg-white [&_th]:font-bold">
@@ -643,7 +642,7 @@ function DownlineClientList() {
 					<TableRow key={client._id}>
 						<TableCell className="font-medium max-w-[20ch]">{client.name}</TableCell>
 						<ClientCategoriesListing categories={client.categories} />
-						<TableCell>{client.coach}</TableCell>
+						<TableCell>{client.coachName}</TableCell>
 						<TableCell>{client.clientId}</TableCell>
 						<TableCell>{client.email || "-"}</TableCell>
 						<TableCell>{client.mobileNumber || "-"}</TableCell>
@@ -813,7 +812,7 @@ function SelectDownlineCoach({ onChange }) {
 	</Select>
 }
 
-function ClientCategoriesListing({ categories }) {
+function ClientCategoriesListing({ categories = [] }) {
 	const { client_categories } = useAppSelector(state => state.coach.data)
 
 	const selectedCategories = useMemo(() => findClientCategories(categories, client_categories), [])
@@ -848,11 +847,11 @@ function ClientCategoriesListing({ categories }) {
 	</TableCell>
 }
 
-function findClientCategories(categories, coachCategories) {
+function findClientCategories(categories = [], coachCategories) {
 	const coachCategoryMap = new Map(
 		coachCategories.map(cat => [cat._id, cat.name])
 	)
-	return categories
+	return (categories || [])
 		.map(cat => ({
 			id: cat,
 			name: coachCategoryMap.get(cat)
