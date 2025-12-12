@@ -1,3 +1,4 @@
+import { Ellipsis, EllipsisVertical } from "lucide-react";
 import Link from "next/link";
 
 export default function Page() {
@@ -61,7 +62,7 @@ export default function Page() {
             <li>Go to <strong className="font-bold">&quot;Club&quot; &gt; &quot;Meetings&quot; &gt; &quot;With Zoom Meetings&quot;</strong>.</li>
             <li>Click <strong>With Zoom Meetings</strong>, if zoom not connected kindly authorize us your zoom account to schedule meeting.</li>
             <li>Enter meeting details (Title, Date, Time, Duration, etc as prompted in the form.).</li>
-            <li>Click <strong>&quot;Create Meeting&quot;</strong>. A Zoom meeting link will be generated.</li>
+            <li>Click <strong>&quot;Club&quot; &gt; &quot;Link Generator&quot; &gt; &quot;With Zoom Meetings&quot;</strong>. A Zoom meeting link will be generated.</li>
           </ol>
 
           <h3 className="mt-4 text-lg font-semibold">
@@ -101,6 +102,16 @@ export default function Page() {
             <li>Go to <strong>Meetings</strong>.</li>
             <li>Multiple Meetings are displayed in the meetings table.</li>
             <li>Under the Base Link column click on the link zoom link to check the zoom events.</li>
+          </ol>
+
+          <h3 className="mt-4 text-lg font-semibold leading-[1] mb-4">
+            📊 7. Deauthorize zoom account&nbsp;
+            <span className="text-gray-400 text-[14px] font-regular hover:text-gray-900">{"("}meeting:read:meeting:admin, meeting:read:participant:admin, meeting:read:list_meetings:admin{")"}</span>
+          </h3>
+          {/* <p>Listening to Zoom webhooks for every meeting is available under <strong>Meetings</strong>. Click on the Zoom meeting link to track attendance.</p> */}
+          <ol className="list-decimal list-inside mt-2">
+            <li>Click <strong>&quot;Club&quot; &gt; &quot;Link Generator&quot;</strong></li>
+            <li>An option with the <strong>&quot;With Zoom Meetings&quot;</strong> a menu icon that is ellipsis-{"("}<EllipsisVertical className="h-[14px] w-[14px] inline" />{")"} Click on this option and disconnect zoom option will be visible.</li>
           </ol>
 
           {/* <h2 className="mt-6 text-xl font-semibold">🔹 7. How to Uninstall Way to Wellness Club Zoom App</h2>
