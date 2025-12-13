@@ -108,6 +108,51 @@ export const sidebar__coachContent = [
     ],
   },
   {
+    id: 11,
+    title: "Club",
+    icon: <LayoutDashboard className="min-w-[20px] min-h-[20px]" />,
+    url: "/coach/club",
+    permission: 8, // Permission 8 = Club
+    items: [
+      {
+        id: 1,
+        icon: <Projector className="icon min-w-[20px] min-h-[20px]" />,
+        title: "Meetings",
+        url: "/coach/club/meetings",
+      },
+      {
+        id: 2,
+        icon: <Link className="icon min-w-[20px] min-h-[20px]" />,
+        title: "Link Generator",
+        url: "/coach/club/link-generator",
+      },
+      {
+        id: 3,
+        icon: <ContactRound className="icon min-w-[20px] min-h-[20px]" />,
+        title: "Membership",
+        url: "/coach/club/membership",
+      },
+      // {
+      //   id: 4,
+      //   icon: <Video className="icon min-w-[20px] min-h-[20px]" />,
+      //   title: "Zoom Settings",
+      //   url: "/coach/club/zoom-settings"
+      // },
+      {
+        id: 5,
+        icon: <Soup className="icon min-w-[20px] min-h-[20px]" />,
+        title: "Free Trial",
+        url: "/coach/club/free-trial",
+      },
+      {
+        id: 6,
+        icon: <Unlink className="icon min-w-[20px] min-h-[20px]" />,
+        title: "Coach Sync",
+        url: "/coach/club/coach-sync",
+      },
+    ],
+  },
+  {
     id: 3.5,
     title: "Users",
     icon: <Users className="min-w-[20px] min-h-[20px]" />,
@@ -388,51 +433,6 @@ export const sidebar__coachContent = [
     icon: <Footprints className="min-w-[20px] min-h-[20px]" />,
     url: "/coach/marathons",
     permission: 7, // Permission 7 = Marathon
-  },
-  {
-    id: 11,
-    title: "Club",
-    icon: <LayoutDashboard className="min-w-[20px] min-h-[20px]" />,
-    url: "/coach/club",
-    permission: 8, // Permission 8 = Club
-    items: [
-      {
-        id: 1,
-        icon: <Projector className="icon min-w-[20px] min-h-[20px]" />,
-        title: "Meetings",
-        url: "/coach/club/meetings",
-      },
-      {
-        id: 2,
-        icon: <Link className="icon min-w-[20px] min-h-[20px]" />,
-        title: "Link Generator",
-        url: "/coach/club/link-generator",
-      },
-      {
-        id: 3,
-        icon: <ContactRound className="icon min-w-[20px] min-h-[20px]" />,
-        title: "Membership",
-        url: "/coach/club/membership",
-      },
-      // {
-      //   id: 4,
-      //   icon: <Video className="icon min-w-[20px] min-h-[20px]" />,
-      //   title: "Zoom Settings",
-      //   url: "/coach/club/zoom-settings"
-      // },
-      {
-        id: 5,
-        icon: <Soup className="icon min-w-[20px] min-h-[20px]" />,
-        title: "Free Trial",
-        url: "/coach/club/free-trial",
-      },
-      {
-        id: 6,
-        icon: <Unlink className="icon min-w-[20px] min-h-[20px]" />,
-        title: "Coach Sync",
-        url: "/coach/club/coach-sync",
-      },
-    ],
   },
   {
     id: 12,

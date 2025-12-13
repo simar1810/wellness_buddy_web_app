@@ -368,6 +368,7 @@ function CreateInvitation() {
 }
 
 function CoachesList() {
+	const { downline: { depth } = {} } = useAppSelector(state => state.coach.data)
 	const [query, setQuery] = useState("")
 	const { clubType } = useAppSelector(state => state.coach.data)
 	const { isLoading, error, data, mutate } = useSWR(
@@ -375,12 +376,23 @@ function CoachesList() {
 		retrieveDownlineCoaches
 	);
 
+	const allCoaches = useMemo(() => {
+		const coaches = data?.data || [];
+		return coaches
+			.map(coach => ({
+				...coach,
+				downline: {
+					...coach.downline,
+					depth: parseInt(coach?.downline?.depth ?? 0) - parseInt(depth ?? 0)
+				}
+			}))
+	}, [isLoading]);
+
 	if (isLoading) return <ContentLoader />;
 
 	if (error || data.status_code !== 200)
 		return <ContentError title={error?.message || data.message} />;
 
-	const allCoaches = data?.data || [];
 	const coaches = allCoaches.filter(coach => new RegExp(query, "i").test(coach.name));
 
 	const handleMakeTop = async (coachId) => {
