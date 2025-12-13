@@ -87,9 +87,9 @@ function MeetingAttendanceTable({ meetingType, attendenceList }) {
     className="!min-h-[200px] font-[600] mt-4 mb-8"
     title="No record for this meeting found!"
   />
-
+  const { mobile, web } = calculatePortalVersions(attendenceList, meetingType)
   return <Table className="bordered-table [&_th]:font-bold [&_th]:text-center mb-10">
-    <TableCaption>Meeting Attendance</TableCaption>
+    <TableCaption>{mobile} joined from Mobile & {web} joined from web</TableCaption>
     <TableHeader>
       <TableRow>
         <TableHead className="w-[100px]">Sr. No</TableHead>
@@ -158,4 +158,26 @@ function MeetingEventsTable({ _id }) {
       />)}
     </TableBody>
   </Table>
+}
+
+function calculatePortalVersions(attendance, meetingType) {
+  if (!Array.isArray(attendance)) return { web: 0, mobile: 0 }
+  if (meetingType !== "reocurr") {
+    return attendance.reduce((acc, record) => {
+      return {
+        ...acc,
+        [record?.attendance?.portalRequestedFrom]: acc[record?.attendance?.portalRequestedFrom] + 1
+      }
+    }, { mobile: 0, web: 0 })
+  }
+  return attendance
+    .map(item => item.details)
+    .flatMap(item => item)
+    .reduce((acc, item) => {
+      return {
+        ...acc,
+        [item?.attendance?.portalRequestedFrom]:
+          acc[item?.attendance?.portalRequestedFrom] + 1
+      }
+    }, { mobile: 0, web: 0 })
 }

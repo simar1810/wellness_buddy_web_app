@@ -107,7 +107,7 @@ function TabsHeader() {
     {tabItems
       .filter(item =>
         [3].includes(item.id)
-          ? ["System Leader", "Club Leader"].includes(clubType)
+          ? ["System Leader", "Club Leader", "Club Leader Jr"].includes(clubType)
           : true
       )
       .map(tab => <TabsTrigger
