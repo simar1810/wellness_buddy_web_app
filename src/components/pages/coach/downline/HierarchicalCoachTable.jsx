@@ -352,7 +352,7 @@ function UpdateCoachClubType({ coach }) {
             </SelectContent>
           </Select>
 
-          <div className="mt-4">No. Of Login Devices</div>
+          {/* <div className="mt-4">No. Of Login Devices</div>
           <Input
             value={loginDevices}
             onChange={(e) =>
@@ -362,9 +362,9 @@ function UpdateCoachClubType({ coach }) {
             }
             className="!mb-4"
             type="number"
-          />
+          /> */}
 
-          <Button onClick={handleUpdate} disabled={loading} className="w-full">
+          <Button onClick={handleUpdate} disabled={loading} className="mt-4 w-full">
             {loading ? "Updating..." : "Update Club Type"}
           </Button>
         </div>
