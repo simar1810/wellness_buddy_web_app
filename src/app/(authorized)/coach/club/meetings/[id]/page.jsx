@@ -124,7 +124,7 @@ function ReocurringMeetingAttendanceTable({ attendenceList }) {
         {attendance?.commonDate}
       </TableCell>
       <TableCell className="px-0 py-0 divide-y-1">
-        {attendance.details.map((detail, index) => <p className="py-[2px]" key={index}>{format(addMinutes(parse(detail?.time, "hh:mm:ss a", new Date()), 330), "hh:mm a")}</p>)}
+        {attendance.details.map((detail, index) => <p className="py-[2px]" key={index}>{format(addMinutes(parse(detail?.time, "hh:mm:ss a", new Date()), 0), "hh:mm a")}</p>)}
       </TableCell>
     </TableRow>)}
   </>
