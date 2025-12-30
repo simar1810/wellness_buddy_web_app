@@ -85,7 +85,7 @@ export default function Page() {
 		}
 	};
 
-	if (!features?.includes(5) && ["System Leader", "Club Leader", "Club Leader Jr", "Club Captain"].includes(clubType)) {
+	if (!features?.includes(5) && !["System Leader", "Club Leader", "Club Leader Jr", "Club Captain"].includes(clubType)) {
 		return <ContentError title="This feature isn't enabled for you" />;
 	}
 
@@ -620,12 +620,15 @@ function DownlineClientList() {
 		"downline-clients",
 		() => retrieveClientList()
 	);
+	const { clubType } = useAppSelector(state => state.coach.data)
 
 	if (isLoading) return <ContentLoader />
 
 	if (error || data.status_code !== 200) return <ContentError title={error?.message || data.message} />
 
 	const clients = data.data.filter(client => regex.test(client.name)) || [];
+
+	const hasEditAccess = ["System Leader", "Club Leader", "Club Leader Jr"].includes(clubType)
 
 	return <div className="bg-[var(--comp-1)] p-4 rounded-[10px] border-1">
 		<FormControl
@@ -663,17 +666,17 @@ function DownlineClientList() {
 							? <Badge variant="wz_fill">Active</Badge>
 							: <Badge variant="destructive">In active</Badge>}</TableCell>
 						{<TableCell onClick={e => e.stopPropagation()}>
-							<SyncedCoachClientDetails
+							{hasEditAccess && <SyncedCoachClientDetails
 								client={client}
 								onUpdate={() => location.reload()}
 							>
 								<DialogTrigger>
 									<Eye className="hover:text-[var(--accent-1)] opacity-50 hover:opacity-100" />
 								</DialogTrigger>
-							</SyncedCoachClientDetails>
+							</SyncedCoachClientDetails>}
 						</TableCell>}
 						<TableCell onClick={e => e.stopPropagation()}>
-							<ClientActionsDropdown client={client} />
+							{hasEditAccess && <ClientActionsDropdown client={client} />}
 						</TableCell>
 					</TableRow>
 				))}
@@ -698,6 +701,7 @@ function AddCoachInDownline() {
 		email: "",
 		downlineCoachId: ""
 	})
+	const { clubType } = useAppSelector(state => state.coach.data)
 
 	const handleChange = (e, name) => {
 		setFormData({ ...formData, [name]: e.target.value })
@@ -713,6 +717,8 @@ function AddCoachInDownline() {
 			toast.error(error.message)
 		}
 	}
+
+	if (!["System Leader", "Club Leader", "Club Leader"].includes(clubType)) return
 
 	return (
 		<Dialog>
