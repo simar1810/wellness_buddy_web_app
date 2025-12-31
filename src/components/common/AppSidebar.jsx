@@ -50,8 +50,9 @@ export default function AppSidebar() {
   // Wallet is now available for all organizations
   if (organisation !== "Herbalife") sidebarItems = sidebarItems.filter(item => item.id !== 7);
   if (!features.includes(4)) sidebarItems = sidebarItems.filter(item => item.id !== 6);
-  if (!["System Leader", "Club Leader", "Club Leader Jr"].includes(clubType)) {
+  if (!["System Leader", "Club Leader", "Club Leader Jr", "Club Captain"].includes(clubType)) {
     sidebarItems = sidebarItems.filter(item => item.id !== 14);
+    sidebarItems = sidebarItems.filter(item => item.id !== 11)
   }
 
   // Filter sidebar items based on user permissions
@@ -339,28 +340,28 @@ export function ClientSearchBar({ setModal }) {
       className="relative w-full md:min-w-80 md:max-w-[250px] px-4 md:mt-0 z-[50]"
     >
       <div className="relative flex items-center">
-      <Search className="w-[16px] h-[16px] text-[#808080] absolute left-3 top-1/2 -translate-y-1/2" />
-      <Input
-        placeholder="Search Client..."
-        onFocus={() => setOpen(true)}
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-         className="bg-[var(--primary-1)] w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm text-[var(--dark-1)] focus:ring-1 focus:ring-[var(--accent-1)] focus:outline-none"
-        />
-        </div>
-    {open && (
-      <div className="absolute top-12 left-0 w-full bg-[var(--primary-1)] rounded-md shadow-lg z-[100] border border-gray-300">
-        <SearchedResults
-          query={searchQuery}
-          setQuery={setSearchQuery}
-          setModal={setModal}
-          loading={loading}
-          data={data}
+        <Search className="w-[16px] h-[16px] text-[#808080] absolute left-3 top-1/2 -translate-y-1/2" />
+        <Input
+          placeholder="Search Client..."
+          onFocus={() => setOpen(true)}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="bg-[var(--primary-1)] w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm text-[var(--dark-1)] focus:ring-1 focus:ring-[var(--accent-1)] focus:outline-none"
         />
       </div>
-    )}
-  </div>
-);
+      {open && (
+        <div className="absolute top-12 left-0 w-full bg-[var(--primary-1)] rounded-md shadow-lg z-[100] border border-gray-300">
+          <SearchedResults
+            query={searchQuery}
+            setQuery={setSearchQuery}
+            setModal={setModal}
+            loading={loading}
+            data={data}
+          />
+        </div>
+      )}
+    </div>
+  );
 }
 
 function SearchedResults({ setModal, loading, data, query, setQuery }) {

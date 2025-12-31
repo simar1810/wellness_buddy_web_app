@@ -1,7 +1,7 @@
 "use client";
 import ContentError from "@/components/common/ContentError";
 import ContentLoader from "@/components/common/ContentLoader";
-import DashboardClientList from "@/components/drawers/DashboardClientList";
+import DashboardFeaturesDetails from "@/components/drawers/DashboardFeaturesDetails";
 import ActivityTool from "@/components/pages/coach/dashboard/ActivityTool";
 import StatisticsCards from "@/components/pages/coach/dashboard/StatisticsCards";
 import Stories from "@/components/pages/coach/dashboard/Stories";
@@ -33,7 +33,7 @@ function Container() {
       <Stories stories={coachHomeData.story} />
       <MarathonLeaderBoard />
     </div>
-    <DashboardClientList
+    <DashboardFeaturesDetails
       topPerformers={coachHomeData.topPerformers}
       clientFollowUps={coachHomeData.clientFollowUps}
       missingFollowups={coachHomeData.missingFollowups}

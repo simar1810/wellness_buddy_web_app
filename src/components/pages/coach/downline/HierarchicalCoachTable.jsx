@@ -42,6 +42,7 @@ import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useAppSelector } from "@/providers/global/hooks";
 
 /**
  * HierarchicalCoachTable Component
@@ -178,6 +179,10 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
   const levelNum = Number(level);
   const isExpanded = expandedLevels.has(levelNum);
   const levelCoaches = groupedCoaches[level] || [];
+  const { clubType } = useAppSelector(state => state.coach.data)
+
+  const hasEditAccess = ["System Leader", "Club Leader", "Club Leader Jr"].includes(clubType)
+
   return (
     <Table>
       <TableHeader>
@@ -243,7 +248,9 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
                     </Link>
                   </TableCell>
                   <TableCell className="text-center">
-                    <UpdateCoachClubType coach={coach} />
+                    {hasEditAccess
+                      ? <UpdateCoachClubType coach={coach} />
+                      : coach.clubType}
                   </TableCell>
                   <TableCell className="flex justify-center">
                     <SyncCoachComponent coach={coach} />
@@ -260,7 +267,8 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
                       <Link href={`/coach/downline/coach/${coach._id}`}>
                         <Eye className="w-[20px] h-[20px] mx-auto" />
                       </Link>
-                      <DeleteDownlineCoach coachId={coach._id} />
+                      {hasEditAccess
+                        && <DeleteDownlineCoach coachId={coach._id} />}
                     </div>
                   </TableCell>
                 </TableRow>
