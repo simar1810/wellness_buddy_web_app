@@ -181,7 +181,8 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
   const levelCoaches = groupedCoaches[level] || [];
   const { clubType } = useAppSelector(state => state.coach.data)
 
-  const hasEditAccess = ["System Leader", "Club Leader", "Club Leader Jr"].includes(clubType)
+  const hasEditAccess = (coachClubType) => ["System Leader", "Club Leader", "Club Leader Jr"].includes(clubType) &&
+    (["Club Leader", "Club Leader Jr"].includes(coachClubType) ? clubType === "System Leader" : true )
 
   return (
     <Table>
@@ -248,7 +249,7 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
                     </Link>
                   </TableCell>
                   <TableCell className="text-center">
-                    {hasEditAccess
+                    {hasEditAccess(coach.clubType)
                       ? <UpdateCoachClubType coach={coach} />
                       : coach.clubType}
                   </TableCell>
@@ -267,7 +268,7 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
                       <Link href={`/coach/downline/coach/${coach._id}`}>
                         <Eye className="w-[20px] h-[20px] mx-auto" />
                       </Link>
-                      {hasEditAccess
+                      {hasEditAccess(coach.clubType)
                         && <DeleteDownlineCoach coachId={coach._id} />}
                     </div>
                   </TableCell>

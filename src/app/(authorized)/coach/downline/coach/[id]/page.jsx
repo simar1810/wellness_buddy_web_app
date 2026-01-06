@@ -56,7 +56,7 @@ const tabItems = [
 
 export default function Page() {
   const pathname = usePathname()
-
+  const { clubType } = useAppSelector(state => state.coach.data)
   const params = useSearchParams();
   const selectedTab = tabItems.map(item => item.value).includes(params.get("tab"))
     ? params.get("tab")
@@ -79,9 +79,9 @@ export default function Page() {
     plans = [],
     retailRequests = [],
     retailOrders = [],
-    clients = []
+    clients = [],
+    clubType: coachClubType
   } = data?.data || {};
-
   return <div className="content-container content-height-screen">
     <Tabs defaultValue={selectedTab}
       onValueChange={value => tabChange(value, router, params, pathname)}
@@ -93,7 +93,7 @@ export default function Page() {
         className="bg-[var(--comp-1)] p-4 border-1 rounded-[10px]"
         value="subscriptions"
       >
-        <SubscriptionsTab coachId={coachId} />
+        <SubscriptionsTab coachId={coachId} coachClubType={coachClubType} />
       </TabsContent>
       <TabsRetail retailOrders={retailOrders} />
       <TabsPlans plans={plans} />
@@ -559,20 +559,23 @@ function UpdateRollno({ rollno: defaultRollno, coachId }) {
   </div>
 }
 
-function SubscriptionsTab({ coachId }) {
+function SubscriptionsTab({ coachId, coachClubType }) {
   const [loading, setLoading] = useState(false);
+  const { clubType } = useAppSelector(state => state.coach.data)
   const { isLoading, error, data, mutate } = useSWR(
     `clubSubscription/${coachId}`,
     () => fetchClubSubscription(coachId)
   );
+  const canAddSubscription = ["Club Leader", "Club Leader Jr", "System Leader"].includes(clubType) && 
+    (["Club Leader", "Club Leader Jr"].includes(coachClubType) ? clubType === "System Leader" : true)
 
   if (isLoading) return <ContentLoader />
 
   if (error || data.status_code !== 200) return <div>
-    <CreateSubscriptionDialog
+    {canAddSubscription && <CreateSubscriptionDialog
       coachId={coachId}
       onCreated={mutate}
-    />
+      />}
     <ContentError title={error?.message || data.message} />
   </div>
 
@@ -617,10 +620,10 @@ function SubscriptionsTab({ coachId }) {
           }}
         />
       </div>
-      <CreateSubscriptionDialog
-        coachId={coachId}
-        onCreated={mutate}
-      />
+    {canAddSubscription && <CreateSubscriptionDialog
+      coachId={coachId}
+      onCreated={mutate}
+      />}
     </div>
     <SubscriptionsTable
       subscriptions={data.data?.history || []}
