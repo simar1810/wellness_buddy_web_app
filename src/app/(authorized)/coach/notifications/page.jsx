@@ -30,6 +30,8 @@ export default function Page() {
     types.add(notification.notificationType)
   }
 
+  console.log(data)
+
   if (notifications.length === 0) return <div>
     <div className="flex justify-end gap-2">
       <ScheduleNotificationWrapper />

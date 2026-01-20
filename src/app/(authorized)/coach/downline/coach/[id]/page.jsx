@@ -15,7 +15,7 @@ import Paginate from "@/components/Paginate";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Eye, Pen } from "lucide-react";
+import { Eye, Pen, Plus } from "lucide-react";
 import FormControl from "@/components/FormControl";
 import { Button } from "@/components/ui/button";
 import { sendData } from "@/lib/api";
@@ -25,6 +25,7 @@ import { useAppSelector } from "@/providers/global/hooks";
 import CreateSubscriptionDialog from "@/components/pages/coach/club/club-subscription/CreateClubSubscription";
 import SubscriptionsTable from "@/components/pages/coach/club/club-subscription/ListClubSubscriptions";
 import SelectControl from "@/components/Select";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const tabItems = [
   {
@@ -230,20 +231,29 @@ function TabsClients({ clients = [] }) {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Coach</TableHead>
                 <TableHead>Client ID</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Mobile</TableHead>
                 <TableHead>City</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedClients.map((client) => (
                 <TableRow key={client._id}>
                   <TableCell className="font-medium">{client.name}</TableCell>
+                  <ClientCategoriesListing categories={client.categories} />
+                  <TableCell>{client.coachName}</TableCell>
                   <TableCell>{client.clientId}</TableCell>
                   <TableCell>{client.email || "-"}</TableCell>
                   <TableCell>{client.mobileNumber || "-"}</TableCell>
                   <TableCell>{client.city || "-"}</TableCell>
+                  <TableCell>{client?.isSubscription
+                    ? <Badge variant="wz_fill">Active</Badge>
+                    : <Badge variant="destructive">In active</Badge>}
+                  </TableCell>
                   {["System Leader", "Club Leader", "Club Leader Jr"].includes(clubType) && <TableCell onClick={e => e.stopPropagation()}>
                     <SyncedCoachClientDetails
                       client={client}
@@ -258,7 +268,7 @@ function TabsClients({ clients = [] }) {
               ))}
               {paginatedClients.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-sm text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center text-sm text-muted-foreground">
                     No clients found
                   </TableCell>
                 </TableRow>
@@ -277,6 +287,52 @@ function TabsClients({ clients = [] }) {
       </div>
     </TabsContent>
   )
+}
+
+function ClientCategoriesListing({ categories = [] }) {
+  const { client_categories } = useAppSelector(state => state.coach.data)
+
+  const selectedCategories = useMemo(() => findClientCategories(categories, client_categories), [categories, client_categories])
+
+  if (categories.length === 0) return <TableCell className="opacity-50">
+    -
+  </TableCell>
+
+  return <TableCell className="flex items-center gap-1">
+    {selectedCategories
+      .slice(0, 2)
+      .map(cat => <span
+        key={cat.id}
+        className="px-2 py-1 text-[12px] bg-[var(--accent-1)] rounded-full text-white"
+      >
+        {cat.name}
+      </span>)}
+    <Tooltip>
+      <TooltipTrigger className="px-2 py-1 text-[12px] bg-[var(--accent-1)] rounded-full text-white">
+        <Plus className="w-[16px] h-[16px]" />
+      </TooltipTrigger>
+      <TooltipContent className="w-[300px] bg-[var(--comp-1)] border-1 border-[#8080808D] shadow-xl p-4 flex gap-x-1 gap-y-2 flex-wrap">
+        {selectedCategories
+          .map(cat => <span
+            key={cat.id}
+            className="px-2 py-1 text-[12px] bg-[var(--accent-1)] rounded-full text-white font-bold"
+          >
+            {cat.name}
+          </span>)}
+      </TooltipContent>
+    </Tooltip>
+  </TableCell>
+}
+
+function findClientCategories(categories = [], coachCategories) {
+  const coachCategoryMap = new Map(
+    coachCategories.map(cat => [cat._id, cat.name])
+  )
+  return (categories || [])
+    .map(cat => ({
+      id: cat,
+      name: coachCategoryMap.get(cat)
+    }))
 }
 
 const getPendingAmount = (sellingPrice, paidAmount) =>
@@ -566,7 +622,7 @@ function SubscriptionsTab({ coachId, coachClubType }) {
     `clubSubscription/${coachId}`,
     () => fetchClubSubscription(coachId)
   );
-  const canAddSubscription = ["Club Leader", "Club Leader Jr", "System Leader"].includes(clubType) && 
+  const canAddSubscription = ["Club Leader", "Club Leader Jr", "System Leader"].includes(clubType) &&
     (["Club Leader", "Club Leader Jr"].includes(coachClubType) ? clubType === "System Leader" : true)
 
   if (isLoading) return <ContentLoader />
@@ -575,7 +631,7 @@ function SubscriptionsTab({ coachId, coachClubType }) {
     {canAddSubscription && <CreateSubscriptionDialog
       coachId={coachId}
       onCreated={mutate}
-      />}
+    />}
     <ContentError title={error?.message || data.message} />
   </div>
 
@@ -620,9 +676,9 @@ function SubscriptionsTab({ coachId, coachClubType }) {
           }}
         />
       </div>
-    {canAddSubscription && <CreateSubscriptionDialog
-      coachId={coachId}
-      onCreated={mutate}
+      {canAddSubscription && <CreateSubscriptionDialog
+        coachId={coachId}
+        onCreated={mutate}
       />}
     </div>
     <SubscriptionsTable
