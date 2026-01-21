@@ -642,7 +642,7 @@ function DownlineClientList() {
 				<TableRow className="bg-white [&_th]:font-bold">
 					<TableHead>Name</TableHead>
 					<TableHead>Categories</TableHead>
-					<TableHead>Coach</TableHead>
+					<TableHead>Coach ID</TableHead>
 					<TableHead>Client ID</TableHead>
 					<TableHead>Email</TableHead>
 					<TableHead>Mobile</TableHead>
@@ -901,28 +901,83 @@ function DownlineCoachIncrementContainer() {
 	if (error || data?.status_code !== 200) return <div className="min-h-[200px] flex items-center justify-center">
 		{error || data?.message || "Something went wrong"}
 	</div>
+
 	const coaches = Object
 		.entries(data?.data || [])
 		.map(([_, coaches]) => coaches)
 		.flatMap(coach => coach)
 
-	function exportCoachData() {
-		const excelData = coaches.map(coach => ({
+	const ALL_MONTHS_OPTION = "All Months";
+	const NOT_SET_MONTH = "Not Set";
+	const [selectedMonth, setSelectedMonth] = useState(ALL_MONTHS_OPTION);
+
+	const eligibilityMonths = useMemo(() => {
+		const uniqueMonths = [];
+		coaches.forEach((coach) => {
+			const month = coach.eligibilityMonth ?? NOT_SET_MONTH;
+			if (!uniqueMonths.includes(month)) {
+				uniqueMonths.push(month);
+			}
+		});
+		return uniqueMonths;
+	}, [coaches]);
+
+	const filteredCoaches = useMemo(() => {
+		if (selectedMonth === ALL_MONTHS_OPTION) {
+			return coaches;
+		}
+		return coaches.filter(
+			coach => (coach.eligibilityMonth ?? NOT_SET_MONTH) === selectedMonth
+		);
+	}, [coaches, selectedMonth]);
+
+	function exportCoachData(targetCoaches = filteredCoaches) {
+		const excelData = targetCoaches.map(coach => ({
 			"Coach Name": coach.coach,
 			"Mobile Number": coach.mobileNumber,
 			"Club Type": coach.clubType,
-			"Qualified For": coach.qualifiedClubType
+			"Qualified For": coach.qualifiedClubType,
+			"Eligibility Month": coach.eligibilityMonth ?? NOT_SET_MONTH,
 		}))
 		exportToExcel(excelData)
 	}
 
+	const emptyMessage = coaches.length === 0
+		? "No coaches found that are qualified"
+		: selectedMonth === ALL_MONTHS_OPTION
+			? "No coaches found that are qualified"
+			: `No coaches found for "${selectedMonth}" eligibility month.`;
+
 	return <div className="overflow-clip">
-		<DialogTitle className="p-4 border-b-1 flex items-center justify-between">
-			Qualifications
-			{coaches.length > 0 && <Button className="mr-4 bg-[var(--accent-1)] text-white" variant="icon" size="sm" onClick={exportCoachData}>
-				Download
-				<FileSpreadsheet />
-			</Button>}
+		<DialogTitle className="p-4 border-b-1">
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
+					<span className="text-lg font-semibold mr-auto">Qualifications</span>
+					<div className="flex items-center gap-2 ml-auto">
+						<span className="text-sm font-medium text-muted-foreground">Filter</span>
+						<Select
+							value={selectedMonth}
+							onValueChange={value => setSelectedMonth(value)}
+						>
+							<SelectTrigger className="min-w-[180px] py-2 text-sm">
+								<SelectValue placeholder={ALL_MONTHS_OPTION} />
+							</SelectTrigger>
+							<SelectContent side="bottom">
+								<SelectItem value={ALL_MONTHS_OPTION}>All Months</SelectItem>
+								{eligibilityMonths.map(month => (
+									<SelectItem key={month} value={month}>
+										{month}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+				</div>
+				{coaches.length > 0 && <Button className="mr-4 bg-[var(--accent-1)] text-white" variant="icon" size="sm" onClick={() => exportCoachData(filteredCoaches)}>
+					Download
+					<FileSpreadsheet />
+				</Button>}
+			</div>
 		</DialogTitle>
 		<Table className="bg-[var(--comp-1)] rounded-md">
 			<TableHeader className="[&_th]:font-bold">
@@ -934,7 +989,7 @@ function DownlineCoachIncrementContainer() {
 				</TableRow>
 			</TableHeader>
 			<TableBody>
-				{coaches.map(coach => (
+				{filteredCoaches.map(coach => (
 					<TableRow key={coach._id}>
 						<TableCell>{coach.coach}</TableCell>
 						<TableCell>{coach.mobileNumber}</TableCell>
@@ -951,8 +1006,8 @@ function DownlineCoachIncrementContainer() {
 				))}
 			</TableBody>
 		</Table>
-		{coaches.length === 0 && <div className="h-[200px] flex items-center justify-center">
-			No coaches found that are qualified
+		{filteredCoaches.length === 0 && <div className="h-[200px] flex items-center justify-center">
+			{emptyMessage}
 		</div>}
 	</div>
 }

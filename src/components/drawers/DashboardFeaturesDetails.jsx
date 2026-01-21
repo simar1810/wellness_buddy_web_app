@@ -153,6 +153,7 @@ function Container({ topPerformers, clientFollowUps, missingFollowups }) {
                   <TabsTrigger
                     key={tabItem.value}
                     value={tabItem.value}
+
                     className="relative flex-none rounded-none border-0 bg-transparent px-0 p-2 md:pb-3 text-sm md:text-base font-semibold text-slate-500 h-auto data-[state=active]:text-slate-900 data-[state=active]:shadow-none data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:h-[3px] data-[state=active]:after:w-full data-[state=active]:after:rounded-full data-[state=active]:after:bg-[var(--accent-1)]"
                   >
                     {tabItem.label}
@@ -513,6 +514,12 @@ function createTabsConfig({
       render: (row) => <DaysPill badge={row.daysRemaining} />,
       exportValue: (row) => row.daysRemaining?.value ?? "",
     },
+    // {
+    //  key: "coachName",
+    //  label: "Coach Name",
+    //  render: (row) => <DaysPill badge={row.coachName} />,
+    //  exportValue: (row) => row.coachName ?? "",
+    // },
   ];
   const mealPlanColumns = [
     {
