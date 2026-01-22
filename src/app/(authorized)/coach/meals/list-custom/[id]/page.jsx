@@ -126,9 +126,10 @@ function MealDetails({ meal }) {
       height={200}
       width={200}
       className="w-full max-h-[180px] object-cover border-b-1"
+      onError={(e) => e.target.src = "/not-found.png"}
     />
     <div className="p-3 text-md">
-      <h3>{meal.dish_name}</h3>
+      <h3>{meal.dish_name || meal.name}</h3>
       <p className="text-black/60 text-xs mt-1">{meal.description}</p>
       <p className="text-[14px] text-[#808080]">{meal.meal_time}</p>
     </div>
