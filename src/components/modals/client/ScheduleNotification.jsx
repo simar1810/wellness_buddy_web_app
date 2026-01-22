@@ -20,6 +20,8 @@ import { useParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAppSelector } from "@/providers/global/hooks";
+import { _throwError } from "@/lib/formatter";
 
 function convertTimeTo12Hour(timeStr) {
   if (!timeStr) return "";
@@ -143,6 +145,7 @@ function ScheduleNotification({
   const [showHistory, setShowHistory] = useState(false);
   const subjectRef = useRef(null);
   const dropdownRef = useRef(null);
+  const { client_categories } = useAppSelector(state => state.coach.data)
 
   const { id: currentClientId } = useParams()
 
@@ -292,7 +295,7 @@ function ScheduleNotification({
         getNormalizedPayloadForSave(payload),
         defaultPayload._id,
       );
-      console.log(formData)
+
       const response = await sendData(
         `app/notifications-schedule`,
         formData,
@@ -323,6 +326,24 @@ function ScheduleNotification({
       toast.dismiss(toastId);
     }
   }
+
+  const availableUserTypes = [
+    {
+      id: 1,
+      name: "Clients",
+      value: "clients"
+    },
+    {
+      id: 2,
+      name: "Coaches",
+      value: "coaches"
+    },
+    ...client_categories.map((cat, idx) => ({
+      id: idx + 3,
+      name: cat.name,
+      value: cat._id
+    }))
+  ]
 
   return <Dialog>
     <DialogTrigger asChild>
@@ -498,7 +519,8 @@ function ScheduleNotification({
           <div className="mb-4">
             <SelectMultiple
               label="Select Clients"
-              options={clients}
+              // options={clients}
+              options={availableUserTypes}
               value={payload.clients}
               onChange={value => setPayload(prev => ({ ...prev, clients: value }))}
               className="[&_.option]:px-4 [&_.option]:py-2"

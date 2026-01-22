@@ -37,8 +37,7 @@ export default function Stage2() {
 				for (const mealType of state.selectedPlans[day]) {
 					if (!mealType.meals || mealType.meals?.length === 0)
 						_throwError(
-							`On ${day}, for ${
-								mealType.mealType || "First Meal Type"
+							`On ${day}, for ${mealType.mealType || "First Meal Type"
 							} at least one meal should be assigned!`
 						);
 					for (const meal of mealType.meals) {
@@ -171,7 +170,6 @@ export default function Stage2() {
 			setLoading(false);
 		}
 	}
-
 	return (
 		<div>
 			<div className="flex flex-col gap-y-4">

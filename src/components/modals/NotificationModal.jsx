@@ -56,8 +56,62 @@ function DropDownContainer() {
   </>
 }
 
+function parseDateByFormat(dateStr) {
+  if (!dateStr) return "";
+  const formats = [
+    {
+      regex: /^\d{2}-\d{2}-\d{4}\s\d{2}:\d{2}$/,
+      parser: (s) => {
+        const [d, t] = s.split(" ");
+        const [day, month, year] = d.split("-").map(Number);
+        const [hour, minute] = t.split(":").map(Number);
+        return new Date(year, month - 1, day, hour, minute);
+      },
+    },
+    {
+      regex: /^\d{2}-\d{2}-\d{4}\s\d{2}:\d{2}:\d{2}$/,
+      parser: (s) => {
+        const [d, t] = s.split(" ");
+        const [day, month, year] = d.split("-").map(Number);
+        const [hour, minute, second] = t.split(":").map(Number);
+        return new Date(year, month - 1, day, hour, minute, second);
+      },
+    },
+    {
+      regex: /^\d{2}-\d{2}-\d{4}\s\d{2}:\d{2}\s(AM|PM)$/i,
+      parser: (s) => {
+        const [d, time, meridian] = s.split(" ");
+        let [hour, minute] = time.split(":").map(Number);
+        const [day, month, year] = d.split("-").map(Number);
+
+        if (meridian.toUpperCase() === "PM" && hour !== 12) hour += 12;
+        if (meridian.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+        return new Date(year, month - 1, day, hour, minute);
+      },
+    },
+    {
+      regex: /^\d{2}-\d{2}-\d{4}$/,
+      parser: (s) => {
+        const [day, month, year] = s.split("-").map(Number);
+        return new Date(year, month - 1, day);
+      },
+    },
+  ];
+
+  for (const { regex, parser } of formats) {
+    if (regex.test(dateStr)) {
+      const date = parser(dateStr);
+      if (!isNaN(date.getTime())) return format(date, "dd-MM-yyyy hh:mm a");
+    }
+  }
+
+  return "";
+}
+
 function Notification({ notification }) {
-  const formatted = format(parse(notification.createdDate, 'dd-MM-yyyy HH:mm', new Date()), 'dd-MM-yyyy hh:mm a');
+  console.log(notification.createdDate)
+  const formatted = parseDateByFormat(notification.createdDate)
   return <Link
     href={navigateUserToFeature__notification(notification.notificationType)}
     className="max-w-[96ch] min-w-[60ch] pb-2 mb-3 flex items-start gap-2 cursor-pointer"

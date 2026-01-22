@@ -894,14 +894,6 @@ function DownlineCoachIncrementContainer() {
 		() => fetchData(`way-to-wellness/increment?coachId=${coachId}`)
 	)
 
-	if (isLoading) return <div className="min-h-[200px] flex items-center justify-center">
-		<Loader />
-	</div>
-
-	if (error || data?.status_code !== 200) return <div className="min-h-[200px] flex items-center justify-center">
-		{error || data?.message || "Something went wrong"}
-	</div>
-
 	const coaches = Object
 		.entries(data?.data || [])
 		.map(([_, coaches]) => coaches)
@@ -948,7 +940,15 @@ function DownlineCoachIncrementContainer() {
 			? "No coaches found that are qualified"
 			: `No coaches found for "${selectedMonth}" eligibility month.`;
 
-	return <div className="overflow-clip">
+	if (isLoading) return <div className="min-h-[200px] flex items-center justify-center">
+		<Loader />
+	</div>
+
+	if (error || data?.status_code !== 200) return <div className="min-h-[200px] flex items-center justify-center">
+		{error || data?.message || "Something went wrong"}
+	</div>
+
+	return <div className="overflow-clip max-h-[70vh] overflow-y-auto">
 		<DialogTitle className="p-4 border-b-1">
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
