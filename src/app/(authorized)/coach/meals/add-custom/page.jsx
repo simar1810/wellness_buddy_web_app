@@ -68,6 +68,7 @@ function CustomWorkoutContainer() {
               ...meal,
               meals: meal.meals.map(item => ({
                 ...item,
+                dish_name: item.name || item.dish_name,
                 time: getFormattedTime(item.meal_time)
               }))
             })
