@@ -47,7 +47,7 @@ export default function Page() {
               sign in.
             </li>
             <li>Navigate &gt; <strong className="font-bold">&quot;Club&quot; &gt; &quot;Link Generator&quot; &gt; &quot;With Zoom Meetings&quot; &gt; &quot;Connect Now&quot;</strong>.</li>
-            <li>Click on <strong>&quot;Connect Now&quot;</strong>. You will be redirected to Zoom&apos;s authentication page, if zoom is already connected then you will not see this option.</li>
+            <li>Click on <strong>&quot;Connect Now&quot;</strong>. You will be redirected to Zoom&apos;s authentication page, if Zoom is already connected then you will not see this option.</li>
             <li>Authorize Way to Wellness Club to access your Zoom account.</li>
             <li>After authorization, you will be redirected back to Way to Wellness Club.</li>
           </ol>
@@ -60,7 +60,7 @@ export default function Page() {
           </h3>
           <ol className="list-decimal list-inside mt-2">
             <li>Go to <strong className="font-bold">&quot;Club&quot; &gt; &quot;Meetings&quot; &gt; &quot;With Zoom Meetings&quot;</strong>.</li>
-            <li>Click <strong>With Zoom Meetings</strong>, if zoom not connected kindly authorize us your zoom account to schedule meeting.</li>
+            <li>Click <strong>With Zoom Meetings</strong>, if Zoom not connected kindly authorize us your Zoom account to schedule meeting.</li>
             <li>Enter meeting details (Title, Date, Time, Duration, etc as prompted in the form.).</li>
             <li>Click <strong>&quot;Club&quot; &gt; &quot;Link Generator&quot; &gt; &quot;With Zoom Meetings&quot;</strong>. A Zoom meeting link will be generated.</li>
           </ol>
@@ -101,23 +101,23 @@ export default function Page() {
           <ol className="list-decimal list-inside mt-2">
             <li>Go to <strong>Meetings</strong>.</li>
             <li>Multiple Meetings are displayed in the meetings table.</li>
-            <li>Under the Base Link column click on the link zoom link to check the zoom events.</li>
+            <li>Under the Base Link column click on the link Zoom link to check the Zoom events.</li>
           </ol>
 
           <h3 className="mt-4 text-lg font-semibold leading-[1] mb-4">
-            📊 7. Deauthorize zoom account&nbsp;
+            📊 7. Deauthorize Zoom account&nbsp;
             <span className="text-gray-400 text-[14px] font-regular hover:text-gray-900">{"("}meeting:read:meeting:admin, meeting:read:participant:admin, meeting:read:list_meetings:admin{")"}</span>
           </h3>
           {/* <p>Listening to Zoom webhooks for every meeting is available under <strong>Meetings</strong>. Click on the Zoom meeting link to track attendance.</p> */}
           <ol className="list-decimal list-inside mt-2">
             <li>Click <strong>&quot;Club&quot; &gt; &quot;Link Generator&quot;</strong></li>
-            <li>An option with the <strong>&quot;With Zoom Meetings&quot;</strong> a menu icon that is ellipsis-{"("}<EllipsisVertical className="h-[14px] w-[14px] inline" />{")"} Click on this option and disconnect zoom option will be visible.</li>
+            <li>An option with the <strong>&quot;With Zoom Meetings&quot;</strong> a menu icon that is ellipsis-{"("}<EllipsisVertical className="h-[14px] w-[14px] inline" />{")"} Click on this option and disconnect Zoom option will be visible.</li>
           </ol>
 
           {/* <h2 className="mt-6 text-xl font-semibold">🔹 7. How to Uninstall Way to Wellness Club Zoom App</h2>
         <ol className="list-decimal list-inside mt-2">
           <li>
-            Go to <a href="https://marketplace.zoom.us/user/installed-apps" className="text-blue-600">Zoom Installed Apps</a>.
+            Go to <a href="https://marketplace.Zoom.us/user/installed-apps" className="text-blue-600">Zoom Installed Apps</a>.
           </li>
           <li>Find <strong>Way to Wellness Club</strong> and click <strong>“Uninstall”</strong>.</li>
           <li>Confirm the uninstallation to remove all Zoom data from Way to Wellness Club.</li>
