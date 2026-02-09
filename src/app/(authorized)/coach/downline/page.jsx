@@ -43,6 +43,7 @@ import ClientUpdateCategories from "@/components/pages/coach/client/ClientUpdate
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import Loader from "@/components/common/Loader";
 import { exportToExcel } from "@/lib/excel";
+import { calculateCurrentSubscriptions, getClusterSubscriptions } from "@/lib/downline";
 
 const categoriesFetcher = () =>
 	fetchData("app/coach-categories").then((res) => {
@@ -881,7 +882,7 @@ function DownlineIncrement() {
 		<DialogTrigger asChild>
 			<Button variant="wz">Qualifications</Button>
 		</DialogTrigger>
-		<DialogContent className="!max-w-[550px] w-full p-0 gap-0">
+		<DialogContent className="!max-w-[750px] w-full p-0 gap-0">
 			<DownlineCoachIncrementContainer />
 		</DialogContent>
 	</Dialog>
@@ -955,6 +956,7 @@ function DownlineCoachIncrementContainer() {
 					<span className="text-lg font-semibold mr-auto">Qualifications</span>
 					<div className="flex items-center gap-2 ml-auto">
 						<span className="text-sm font-medium text-muted-foreground">Filter</span>
+						<button type="" onClick={mutate}>mutate</button>
 						<Select
 							value={selectedMonth}
 							onValueChange={value => setSelectedMonth(value)}
@@ -986,6 +988,8 @@ function DownlineCoachIncrementContainer() {
 					<TableHead>Mobile Number</TableHead>
 					<TableHead>Club Type</TableHead>
 					<TableHead>Qualified Club Type</TableHead>
+					<TableHead>Current</TableHead>
+					<TableHead>Cluster</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
@@ -1002,6 +1006,8 @@ function DownlineCoachIncrementContainer() {
 								clubType={coach.qualifiedClubType}
 							/>
 						</TableCell>
+						<TableCell className="text-center">{calculateCurrentSubscriptions(coach)}</TableCell>
+						<TableCell className="text-center">{getClusterSubscriptions(coach)}</TableCell>
 					</TableRow>
 				))}
 			</TableBody>

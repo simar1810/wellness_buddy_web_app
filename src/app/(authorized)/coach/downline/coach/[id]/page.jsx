@@ -26,6 +26,10 @@ import CreateSubscriptionDialog from "@/components/pages/coach/club/club-subscri
 import SubscriptionsTable from "@/components/pages/coach/club/club-subscription/ListClubSubscriptions";
 import SelectControl from "@/components/Select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { copyText } from "@/lib/utils";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { endOfMonth, format, subMonths } from "date-fns";
+import { buildListOfMonths, CLUB_LEADER_JR_QUALIFICATION_DURATION } from "@/lib/downline";
 
 const tabItems = [
   {
@@ -43,16 +47,11 @@ const tabItems = [
     title: "Subscriptions",
     value: "subscriptions"
   },
-  // {
-  //   id: 3,
-  //   title: "Retail",
-  //   value: "retail"
-  // },
-  // {
-  //   id: 4,
-  //   title: "Plans",
-  //   value: "plans"
-  // }
+  {
+    id: 4,
+    title: "Analytics",
+    value: "analytics"
+  },
 ]
 
 export default function Page() {
@@ -66,7 +65,7 @@ export default function Page() {
   const router = useRouter();
 
   const { id: coachId } = useParams()
-  const { isLoading, error, data } = useSWR(
+  const { isLoading, error, data, mutate } = useSWR(
     `app/downline/${coachId}`,
     () => retrieveDownlineCoachInformation({ coachId })
   );
@@ -81,12 +80,14 @@ export default function Page() {
     retailRequests = [],
     retailOrders = [],
     clients = [],
-    clubType: coachClubType
+    clubType: coachClubType,
+    downlineCoachAnalytics
   } = data?.data || {};
   return <div className="content-container content-height-screen">
     <Tabs defaultValue={selectedTab}
       onValueChange={value => tabChange(value, router, params, pathname)}
     >
+      {/* <button onClick={mutate}>mutate</button> */}
       <TabsHeader />
       <TabsProfile profile={profile} />
       <TabsClients clients={clients} />
@@ -98,6 +99,7 @@ export default function Page() {
       </TabsContent>
       <TabsRetail retailOrders={retailOrders} />
       <TabsPlans plans={plans} />
+      <TabsAnalytics downlineCoachAnalytics={downlineCoachAnalytics} />
     </Tabs>
   </div>
 }
@@ -686,4 +688,141 @@ function SubscriptionsTab({ coachId, coachClubType }) {
       onDeleted={mutate}
     />
   </div>
+}
+
+function TabsAnalytics({ downlineCoachAnalytics = [] }) {
+  const clubLeaderJrCoaches = downlineCoachAnalytics.filter(
+    coach => coach?.percentages?.clubLeaderJr && !coach?.percentages?.clubCaptain
+    // && coach?.percentages?.clubLeaderJr !== "0.00"
+  );
+
+  const clubCaptainCoaches = downlineCoachAnalytics.filter(
+    coach => coach?.percentages?.clubCaptain
+  );
+  const groups = [
+    {
+      clubType: "Club Leader Jr",
+      members: clubLeaderJrCoaches
+        .sort(sortEligibilityPercentages("clubLeaderJr")),
+    },
+    {
+      clubType: "Club Captain",
+      members: clubCaptainCoaches
+        .sort(sortEligibilityPercentages("clubCaptain")),
+    },
+  ]
+
+  return (
+    <TabsContent value="analytics" className="space-y-4 bg-slate-100 p-4 rounded-[6px] border-1">
+      <Accordion
+        type="multiple"
+        defaultValue={["Club Leader Jr"]}
+        className="w-full space-y-2"
+      >
+        {groups.map(group => (
+          <AccordionItem
+            key={group.clubType}
+            value={group.clubType}
+          >
+            <AccordionTrigger className="bg-white font-bold px-4 py-3 !rounded-none border-1 border-b-0">
+              {group.clubType} ({group.members.length})
+            </AccordionTrigger>
+            <AccordionContent className="p-0 bg-slate-50 border-1">
+              {group.members.length > 0 && <Table>
+                <TableHeader>
+                  <TableRow className="bg-white [&_th]:text-center">
+                    <TableHead className="w-[80px]">Sr No.</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Coach ID</TableHead>
+                    <TableHead>Mobile</TableHead>
+                    <TableHead>Coach Subscriptions</TableHead>
+                    <TableHead>Cluster Subscriptions</TableHead>
+                    <TableHead>Percentage</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {group.members.map((coach, index) => (
+                    <TableRow key={coach._id} className="text-center">
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell className="font-medium">
+                        {coach.name}
+                      </TableCell>
+                      <TableCell>{coach.coachId}</TableCell>
+                      <TableCell>{coach.mobileNumber}</TableCell>
+                      <TableCell>{getCoachSubscriptions(coach, group.clubType)}</TableCell>
+                      <TableCell>{getClusterSubscriptions(coach, group.clubType)}</TableCell>
+                      <TableCell>
+                        <div className="space-y-1 min-w-[140px]">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>Progress</span>
+                            <span>
+                              {group.clubType === "Club Leader Jr"
+                                ? coach.percentages.clubLeaderJr
+                                : coach.percentages.clubCaptain}
+                              %
+                            </span>
+                          </div>
+                          <div className="h-2 w-full rounded-full bg-slate-200 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-emerald-500 transition-all duration-300"
+                              style={{
+                                width: `${Number(
+                                  group.clubType === "Club Leader Jr"
+                                    ? coach?.percentages?.clubLeaderJr
+                                    : coach?.percentages?.clubCaptain
+                                )}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>}
+              {group.members.length === 0 && <div className="bg-white h-[100px] flex items-center text-gray-500 justify-center">
+                No Coaches Are Qualified for {group.clubType}
+              </div>}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </TabsContent>
+  );
+}
+
+function sortEligibilityPercentages(field) {
+  return (coachA, coachB) =>
+    parseInt(coachA?.percentages[field]) <
+      coachB?.percentages[field] ? 1 : -1
+}
+
+function getCoachSubscriptions(coach, clubTypeQualifiedFor) {
+  const { monthlyDownlineAnalytics, downlineAnalytics } = coach
+  if (clubTypeQualifiedFor === "Club Leader Jr") {
+    const months = buildListOfMonths(CLUB_LEADER_JR_QUALIFICATION_DURATION);
+    let totals = 0
+    for (const month of months) {
+      const stats = monthlyDownlineAnalytics[month] || {};
+      totals += (stats?.clusterSubscriptions?.coachSubscriptions || 0)
+    }
+    return totals
+  }
+  return downlineAnalytics?.coachSubscriptionsLevel1
+}
+
+function getClusterSubscriptions(coach, clubTypeQualifiedFor) {
+  const { monthlyDownlineAnalytics, downlineAnalytics } = coach
+  if (clubTypeQualifiedFor === "Club Leader Jr") {
+    const months = buildListOfMonths(CLUB_LEADER_JR_QUALIFICATION_DURATION);
+    let totals = 0
+    for (const month of months) {
+      const stats = monthlyDownlineAnalytics[month] || {};
+      totals += (stats?.clusterSubscriptions?.coachSubscriptions || 0)
+        + (stats?.clusterSubscriptions?.clientSubscriptions || 0)
+    }
+    return totals
+  }
+  return downlineAnalytics?.clientSubscriptions
+    + downlineAnalytics?.coachSubscriptionsLevel1
 }
