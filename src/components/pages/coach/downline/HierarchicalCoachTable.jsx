@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useMemo, useRef } from "react";
 import {
   Table,
@@ -41,17 +40,10 @@ import { mutate } from "swr";
 import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { useAppSelector } from "@/providers/global/hooks";
 
-/**
- * HierarchicalCoachTable Component
- * Displays coaches in a hierarchical table grouped by supervisor level
- */
 export default function HierarchicalCoachTable({ coaches = [], onMakeTop }) {
-  const [expandedLevels, setExpandedLevels] = useState(new Set([1])); // Level 1 expanded by default
-
-  // Group coaches by supervisor level
+  const [expandedLevels, setExpandedLevels] = useState(new Set([1]));
   const groupedCoaches = useMemo(() => {
     const groups = {};
 
@@ -66,12 +58,10 @@ export default function HierarchicalCoachTable({ coaches = [], onMakeTop }) {
     return groups;
   }, [coaches]);
 
-  // Get sorted level keys
   const levels = useMemo(() => {
     return Object.keys(groupedCoaches).sort((a, b) => Number(a) - Number(b));
   }, [groupedCoaches]);
 
-  // Toggle level expansion
   const toggleLevel = (level) => {
     setExpandedLevels((prev) => {
       const newSet = new Set(prev);
@@ -84,17 +74,14 @@ export default function HierarchicalCoachTable({ coaches = [], onMakeTop }) {
     });
   };
 
-  // Expand all levels
   const expandAll = () => {
     setExpandedLevels(new Set(levels.map(Number)));
   };
 
-  // Show only first level
   const showFirstLevelOnly = () => {
     setExpandedLevels(new Set([1]));
   };
 
-  // Calculate visible downline count for a coach
   const getVisibleDownlineCount = (coach) => {
     return (
       coach.visibleDownlineCount ||
@@ -104,19 +91,16 @@ export default function HierarchicalCoachTable({ coaches = [], onMakeTop }) {
     );
   };
 
-  // Get supervisor level for a coach
   const getSupervisorLevel = (coach) => {
     return coach.supervisorLevel || coach.level || coach.hierarchyLevel || 1;
   };
 
   return (
     <div className="space-y-4">
-      {/* Legend Controls */}
       <div className="flex flex-col items-start md:items-center gap-1 md:gap-3 p-3 bg-white border rounded-md shadow-sm">
         <span className="font-semibold text-sm text-gray-700">Legend</span>
         <div className="flex flex-wrap items-center justify-start gap-1 md:gap-3">
           <div className="flex items-center gap-2 md:ml-2">
-            {/* <Checkbox className="w-3 h-3" /> */}
             <span className="text-xs text-gray-600">= Make Top</span>
           </div>
           <Button
@@ -140,7 +124,6 @@ export default function HierarchicalCoachTable({ coaches = [], onMakeTop }) {
         </div>
       </div>
 
-      {/* Hierarchical Table */}
       <div className="border rounded-md overflow-hidden bg-white space-y-4">
         {levels.map((level, index) => (
           <LevelTable
@@ -153,7 +136,6 @@ export default function HierarchicalCoachTable({ coaches = [], onMakeTop }) {
         ))}
       </div>
 
-      {/* Overall Summary */}
       {levels.length > 0 && (
         <div className="flex justify-end gap-6 text-sm font-semibold p-3 bg-blue-50 rounded-md border border-blue-200">
           <span className="text-gray-700">
@@ -182,13 +164,13 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
   const { clubType } = useAppSelector(state => state.coach.data)
 
   const hasEditAccess = (coachClubType) => ["System Leader", "Club Leader", "Club Leader Jr"].includes(clubType) &&
-    (["Club Leader", "Club Leader Jr"].includes(coachClubType) ? clubType === "System Leader" : true )
+    (["Club Leader", "Club Leader Jr"].includes(coachClubType) ? clubType === "System Leader" : true)
 
   return (
     <Table>
       <TableHeader>
         <TableRow className="text-white bg-[#4a5568] hover:bg-[#4a5568] border-b-2 border-gray-600">
-          <TableCell colSpan={5} className="font-semibold py-2">
+          <TableCell colSpan={8} className="font-semibold py-2">
             <button
               onClick={() => toggleLevel(levelNum)}
               className="w-full flex items-center gap-2 cursor-pointer"
@@ -229,6 +211,12 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
               <TableHead className="text-gray-800 font-bold text-center w-[220px] py-3">
                 Subscription Status
               </TableHead>
+              <TableHead className="text-gray-800 font-bold text-center w-[220px] py-3">
+                Personal Subscriptions
+              </TableHead>
+              <TableHead className="text-gray-800 font-bold text-center w-[220px] py-3">
+                Cluster Subscriptions
+              </TableHead>
               <TableHead className="text-gray-800 font-bold text-center w-[220px] py-3"></TableHead>
             </TableRow>
           </TableHeader>
@@ -263,6 +251,14 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
                       <Badge variant="destructive">In Active</Badge>
                     )}
                   </TableCell>
+                  <TableCell className="text-center">
+                    {!isNaN(coach?.downlineAnalytics?.clientSubscriptions) ? coach?.downlineAnalytics?.clientSubscriptions : 0}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {!isNaN(coach?.downlineAnalytics?.clusterSubscriptions?.clientSubscriptions)
+                      ? coach?.downlineAnalytics?.clusterSubscriptions?.clientSubscriptions
+                      : 0}
+                  </TableCell>
                   <TableCell className="">
                     <div className="flex items-center justify-end gap-2 pr-8">
                       <Link href={`/coach/downline/coach/${coach._id}`}>
@@ -279,7 +275,7 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
           {isExpanded && levelCoaches.length > 0 && (
             <TableRow className="bg-blue-50 font-semibold border-b-2 border-blue-200">
               <TableCell />
-              <TableCell colSpan={4} className="text-right py-2 text-blue-900">
+              <TableCell colSpan={6} className="text-right py-2 text-blue-900">
                 Level {level} Total:
               </TableCell>
               <TableCell className="text-center py-2 text-blue-900">
@@ -360,18 +356,6 @@ function UpdateCoachClubType({ coach }) {
               ))}
             </SelectContent>
           </Select>
-
-          {/* <div className="mt-4">No. Of Login Devices</div>
-          <Input
-            value={loginDevices}
-            onChange={(e) =>
-              setLoginDevices(
-                !isNaN(e.target.value) ? parseInt(e.target.value) : 0,
-              )
-            }
-            className="!mb-4"
-            type="number"
-          /> */}
 
           <Button onClick={handleUpdate} disabled={loading} className="mt-4 w-full">
             {loading ? "Updating..." : "Update Club Type"}
