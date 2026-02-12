@@ -888,6 +888,13 @@ function DownlineIncrement() {
 	</Dialog>
 }
 
+const sortCoaches = function (key) {
+	return (coachA, coachB) =>
+		parseInt(coachA?.percentages[key]) > parseInt(coachB?.percentages[key])
+			? -1
+			: 1
+}
+
 function DownlineCoachIncrementContainer() {
 	const { _id: coachId } = useAppSelector(state => state.coach.data)
 	const { isLoading, error, data, mutate } = useSWR(
@@ -923,6 +930,14 @@ function DownlineCoachIncrementContainer() {
 			coach => (coach.eligibilityMonth ?? NOT_SET_MONTH) === selectedMonth
 		);
 	}, [coaches, selectedMonth]);
+
+	const clubLeaderJr = filteredCoaches
+		?.filter(coach => coach?.eligibleFor === "clubLeaderJr")
+		?.sort(sortCoaches("clubLeaderJr"))
+
+	const clubCaptain = filteredCoaches
+		?.filter(coach => coach?.eligibleFor === "clubCaptain")
+		?.sort(sortCoaches("clubCaptain"))
 
 	function exportCoachData(targetCoaches = filteredCoaches) {
 		const excelData = targetCoaches.map(coach => ({
@@ -975,7 +990,12 @@ function DownlineCoachIncrementContainer() {
 						</Select>
 					</div>
 				</div>
-				{coaches.length > 0 && <Button className="mr-4 bg-[var(--accent-1)] text-white" variant="icon" size="sm" onClick={() => exportCoachData(filteredCoaches)}>
+				{coaches.length > 0 && <Button
+					className="mr-4 bg-[var(--accent-1)] text-white"
+					variant="icon"
+					size="sm"
+					onClick={() => exportCoachData(filteredCoaches)}
+				>
 					Download
 					<FileSpreadsheet />
 				</Button>}
@@ -988,12 +1008,11 @@ function DownlineCoachIncrementContainer() {
 					<TableHead>Mobile Number</TableHead>
 					<TableHead>Club Type</TableHead>
 					<TableHead>Qualified Club Type</TableHead>
-					<TableHead>Current</TableHead>
-					<TableHead>Cluster</TableHead>
+					<TableHead>Percent</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
-				{filteredCoaches.map(coach => (
+				{clubLeaderJr?.map(coach => (
 					<TableRow key={coach._id}>
 						<TableCell>{coach.coach}</TableCell>
 						<TableCell>{coach.mobileNumber}</TableCell>
@@ -1006,8 +1025,23 @@ function DownlineCoachIncrementContainer() {
 								clubType={coach.qualifiedClubType}
 							/>
 						</TableCell>
-						<TableCell className="text-center">{calculateCurrentSubscriptions(coach)}</TableCell>
-						<TableCell className="text-center">{getClusterSubscriptions(coach)}</TableCell>
+						<TableCell>{coach?.percentages?.clubLeaderJr}</TableCell>
+					</TableRow>
+				))}
+				{clubCaptain?.map(coach => (
+					<TableRow key={coach._id}>
+						<TableCell>{coach.coach}</TableCell>
+						<TableCell>{coach.mobileNumber}</TableCell>
+						<TableCell>{coach.clubType}</TableCell>
+						<TableCell className="flex items-center gap-1">
+							{coach.qualifiedClubType}
+							<QualifyCoachClubType
+								mutate={mutate}
+								coachId={coach._id}
+								clubType={coach.qualifiedClubType}
+							/>
+						</TableCell>
+						<TableCell>{coach?.percentages?.clubCaptain}</TableCell>
 					</TableRow>
 				))}
 			</TableBody>
