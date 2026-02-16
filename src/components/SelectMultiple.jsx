@@ -5,7 +5,8 @@ import { cn } from '@/lib/utils';
 
 const alignClasses = {
   top: "bottom-[120%]",
-  bottom: "bottom-[100%]"
+  bottom: "bottom-[100%]",
+  topx: "top-[100%]"
 }
 
 export default function SelectMultiple({
