@@ -879,7 +879,7 @@ function findClientCategories(categories = [], coachCategories) {
 }
 
 function DownlineIncrement() {
-	return <Dialog open={true}>
+	return <Dialog>
 		<DialogTrigger asChild>
 			<Button variant="wz">Qualifications</Button>
 		</DialogTrigger>
