@@ -30,7 +30,7 @@ import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TreeVisualizer from "@/components/pages/coach/downline/Visualizer";
 import HierarchicalCoachTable from "@/components/pages/coach/downline/HierarchicalCoachTable";
-import { PlusCircle, Edit, Trash2, Eye, ChevronDown, MoreVertical, Plus, FileSpreadsheet, Check, Cog } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Eye, ChevronDown, MoreVertical, Plus, FileSpreadsheet, Check, Cog, FilterX } from "lucide-react";
 import { ManageCategoryModal } from "@/components/modals/coach/ManageCategoryModal";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -44,6 +44,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import Loader from "@/components/common/Loader";
 import { exportToExcel } from "@/lib/excel";
 import { calculateCurrentSubscriptions, getClusterSubscriptions } from "@/lib/downline";
+import SelectMultiple from "@/components/SelectMultiple";
 
 const categoriesFetcher = () =>
 	fetchData("app/coach-categories").then((res) => {
@@ -895,7 +896,15 @@ const sortCoaches = function (key) {
 			: 1
 }
 
+const isEligible = (percent) => Math.ceil(parseInt(percent)) === 100;
+
+const clubTypeOptions = [
+	{ id: 2, name: "Club Leader Jr", value: "clubLeaderJr" },
+	{ id: 3, name: "Club Captain", value: "clubCaptain" },
+]
+
 function DownlineCoachIncrementContainer() {
+	const [selectedClubType, setSelectedClubType] = useState(["clubLeaderJr", "clubCaptain"])
 	const { _id: coachId } = useAppSelector(state => state.coach.data)
 	const { isLoading, error, data, mutate } = useSWR(
 		"way-to-wellness/increment",
@@ -969,26 +978,6 @@ function DownlineCoachIncrementContainer() {
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
 					<span className="text-lg font-semibold mr-auto">Qualifications</span>
-					<div className="flex items-center gap-2 ml-auto">
-						<span className="text-sm font-medium text-muted-foreground">Filter</span>
-						{/* <button type="" onClick={mutate}>mutate</button> */}
-						<Select
-							value={selectedMonth}
-							onValueChange={value => setSelectedMonth(value)}
-						>
-							<SelectTrigger className="min-w-[180px] py-2 text-sm">
-								<SelectValue placeholder={ALL_MONTHS_OPTION} />
-							</SelectTrigger>
-							<SelectContent side="bottom">
-								<SelectItem value={ALL_MONTHS_OPTION}>All Months</SelectItem>
-								{eligibilityMonths.map(month => (
-									<SelectItem key={month} value={month}>
-										{month}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</div>
 				</div>
 				{coaches.length > 0 && <Button
 					className="mr-4 bg-[var(--accent-1)] text-white"
@@ -1001,6 +990,34 @@ function DownlineCoachIncrementContainer() {
 				</Button>}
 			</div>
 		</DialogTitle>
+		<div className="px-4 flex items-center justify-between gap-4">
+			<div className="py-2 flex items-center gap-2 ml-auto">
+				<span className="text-sm font-medium text-muted-foreground">Filters</span>
+				<Select
+					value={selectedMonth}
+					onValueChange={value => setSelectedMonth(value)}
+				>
+					<SelectTrigger className="min-w-[180px] py-2 text-sm">
+						<SelectValue placeholder={ALL_MONTHS_OPTION} />
+					</SelectTrigger>
+					<SelectContent side="bottom">
+						<SelectItem value={ALL_MONTHS_OPTION}>All Months</SelectItem>
+						{eligibilityMonths.map(month => (
+							<SelectItem key={month} value={month}>
+								{month}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			</div>
+			<SelectMultiple
+				label="Club Type"
+				align="topx"
+				options={clubTypeOptions}
+				onChange={setSelectedClubType}
+				value={selectedClubType}
+			/>
+		</div>
 		<Table className="bg-[var(--comp-1)] rounded-md">
 			<TableHeader className="[&_th]:font-bold">
 				<TableRow>
@@ -1012,40 +1029,54 @@ function DownlineCoachIncrementContainer() {
 				</TableRow>
 			</TableHeader>
 			<TableBody>
-				{clubLeaderJr?.map(coach => (
+				{selectedClubType.includes("clubLeaderJr") && clubLeaderJr?.map(coach => (
 					<TableRow key={coach._id}>
 						<TableCell>{coach.coach}</TableCell>
 						<TableCell>{coach.mobileNumber}</TableCell>
 						<TableCell>{coach.clubType}</TableCell>
 						<TableCell className="flex items-center gap-1">
 							{coach.qualifiedClubType}
-							<QualifyCoachClubType
+							{isEligible(coach?.percentages?.clubLeaderJr) && <QualifyCoachClubType
 								mutate={mutate}
 								coachId={coach._id}
 								clubType={coach.qualifiedClubType}
-							/>
+							/>}
 						</TableCell>
 						<TableCell>{coach?.percentages?.clubLeaderJr}</TableCell>
 					</TableRow>
 				))}
-				{clubCaptain?.map(coach => (
+				{selectedClubType.includes("clubCaptain") && clubCaptain?.map(coach => (
 					<TableRow key={coach._id}>
 						<TableCell>{coach.coach}</TableCell>
 						<TableCell>{coach.mobileNumber}</TableCell>
 						<TableCell>{coach.clubType}</TableCell>
 						<TableCell className="flex items-center gap-1">
 							{coach.qualifiedClubType}
-							<QualifyCoachClubType
+							{isEligible(coach?.percentages?.clubCaptain) && <QualifyCoachClubType
 								mutate={mutate}
 								coachId={coach._id}
 								clubType={coach.qualifiedClubType}
-							/>
+							/>}
 						</TableCell>
 						<TableCell>{coach?.percentages?.clubCaptain}</TableCell>
 					</TableRow>
 				))}
 			</TableBody>
 		</Table>
+		{selectedClubType.length === 0 && <div className="flex flex-col items-center justify-center py-10 bg-white shadow-sm">
+			<div className="w-16 h-16 flex items-center justify-center rounded-full bg-gray-100 mb-4">
+				<FilterX className="w-8 h-8 text-gray-400" strokeWidth={1.5} />
+			</div>
+			<h3 className="text-lg font-semibold text-gray-800">
+				No Club Type Selected
+			</h3>
+			<p className="text-sm text-gray-500 mt-2 text-center max-w-sm">
+				Please select at least one club type from the filters above to view coach qualification data.
+			</p>
+			<div className="mt-6 text-xs text-gray-400">
+				Use the <span className="font-medium text-gray-600">Filters</span> dropdown to continue.
+			</div>
+		</div>}
 		{filteredCoaches.length === 0 && <div className="h-[200px] flex items-center justify-center">
 			{emptyMessage}
 		</div>}
