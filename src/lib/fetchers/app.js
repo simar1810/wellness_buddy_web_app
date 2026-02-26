@@ -24,8 +24,7 @@ export function getCoachProfile(_id) {
 }
 
 export const getCoachHome = withClientFilter(async (router, cache) => {
-  const response = await fetchData("app/coachHomeTrial");
-  console.log(response)
+  const response = await fetchData("app/coachHomeTrial?whitelabel=wellnessbuddy");
   await logoutUser(response, router, cache);
   return response;
 });

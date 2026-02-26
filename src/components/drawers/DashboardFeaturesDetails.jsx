@@ -84,13 +84,17 @@ function Container({ topPerformers, clientFollowUps, missingFollowups }) {
     incomplete: { page: 1, limit: 10 },
   });
   const [filters, setFilters] = useState({
-    plans: "all"
+    plans: "all",
+    subscriptions: {
+      key: "",
+      direction: ""
+    }
   })
 
   const { birthdays = [], subscriptions = [], plans = [] } = data?.data || {};
   const normalizedBirthdays = useMemo(() => normalizeBirthdays(birthdays), [birthdays])
 
-  const normalizedSubscriptions = useMemo(() => normalizeSubscriptions(subscriptions), [subscriptions]);
+  const normalizedSubscriptions = useMemo(() => normalizeSubscriptions(subscriptions, filters.subscriptions), [subscriptions, filters.subscriptions]);
   const normalizedPlans = useMemo(() => normalizeMealPlans(plans), [plans]);
   const normalizedIncompletePlans = useMemo(() => normalizeIncompletePlans(plans), [plans])
 
@@ -342,17 +346,6 @@ function ClientsSidebar({
 
   return (
     <aside className="flex min-w-0 flex-col gap-4 px-2 md:px-0">
-      {/* <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-900">Clients</h3>
-        <Button
-          asChild
-          size="sm"
-          className="bg-[var(--accent-1)] px-4 py-2 text-white hover:bg-[var(--accent-1)]/90 border border-[var(--accent-1)]"
-        >
-          <Link href="/coach/add-client">+ Add Clients</Link>
-        </Button>
-      </div> */}
-
       {hasTopPerformers ? (
         <TopPerformers clients={topPerformers} />
       ) : (
@@ -450,12 +443,6 @@ function createTabsConfig({
       render: (row) => <UserCell user={{ name: row.name, profilePhoto: row.profilePhoto }} />,
       exportValue: (row) => row.name ?? "",
     },
-    // {
-    //   key: "status",
-    //   label: "Status",
-    //   render: (row) => <StatusBadge status={row.status} />,
-    //   exportValue: (row) => row.status?.label ?? "",
-    // },
     {
       key: "clientId",
       label: "Client ID",
@@ -663,16 +650,6 @@ function UserCell({ user }) {
   );
 }
 
-function StatusBadge({ status }) {
-  if (!status?.label) return <EmptyCell />;
-  const toneClass = TONE_CLASSES[status.tone] ?? TONE_CLASSES.neutral;
-  return (
-    <Badge variant="outline" className={cn("border", toneClass)}>
-      {status.label}
-    </Badge>
-  );
-}
-
 function DaysPill({ badge }) {
   if (!badge?.label) return <EmptyCell />;
   const toneClass = TONE_CLASSES[badge.tone] ?? TONE_CLASSES.neutral;
@@ -759,24 +736,74 @@ function normalizeBirthdays(birthdays = []) {
     .sort((a, b) => isBefore(a.dob, b.dob) ? -1 : 1)
 }
 
-function normalizeSubscriptions(subscriptions = []) {
-  return subscriptions.map((subscription, index) => {
+function normalizeSubscriptions(subscriptions = [], filters) {
+  const sortKey = filters?.key;
+  const sortDirection = filters?.direction;
+  const normalized = subscriptions.map((subscription, index) => {
     const client = subscription?.user || {};
     const timeline = getSubscriptionTimeline(subscription);
     return {
       id: subscription?._id ?? client?._id ?? index,
       user: {
         name: client?.name ?? subscription?.name ?? "",
-        username: client?.username ?? client?.handle ?? subscription?.username ?? "",
-        avatar: client?.profilePhoto ?? subscription?.profilePhoto ?? "",
+        username:
+          client?.username ??
+          client?.handle ??
+          subscription?.username ??
+          "",
+        avatar:
+          client?.profilePhoto ??
+          subscription?.profilePhoto ??
+          "",
       },
-      clientId: sanitizeClientId(client?.clientId ?? subscription?.clientId),
-      mobileNumber: client?.mobileNumber ?? subscription?.mobileNumber ?? "",
+      clientId: sanitizeClientId(
+        client?.clientId ?? subscription?.clientId
+      ),
+      mobileNumber:
+        client?.mobileNumber ??
+        subscription?.mobileNumber ??
+        "",
+      validFromRaw: timeline.start,
+      validTillRaw: timeline.end,
+      daysRemainingRaw: timeline.daysRemaining,
       validFrom: formatDateDisplay(timeline.start),
       validTill: formatDateDisplay(timeline.end),
-      daysRemaining: timeline.daysRemaining !== null ? createDaysBadge(timeline.daysRemaining) : null,
+      daysRemaining:
+        timeline.daysRemaining !== null
+          ? createDaysBadge(timeline.daysRemaining)
+          : null,
     };
   });
+
+  if (sortKey && sortDirection) {
+    normalized.sort((a, b) => {
+      let aValue;
+      let bValue;
+      switch (sortKey) {
+        case "validFrom":
+          aValue = new Date(a.validFromRaw);
+          bValue = new Date(b.validFromRaw);
+          break;
+        case "validTill":
+          aValue = new Date(a.validTillRaw);
+          bValue = new Date(b.validTillRaw);
+          break;
+        case "daysRemaining":
+          aValue = a.daysRemainingRaw ?? -Infinity;
+          bValue = b.daysRemainingRaw ?? -Infinity;
+          break;
+
+        default:
+          return 0;
+      }
+      if (sortDirection === "asc") {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+  }
+  return normalized;
 }
 
 function normalizeMealPlans(plans = []) {
@@ -997,14 +1024,6 @@ function parseDateFlexible(value) {
   return isValid(fallback) ? fallback : null;
 }
 
-function createStatus(value) {
-  const label = String(value).trim().toUpperCase();
-  return {
-    label,
-    tone: getStatusTone(label),
-  };
-}
-
 function createDaysBadge(days) {
   const numeric = safeNumber(days);
   if (numeric === null) return null;
@@ -1014,14 +1033,6 @@ function createDaysBadge(days) {
     value: safeValue,
     tone: getDaysTone(numeric),
   };
-}
-
-function getStatusTone(label) {
-  const normalized = label.toLowerCase();
-  if (["ok", "active", "success", "yes"].some((keyword) => normalized.includes(keyword))) return "success";
-  if (["ko", "inactive", "expired", "no", "overdue"].some((keyword) => normalized.includes(keyword)))
-    return "danger";
-  return "neutral";
 }
 
 function getDaysTone(days) {
@@ -1095,6 +1106,16 @@ function FilterOptions({
     filter={filter}
     onFilterChange={onFilterChange}
   />
+  if (selectedTab == "subscriptions") return <SubscriptionsFilter
+    value={filter.subscriptions}
+    onChange={(newSort) =>
+      onFilterChange(prev => ({
+        ...prev,
+        subscriptions: newSort
+      }))
+    }
+
+  />
   return <></>
 }
 
@@ -1124,4 +1145,78 @@ function renderMealPlanRows(plans, { plans: plansFilter } = {}) {
   if (plansFilter === "expired") return plans
     .filter(plan => plan.remainingDays <= 0);
   return plans;
+}
+
+function SubscriptionsFilter({
+  value,
+  onChange
+}) {
+  const [localSort, setLocalSort] = useState(value);
+
+  const applySort = () => {
+    onChange(localSort);
+  };
+
+  const resetSort = () => {
+    const reset = { key: "", direction: "" };
+    setLocalSort(reset);
+    onChange(reset);
+  };
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button size="sm">
+          Filter Subscriptions
+        </Button>
+      </PopoverTrigger>
+
+      <PopoverContent className="w-72 p-5 rounded-2xl border shadow-xl bg-white space-y-5">
+        <div className="space-y-2">
+          <p className="text-sm font-medium">Sort By</p>
+          <Select
+            value={localSort.key}
+            onValueChange={(val) =>
+              setLocalSort(prev => ({ ...prev, key: val }))
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select field" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="validFrom">Valid From</SelectItem>
+              <SelectItem value="validTill">Valid Till</SelectItem>
+              <SelectItem value="daysRemaining">Days Remaining</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <p className="text-sm font-medium">Order</p>
+          <Select
+            value={localSort.direction}
+            onValueChange={(val) =>
+              setLocalSort(prev => ({ ...prev, direction: val }))
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select order" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="asc">Ascending</SelectItem>
+              <SelectItem value="desc">Descending</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex justify-between pt-2">
+          <Button variant="ghost" size="sm" onClick={resetSort}>
+            Reset
+          </Button>
+          <Button size="sm" onClick={applySort}>
+            Apply
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
 }
