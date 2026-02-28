@@ -89,6 +89,17 @@ function ProgramContainer() {
       rollnos={state.allowed_rollno_series}
       onChange={value => dispatch(changeProgramFieldValue("allowed_rollno_series", value))}
     />
+    <label className="block select-none cursor-pointer">
+      <span className="font-bold">Visibility</span>
+      <select
+        value={state.isActive}
+        onChange={e => dispatch(changeProgramFieldValue("isActive", e.target.value))}
+        className="mt-2 w-full px-4 py-2 border-1 rounded-[4px] focus:outline-none cursor-pointer"
+      >
+        <option value="true">Active</option>
+        <option value="false">In Active</option>
+      </select>
+    </label>
     <div className="relative">
       <Image
         src={state.file ? getObjectUrl(state.file) : state.defaultImage || "/not-found.png"}
