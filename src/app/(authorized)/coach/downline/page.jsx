@@ -996,6 +996,7 @@ function DownlineClientList() {
 					<TableHead>Name</TableHead>
 					<TableHead>Categories</TableHead>
 					<TableHead>Coach Name</TableHead>
+					<TableHead>Club Leader</TableHead>
 					<TableHead>Client ID</TableHead>
 					<TableHead>Email</TableHead>
 					<TableHead>Mobile</TableHead>
@@ -1011,6 +1012,7 @@ function DownlineClientList() {
 						<TableCell className="font-medium max-w-[20ch]">{client.name}</TableCell>
 						<ClientCategoriesListing categories={client.categories} />
 						<TableCell>{client.coachName}</TableCell>
+						<TableCell>{client.clubTypeClubLeader}</TableCell>
 						<TableCell>{client.clientId}</TableCell>
 						<TableCell>{client.email || "-"}</TableCell>
 						<TableCell>{client.mobileNumber || "-"}</TableCell>

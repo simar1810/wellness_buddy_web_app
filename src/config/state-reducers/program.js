@@ -21,6 +21,7 @@ export function generateProgramIS(data = {}) {
     defaultImage: data.image || "",
     availability: data.availability,
     allowed_rollno_series: data.allowed_rollno_series || [],
+    isActive: data.isActive || isActive
   }
 }
 
@@ -42,6 +43,7 @@ export function generateProgramRP(state) {
   formData.append("link", buildClickableUrl(state.link))
   formData.append("availability", JSON.stringify(state.availability || "[]"))
   formData.append("programId", state.id);
+  formData.append("isActive", state.isActive);
   for (const rollno of state.allowed_rollno_series) {
     formData.append("allowed_rollno_series", rollno)
   }
