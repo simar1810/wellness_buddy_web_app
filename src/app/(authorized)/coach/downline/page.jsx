@@ -1236,7 +1236,7 @@ function DownlineIncrement() {
 		<DialogTrigger asChild>
 			<Button variant="wz">Qualifications</Button>
 		</DialogTrigger>
-		<DialogContent className="!max-w-[800px] w-full p-0 gap-0">
+		<DialogContent className="!max-w-[1024px] w-full p-0 gap-0">
 			<DownlineCoachIncrementContainer />
 		</DialogContent>
 	</Dialog>
@@ -1378,6 +1378,8 @@ function DownlineCoachIncrementContainer() {
 					<TableHead>Mobile Number</TableHead>
 					<TableHead>Club Type</TableHead>
 					<TableHead>Qualified Club Type</TableHead>
+					<TableHead>Client Subs</TableHead>
+					<TableHead>Coach Subs</TableHead>
 					<TableHead>Percent</TableHead>
 				</TableRow>
 			</TableHeader>
@@ -1416,7 +1418,9 @@ function DownlineCoachIncrementContainer() {
 								clubType={coach.qualifiedClubType}
 							/>}
 						</TableCell>
-						<TableCell className="w-[300px]">
+						<TableCell className="text-center">{coach?.downlineAnalytics?.clientSubscriptions}</TableCell>
+						<TableCell className="text-center">{coach?.downlineAnalytics?.coachSubscriptionsLevel1}</TableCell>
+						<TableCell className="min-w-[300px]">
 							<span className="flex items-center gap-2">
 								{coach?.percentages?.clubCaptain}
 								<Progress value={coach?.percentages?.clubCaptain} />
