@@ -16,6 +16,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 import { CSS } from '@dnd-kit/utilities';
+import { Badge } from "@/components/ui/badge";
 
 export default function Page() {
   const [isBeingShuffled, setIsBeingShuffled] = useState(false);
@@ -47,9 +48,14 @@ function ProgramList({ programs }) {
       className="bg-[var(--comp-1)] rounded-[10px] border-1 overflow-clip hover:[&_.actions]:opacity-100"
     >
       <div className="relative">
-        <div className="bg-white px-2 py-1 rounded-[10px] border-1 actions absolute bottom-2 right-2 opacity-0 flex items-center gap-1">
-          <EditProgramModal program={{ ...program, order: index }} />
-          <DeleteProgramAction id={program._id} />
+        <div className="absolute bottom-2 right-2 flex items-center gap-1">
+          <div className="bg-white px-2 py-1 rounded-[10px] border-1 actions opacity-0 flex items-center gap-1">
+            <EditProgramModal program={{ ...program, order: index }} />
+            <DeleteProgramAction id={program._id} />
+          </div>
+          {program.isActive === "true"
+            ? <Badge variant="wz_fill">Active</Badge>
+            : <Badge variant="destructive">In Active</Badge>}
         </div>
         <Image
           src={program.image || "/not-found.png"}
