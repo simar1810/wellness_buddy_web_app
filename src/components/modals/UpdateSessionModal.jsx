@@ -28,6 +28,7 @@ export default function UpdateSessionModal({ session }) {
     time: session.time || "",
     videoUrl: session.videoUrl || "",
     availability: session.availability || [],
+    status: session.status || "active"
   })
 
   const closeBtnRef = useRef()
@@ -97,11 +98,11 @@ export default function UpdateSessionModal({ session }) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="update-day">Day</Label>
               <Select value={formData.day} onValueChange={(value) => handleInputChange("day", value)}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select day" />
                 </SelectTrigger>
                 <SelectContent>
@@ -112,6 +113,19 @@ export default function UpdateSessionModal({ session }) {
                   <SelectItem value="Friday">Friday</SelectItem>
                   <SelectItem value="Saturday">Saturday</SelectItem>
                   <SelectItem value="Sunday">Sunday</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="update-status">Status</Label>
+              <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">In Active</SelectItem>
                 </SelectContent>
               </Select>
             </div>

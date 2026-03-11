@@ -30,7 +30,8 @@ export default function SessionsPage() {
     workoutType: "",
     time: "",
     videoUrl: "",
-    availability: []
+    availability: [],
+    status: "active"
   });
 
   const router = useRouter()
@@ -91,7 +92,7 @@ export default function SessionsPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="day">Day</Label>
               <Select
@@ -109,6 +110,19 @@ export default function SessionsPage() {
                   <SelectItem value="Friday">Friday</SelectItem>
                   <SelectItem value="Saturday">Saturday</SelectItem>
                   <SelectItem value="Sunday">Sunday</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="update-status">Status</Label>
+              <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">In Active</SelectItem>
                 </SelectContent>
               </Select>
             </div>
