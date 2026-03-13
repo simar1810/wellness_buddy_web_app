@@ -12,11 +12,12 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/componen
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { coachPortfolioSocialLinks } from "@/config/data/ui";
+import IntegrationsContainer from "@/features/integrations";
 import { sendData, sendDataWithFormData } from "@/lib/api";
 import { getCoachSocialLinks, retrieveBankDetails } from "@/lib/fetchers/app";
 import { getObjectUrl } from "@/lib/utils";
 import { useAppSelector } from "@/providers/global/hooks";
-import { Link as LucideLink, Award, Users, X, Landmark, Banknote, Pen, Pencil, Dot } from "lucide-react";
+import { Link as LucideLink, Award, Users, X, Landmark, Banknote, Pen, Pencil, Dot, Workflow } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -31,6 +32,9 @@ export default function CoachData({ awards }) {
       <CoachAwards awards={awards} />
       <CoachClubSettings />
       <BankDetails />
+      <TabsContent value="integrations">
+        <IntegrationsContainer />
+      </TabsContent>
     </Tabs>
   </div>
 }
@@ -39,6 +43,7 @@ const tabItems = [
   { icon: <Award className="w-[16px] h-[16px]" />, value: "awards", label: "Awards" },
   { icon: <Users className="w-[16px] h-[16px]" />, value: "club", label: "Club" },
   { icon: <Landmark className="w-[16px] h-[16px]" />, value: "bank", label: "Bank" },
+  { icon: <Workflow className="w-[16px] h-[16px]" />, value: "integrations", label: "Integrations", },
 ];
 
 function Header() {

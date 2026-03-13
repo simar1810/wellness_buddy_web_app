@@ -17,9 +17,18 @@ import { sendData } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { mutate } from "swr";
+import SessionVideoURLComponent from "@/features/sessions/components/SessionVideoURLComponent";
+import { buildSessionCreationPayload } from "@/features/sessions/utils/request-payload";
+import { handleSessionVideoUpload, uploadChunks } from "@/features/sessions/utils/file-upload";
 
 export default function SessionsPage() {
   const { client_categories } = useAppSelector(state => state.coach.data);
+  const [videoConfig, setVideoConfig] = useState({
+    videoType: "link", // link, yt
+    status: "idle", // idle, initiate-uploading, uploading, upload-complete
+    file: "",
+    uploadProgress: 0
+  })
 
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -52,8 +61,20 @@ export default function SessionsPage() {
   async function createSession() {
     try {
       setIsLoading(true);
-      const response = await sendData("app/workout/sessions", formData);
+
+      if (videoConfig.videoType === "yt" && !(videoConfig.file instanceof File)) {
+        throw new Error("Please select a video to proceed!")
+      }
+
+      const payload = buildSessionCreationPayload(formData, videoConfig, "create")
+      const response = await sendData("app/workout/sessions", payload);
       if (response.status_code !== 200) throw new Error(response.message);
+
+      if (videoConfig.videoType === "yt") {
+        setVideoConfig(prev => ({ ...prev, status: "initiate-uploading" }))
+        await handleSessionVideoUpload(response, videoConfig, setVideoConfig);
+      }
+
       mutate("sessions");
       router.push("/coach/workouts/sessions/list")
     } catch (error) {
@@ -185,18 +206,12 @@ export default function SessionsPage() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="videoUrl">Video URL</Label>
-            <Input
-              id="videoUrl"
-              type="url"
-              value={formData.videoUrl}
-              onChange={(e) =>
-                handleInputChange("videoUrl", e.target.value)
-              }
-              placeholder="https://example.com/video"
-            />
-          </div>
+          <SessionVideoURLComponent
+            formData={formData}
+            handleInputChange={handleInputChange}
+            videoConfig={videoConfig}
+            setVideoConfig={setVideoConfig}
+          />
 
           <Button
             onClick={createSession}
