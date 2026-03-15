@@ -46,6 +46,7 @@ import {
   Users,
   Video,
   QrCode,
+  Trophy,
 } from "lucide-react";
 import { FaWeightScale } from "react-icons/fa6";
 import CreateWorkoutModal from "@/components/modals/tools/CreateWorkoutModal";
@@ -158,6 +159,13 @@ export const sidebar__coachContent = [
     icon: <Users className="min-w-[20px] min-h-[20px]" />,
     url: "/coach/users",
     permission: "coach", // Only coaches can see this
+  },
+  {
+    id: 3.7,
+    title: "Recognition",
+    icon: <Trophy className="min-w-[20px] min-h-[20px]" />,
+    url: "/coach/recognition",
+    permission: "coach",
   },
   {
     id: 4,
