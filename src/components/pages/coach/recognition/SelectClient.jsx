@@ -2,9 +2,9 @@ import { fetchData } from "@/lib/api";
 import useSWR from "swr";
 import FormSelect from "./FormSelect";
 
-export default function SelectCoach({ selectedClient, onChange }) {
-  const { isLoading, error, data } = useSWR("app/coaches-list", () =>
-    fetchData("app/downline/coaches-list/admin"),
+export default function SelectClient({ selectedClient, onChange }) {
+  const { isLoading, error, data } = useSWR("app/clients-list", () =>
+    fetchData("app/downline/clients-list/admin"),
   );
   if (isLoading)
     return (
@@ -22,18 +22,18 @@ export default function SelectCoach({ selectedClient, onChange }) {
       </div>
     );
   }
-  const coaches = Array.isArray(data?.data) ? data.data : [];
+  const clients = Array.isArray(data?.data) ? data.data : [];
 
   return (
     <FormSelect
-      label="Coach"
+      label="Client"
       value={selectedClient}
       onChange={onChange}
-      options={coaches.map((coach) => ({
-        label: coach.name,
-        value: coach._id,
-        coachId: coach.coachId,
-        mobileNumber: coach.mobileNumber,
+      options={clients.map((client) => ({
+        label: client.name,
+        value: client._id,
+        clientId: client.clientId,
+        mobileNumber: client.mobileNumber,
       }))}
       placeholder="ObjectId"
     />

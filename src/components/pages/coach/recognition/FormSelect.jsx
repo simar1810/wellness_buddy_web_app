@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -20,8 +20,13 @@ export default function FormSelect({
 
   const isSearchable = options.length > searchableThreshold;
 
+  const regex = useMemo(() => new RegExp(search, "i"), [search])
+
   const filteredOptions = options.filter((opt) =>
-    opt.label?.toLowerCase()?.includes(search.toLowerCase())
+    opt.label?.toLowerCase()?.includes(search.toLowerCase()) ||
+    regex.test(opt.mobileNumber) ||
+    regex.test(opt.coachId) ||
+    regex.test(opt.clientId)
   );
 
   useEffect(() => {

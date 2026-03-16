@@ -27,6 +27,8 @@ import { sendData, uploadImage } from "@/lib/api";
 import SelectCoach from "./SelectCoach";
 import { validateRecognitionPayload } from "./helper";
 import { useRevalidateAndClearCache } from "./useRevalidateAndClearCache";
+import SelectMultiple from "@/components/SelectMultiple";
+import SelectClient from "./SelectClient";
 
 export default function UpdateRecognitionModal({
   recognition,
@@ -39,6 +41,11 @@ export default function UpdateRecognitionModal({
   const [selectedCoach, setSelectedCoach] = useState("");
   const [recognisedAt, setRecognisedAt] = useState("");
   const [updating, setUpdating] = useState(false);
+  const [selectedClient, setSelectedClient] = useState("");
+  const [person, setPerson] = useState("coach"); // client, coach
+  const [availability, setAvailability] = useState([]); // client, coach
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
   const closeRef = useRef()
   const fileRef = useRef();
@@ -53,6 +60,14 @@ export default function UpdateRecognitionModal({
         ? new Date(recognition.recognisedAt).toISOString().split("T")[0]
         : ""
     );
+    setAvailability(
+      Array.isArray(recognition.availability)
+        ? recognition.availability : []
+    )
+    setSelectedClient(recognition.client?._id)
+    setPerson(recognition.person)
+    setTitle(recognition.title)
+    setDescription(recognition.description)
   }, [recognition]);
 
   const handleSubmit = async function () {
@@ -62,14 +77,20 @@ export default function UpdateRecognitionModal({
 
       const payload = {
         recognitionId: recognition._id,
-        coach: selectedCoach,
+        title,
+        description,
         status,
-        recognisedAt: new Date(recognisedAt)
-      };
-
+        recognisedAt: new Date(recognisedAt),
+        person,
+        availability,
+        ...(person === "coach"
+          ? { coach: selectedCoach }
+          : { client: selectedClient }),
+      }
       const { valid, message } = validateRecognitionPayload(payload);
 
       if (!valid) {
+        toast.dismiss(toastId)
         throw new Error(message);
       }
 
@@ -152,12 +173,65 @@ export default function UpdateRecognitionModal({
               )}
             </div>
           </div>
+
           <div className="space-y-2">
+            <Label>Title</Label>
+            <Input
+              placeholder="Fill title"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Description</Label>
+            <Input
+              placeholder="Fill description"
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Availability</Label>
+            <SelectMultiple
+              options={[
+                { id: 1, name: "Client", value: "client" },
+                { id: 2, name: "Coach", value: "coach" },
+              ]}
+              value={availability}
+              onChange={setAvailability}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Person</Label>
+            <Select value={person} onValueChange={setPerson}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Person" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="client">Client</SelectItem>
+                <SelectItem value="coach">Coach</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {person === "coach" && <div className="space-y-2">
             <SelectCoach
               selectedCoach={selectedCoach}
               onChange={val => setSelectedCoach(val)}
             />
-          </div>
+          </div>}
+
+          {person === "client" && <div className="space-y-2">
+            <SelectClient
+              selectedClient={selectedClient}
+              onChange={val => setSelectedClient(val)}
+            />
+          </div>}
+
           <div className="space-y-2">
             <Label>Status</Label>
 
