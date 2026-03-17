@@ -69,7 +69,7 @@ export default function YoutubeIntegrationCard() {
           </span>
         )}
 
-        {isEnabled && !isConnected && (
+        {!isConnected && (
           <button
             onClick={redirectToYoutube}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg bg-red-600 hover:bg-red-700 transition"
