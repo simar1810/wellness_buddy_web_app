@@ -52,7 +52,7 @@ export function format24hr_12hr(time24) {
 }
 
 export function trimString(str, max = 20) {
-  const total = str.split(" ");
+  const total = str?.split(" ") || [];
   const ellipsis = total.length > max ? "..." : "";
   return total.slice(0, max).join(" ") + ellipsis;
 }

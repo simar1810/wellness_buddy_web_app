@@ -25,7 +25,7 @@ export default function DeleteRecognition({ recognitionId, currentCacheKey }) {
   }
 
   return <DualOptionActionModal
-    description="Are you sure you want to recognition this note? This action cannot be undone."
+    description="Are you sure you want to delete this recognition? This action cannot be undone."
     action={(setLoading, btnRef) => deleteRecognition(setLoading, btnRef)}
   >
     <AlertDialogTrigger>
