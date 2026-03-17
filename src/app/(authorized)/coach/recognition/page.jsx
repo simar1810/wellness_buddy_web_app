@@ -128,7 +128,7 @@ function RecognitionCard({ item, endpoint }) {
       <div className="p-5 space-y-2 flex-grow">
         <div>
           <h5>{item.title}</h5>
-          <p className="text-xs text-gray-500 leading-tight mt-[2px] mb-4">{trimString(item.description, 20)}</p>
+          <p className="text-xs text-gray-500 leading-tight mt-[2px] mb-4">{trimString(item.description || "", 20)}</p>
         </div>
         <div className="space-y-1">
           {item.coach?.name ? (
