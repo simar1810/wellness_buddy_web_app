@@ -4,10 +4,10 @@ import ContentError from "@/components/common/ContentError";
 import ContentLoader from "@/components/common/ContentLoader";
 import CreateRecognitionModal from "@/components/pages/coach/recognition/CreateRecognitionModal";
 import { fetchData } from "@/lib/api";
-import { buildUrlWithQueryParams } from "@/lib/formatter";
+import { buildUrlWithQueryParams, trimString } from "@/lib/formatter";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
-import { ChevronLeft, ChevronRight, Calendar, User, Sparkles, RefreshCcw, Copy } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, User, Sparkles, RefreshCcw, Copy, UserCheck, Globe } from "lucide-react";
 import DeleteRecognition from "@/components/pages/coach/recognition/DeleteRecognition";
 import UpdateRecognitionModal from "@/components/pages/coach/recognition/UpdateRecognitionModal";
 
@@ -89,50 +89,92 @@ export default function Page() {
     </div>
   );
 }
-
 function RecognitionCard({ item, endpoint }) {
   const statusColor = {
-    active: "bg-green-100 text-green-700",
-    inactive: "bg-gray-100 text-gray-600",
-    archive: "bg-yellow-100 text-yellow-700"
+    active: "bg-green-100 text-green-700 border-green-200",
+    inactive: "bg-gray-100 text-gray-700 border-gray-200",
+    archive: "bg-amber-100 text-amber-700 border-amber-200",
   };
 
   return (
-    <div className="border rounded-xl bg-white overflow-hidden hover:shadow-sm transition">
-      <div className="h-40 bg-gray-100 flex items-center justify-center overflow-hidden relative">
+    <div className="group border rounded-2xl bg-white overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col">
+      <div className="h-44 bg-slate-50 flex items-center justify-center overflow-hidden relative">
         {item.image ? (
           <img
             src={item.image}
-            className="w-full h-full object-cover"
+            alt="Recognition"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <span className="text-xs text-gray-400">No Image</span>
-        )}
-        <div className="absolute bg-white px-4 py-1 rounded-full border-1 flex items-center gap-2 bottom-2 right-4">
-          <DeleteRecognition currentCacheKey={endpoint} recognitionId={item._id} />
-          <UpdateRecognitionModal currentCacheKey={endpoint} recognition={item} />
-        </div>
-      </div>
-      <div className="p-4 space-y-3">
-        {item.coach && (
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <User className="w-4 h-4 text-muted-foreground" />
-            {item.coach.name}
-            <span className="text-xs text-muted-foreground">
-              ({item.coach.coachId})
-            </span>
+          <div className="flex flex-col items-center gap-2">
+            <div className="p-3 bg-white rounded-full shadow-sm">
+              <User className="w-6 h-6 text-slate-300" />
+            </div>
+            <span className="text-[10px] uppercase tracking-widest text-slate-400 font-medium">No Image</span>
           </div>
         )}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Calendar className="w-3.5 h-3.5" />
-          {new Date(item.recognisedAt).toLocaleDateString()}
+        <div className="absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="bg-white/90 backdrop-blur-sm p-1.5 rounded-xl border shadow-sm flex gap-1">
+            <UpdateRecognitionModal currentCacheKey={endpoint} recognition={item} />
+            <DeleteRecognition currentCacheKey={endpoint} recognitionId={item._id} />
+          </div>
         </div>
-        <div>
-          <span
-            className={`text-xs px-3 py-1 rounded-full capitalize ${statusColor[item.status]}`}
-          >
-            {item.status}
+        <div className="absolute bottom-3 left-3">
+          <span className="bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider">
+            {item.person}
           </span>
+        </div>
+      </div>
+      <div className="p-5 space-y-2 flex-grow">
+        <div>
+          <h5>{item.title}</h5>
+          <p className="text-xs text-gray-500 leading-tight mt-[2px] mb-4">{trimString(item.description, 20)}</p>
+        </div>
+        <div className="space-y-1">
+          {item.coach?.name ? (
+            <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+              {item.coach.name}
+              <span className="text-[11px] font-normal text-slate-400">#{item.coach.coachId}</span>
+            </h3>
+          ) : (
+            <h3 className="text-sm font-bold text-slate-400 italic flex items-center gap-2">
+              {item.client?.name || <span className="text-xs italic text-gray-400">Unknown User</span>}
+              <span className="text-[11px] font-normal text-slate-400">#{item.client?.clientId}</span>
+            </h3>
+          )}
+
+          <div className="flex items-center gap-1.5 text-xs text-slate-500">
+            <Calendar className="w-3.5 h-3.5" />
+            {new Date(item.recognisedAt?.$date || item.recognisedAt).toLocaleDateString(undefined, {
+              month: 'short', day: 'numeric', year: 'numeric'
+            })}
+          </div>
+        </div>
+        <hr className="border-slate-100" />
+        <div className="flex items-center justify-between mt-auto">
+          <div className="pt-3 border-t border-slate-50 flex items-center justify-between">
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight block">
+                Visible To
+              </span>
+              <div className="flex flex-wrap gap-1">
+                {item.availability?.map((role) => (
+                  <span
+                    key={role}
+                    className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 capitalize"
+                  >
+                    {role}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-tight mb-1.5">Status</p>
+            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${statusColor[item.status] || statusColor.inactive}`}>
+              {item.status.toUpperCase()}
+            </span>
+          </div>
         </div>
       </div>
     </div>

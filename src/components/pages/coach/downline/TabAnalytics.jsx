@@ -151,7 +151,7 @@ function StatsGrid({
     { label: "Client Subscriptions", value: clientSubscriptions, },
     { label: "Cluster Client Subs", value: clusterClientSubscriptions, },
     { label: "Cluster Coach Subs", value: clusterCoachSubscriptions, },
-  ], []);
+  ], [coachSubscriptionsLevel1, clientSubscriptions, clusterClientSubscriptions, clusterCoachSubscriptions]);
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
       {items.map((item) => (
