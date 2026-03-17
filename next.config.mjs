@@ -15,8 +15,10 @@ const nextConfig = {
   },
   experimental: {
     serverActions: {
-      bodySizeLimit: "10mb",
+      bodySizeLimit: '50mb'
     },
+    middlewarePrefetch: "flexible",
+    middlewareClientMaxBodySize: "20mb",
   },
   async headers() {
     return [
