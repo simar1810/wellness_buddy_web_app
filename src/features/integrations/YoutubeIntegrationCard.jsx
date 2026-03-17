@@ -17,7 +17,7 @@ export default function YoutubeIntegrationCard() {
     (state) => state.coach.data
   );
 
-  const isEnabled = features?.includes(6);
+  const isEnabled = true
   const isConnected = Boolean(ytDocRef);
 
   function redirectToYoutube() {
