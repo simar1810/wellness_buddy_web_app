@@ -183,14 +183,14 @@ export default function UpdateRecognitionModal({
             />
           </div>
 
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label>Description</Label>
             <Input
               placeholder="Fill description"
               value={description}
               onChange={e => setDescription(e.target.value)}
             />
-          </div>
+          </div> */}
 
           <div className="space-y-2">
             <Label>Availability</Label>

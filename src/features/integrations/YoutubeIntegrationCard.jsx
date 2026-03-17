@@ -4,7 +4,7 @@ import { RefreshCw, Youtube } from "lucide-react";
 
 const YT_REDIRECTION_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const YT_OAUTH_CLIENT_ID =
-  "834817880706-uc3r0pbdiounqiqlvunjn3tqf2lquu18.apps.googleusercontent.com";
+  "834817880706-lp0dk4hsgt1bdluo8lugffk200spgn1a.apps.googleusercontent.com";
 // "92110669040-tjdv1tdl21qs0d1dk5epe4lhrb7cjqqi.apps.googleusercontent.com"
 const YT_RESPONSE_TYPE = "code";
 const YT_REDIRECT_URL =
