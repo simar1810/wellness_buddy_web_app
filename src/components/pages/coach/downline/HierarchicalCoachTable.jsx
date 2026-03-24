@@ -16,6 +16,10 @@ import {
   ChevronUp,
   Eye,
   Trash2,
+  ArrowDownUp,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -158,13 +162,30 @@ export default function HierarchicalCoachTable({ coaches = [], onMakeTop }) {
 }
 
 function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
+  const [sortBy, setSotrBy] = useState({ type: "none", order: "asc" }) // { type: none, personal, cluster, order: asc, desc }
   const levelNum = Number(level);
   const isExpanded = expandedLevels.has(levelNum);
-  const levelCoaches = groupedCoaches[level] || [];
+  const unfilteredCoaches = groupedCoaches[level] || [];
+  const levelCoaches = useMemo(() => sortCoaches(unfilteredCoaches, sortBy), [sortBy, unfilteredCoaches])
   const { clubType } = useAppSelector(state => state.coach.data)
 
   const hasEditAccess = (coachClubType) => ["System Leader", "Club Leader", "Club Leader Jr"].includes(clubType) &&
     (["Club Leader", "Club Leader Jr"].includes(coachClubType) ? clubType === "System Leader" : true)
+
+  function onChangeSortByFilter(newType) {
+    setSotrBy(prev => prev.type !== newType
+      ? ({ type: newType, order: "asc" })
+      : ({
+        ...prev,
+        order: prev.order === "asc" ? "desc" : "asc"
+      })
+    )
+  }
+
+  const getSortIcon = (columnType) => {
+    if (sortBy.type !== columnType) return <ArrowUpDown size={14} className="opacity-50" />;
+    return sortBy.order === "desc" ? <ArrowUp size={14} /> : <ArrowDown size={14} />;
+  };
 
   return (
     <Table>
@@ -211,13 +232,28 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
               <TableHead className="text-gray-800 font-bold text-center w-[220px] py-3">
                 Subscription Status
               </TableHead>
-              <TableHead className="text-gray-800 font-bold text-center w-[220px] py-3">
-                Personal Subscriptions
+              <TableHead className="py-3 px-4">
+                <button
+                  onClick={() => onChangeSortByFilter("personal")}
+                  className={`flex items-center gap-1 font-bold transition-colors ${sortBy.type === "personal" ? "text-blue-600" : "text-gray-800"
+                    }`}
+                >
+                  Personal Subscriptions
+                  {getSortIcon("personal")}
+                </button>
               </TableHead>
-              <TableHead className="text-gray-800 font-bold text-center w-[220px] py-3">
-                Cluster Subscriptions
+
+              <TableHead className="py-3 px-4">
+                <button
+                  onClick={() => onChangeSortByFilter("cluster")}
+                  className={`flex items-center gap-1 font-bold transition-colors ${sortBy.type === "cluster" ? "text-blue-600" : "text-gray-800"
+                    }`}
+                >
+                  Cluster Subscriptions
+                  {getSortIcon("cluster")}
+                </button>
               </TableHead>
-              <TableHead className="text-gray-800 font-bold text-center w-[220px] py-3"></TableHead>
+              <TableHead className="text-gray-800 font-bold text-center w-[220px] py-3">Actions</TableHead>
             </TableRow>
           </TableHeader>
         )}
@@ -288,6 +324,7 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
     </Table>
   );
 }
+
 const CLUB_TYPES = [
   "System Leader",
   "Club Leader",
@@ -400,3 +437,30 @@ function DeleteDownlineCoach({ coachId }) {
     </DualOptionActionModal>
   );
 }
+
+const sortCoaches = function (coaches, sortBy) {
+  const { type, order } = sortBy;
+
+  if (type === "none" || !coaches) {
+    return coaches;
+  }
+
+  return [...coaches].sort((a, b) => {
+    let valA = 0;
+    let valB = 0;
+
+    if (type === "personal") {
+      valA = a?.downlineAnalytics?.clientSubscriptions || 0;
+      valB = b?.downlineAnalytics?.clientSubscriptions || 0;
+    } else if (type === "cluster") {
+      valA = a?.downlineAnalytics?.clusterSubscriptions?.clientSubscriptions || 0;
+      valB = b?.downlineAnalytics?.clusterSubscriptions?.clientSubscriptions || 0;
+    }
+
+    if (order === "desc") {
+      return valB - valA;
+    } else {
+      return valA - valB;
+    }
+  });
+};

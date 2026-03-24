@@ -64,8 +64,8 @@ export default function TabsAnalytics({ coach }) {
           <StatsGrid
             coachSubscriptionsLevel1={overall.coachSubscriptionsLevel1}
             clientSubscriptions={overall.clientSubscriptions}
-            clusterClientSubscriptions={overall.clusterSubscriptions?.clientSubscriptions}
-            clusterCoachSubscriptions={overall.clusterSubscriptions?.coachSubscriptions}
+            clusterClientSubscriptions={overall.clientSubscriptions + overall.clusterSubscriptions?.clientSubscriptions}
+            clusterCoachSubscriptions={overall.coachSubscriptionsLevel1 + overall.clusterSubscriptions?.coachSubscriptions}
           />
         </Section>
         <Section
