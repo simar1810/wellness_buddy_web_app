@@ -55,11 +55,11 @@ export default function FeedFooter({
         className="w-[20px] h-[20px] cursor-pointer"
         onClick={() => likeDislike(!feed.isLikedByMe)}
       />
-      <p>{feed.likesCount}</p>
+      {/* <p>{feed.likesCount}</p>
       <MessageCircle
         onClick={() => setCommentsOpened(prev => !prev)}
         className="w-[20px] h-[20px] ml-2 cursor-pointer"
-      />
+      /> */}
       <p>{feed.commentsCount}</p>
       <Bookmark
         fill={feed.isSavedByMe ? "#000000" : "transparent"}
