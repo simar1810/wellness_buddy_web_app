@@ -47,6 +47,8 @@ import {
   Video,
   QrCode,
   Trophy,
+  Gem,
+  Activity,
 } from "lucide-react";
 import { FaWeightScale } from "react-icons/fa6";
 import CreateWorkoutModal from "@/components/modals/tools/CreateWorkoutModal";
@@ -165,6 +167,20 @@ export const sidebar__coachContent = [
     title: "Recognition",
     icon: <Trophy className="min-w-[20px] min-h-[20px]" />,
     url: "/coach/recognition",
+    permission: "coach",
+  },
+  {
+    id: 3.8,
+    title: "Reward",
+    icon: <Gem className="min-w-[20px] min-h-[20px]" />,
+    url: "/coach/reward",
+    permission: "coach",
+  },
+  {
+    id: 3.9,
+    title: "Health Matrix",
+    icon: <Activity className="min-w-[20px] min-h-[20px]" />,
+    url: "/coach/health-matrix",
     permission: "coach",
   },
   {
