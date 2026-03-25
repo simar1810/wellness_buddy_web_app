@@ -272,7 +272,7 @@ export const sidebar__coachContent = [
   },
   {
     id: 5,
-    title: "Feed",
+    title: "Event & Sessions",
     icon: <Newspaper className="min-w-[20px] min-h-[20px]" />,
     url: "/coach/feed",
     permission: 2, // Permission 2 = Feed
