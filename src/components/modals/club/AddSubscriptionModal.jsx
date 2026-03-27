@@ -144,10 +144,7 @@ function SelectTierType({
       invoice: "",
       paymentMode: "cash",
       startDate: format(new Date(), "yyyy-MM-dd"),
-      endDate: format(
-        addDays(new Date(), config.days),
-        "yyyy-MM-dd"
-      ),
+      endDate: config.calcEndDate(new Date()),
       description: "",
       tier: curr
     })
