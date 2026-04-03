@@ -1,5 +1,7 @@
 
 import { Button } from "@/components/ui/button";
+import { copyText } from "@/lib/utils";
+import { compareAsc, parse } from "date-fns";
 import { ChevronDown } from "lucide-react";
 import { useMemo, useState, useRef, useEffect } from "react";
 
@@ -59,7 +61,7 @@ export default function TabsAnalytics({ coach }) {
 
   return (
     <div className="space-y-8 bg-white">
-      <div className="grid items-stretch lg:grid-cols-2 gap-4">
+      <div className="grid items-stretch lg:gr id-cols-2 gap-4">
         <Section title="Overall Analytics">
           <StatsGrid
             coachSubscriptionsLevel1={overall.coachSubscriptionsLevel1}
@@ -68,50 +70,7 @@ export default function TabsAnalytics({ coach }) {
             clusterCoachSubscriptions={overall.coachSubscriptionsLevel1 + overall.clusterSubscriptions?.coachSubscriptions}
           />
         </Section>
-        <Section
-          title="Monthly Analytics"
-          rightElement={
-            <div className="relative" ref={dropdownRef}>
-              <Button
-                variant="wz_outline"
-                onClick={() => setOpen(!open)}
-                className="bg-[var(--accent-1)]/10 flex items-center justify-between gap-2 min-w-[140px] border px-3 py-2 text-sm rounded-md"
-              >
-                <span>
-                  {selectedMonths?.length === monthKeys.length
-                    ? "All Months"
-                    : `${selectedMonths.length} Selected`}
-                </span>
-                <ChevronDown
-                  size={16}
-                  className={`transition-transform duration-200 ${open ? "rotate-180" : ""
-                    }`}
-                />
-              </Button>
-              {open && (
-                <div className="absolute right-0 mt-2 w-48 border rounded-md bg-white z-20">
-                  <div className="max-h-60 overflow-auto">
-                    {monthKeys.map((month) => (
-                      <label
-                        key={month}
-                        className="flex items-center gap-2 px-3 py-2 text-sm border-b last:border-b-0 select-none cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedMonths.includes(month)}
-                          onChange={() => toggleMonth(month)}
-                        />
-                        {formatMonth(month)}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          }
-        >
-          <StatsGrid {...filteredStats} />
-        </Section>
+        <MonthlyAnalytics rawData={monthlyData} />
       </div>
       <Section title="Achievement Progress">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -193,4 +152,81 @@ function formatMonth(month) {
 
 function formatLabel(label) {
   return label.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
+}
+
+function MonthlyAnalytics({ rawData }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  const sortedData = Object.entries(rawData)
+    .map(([key, val]) => ({ month: key, ...val }))
+    .sort((a, b) => {
+      const dateA = parse(a.month, 'MM-yyyy', new Date());
+      const dateB = parse(b.month, 'MM-yyyy', new Date());
+      return compareAsc(dateA, dateB);
+    });
+
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  const currentItems = sortedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  return (
+    <div className="border-1 border-slate-200 bg-slate-100 rounded-2xl overflow-hidden">
+      <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-white">
+        <h2 className="font-bold text-[16px]">Monthly Analytics</h2>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-slate-50/50">
+              <th className="px-8 py-4 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider">Month</th>
+              <th className="px-8 py-4 text-right text-[11px] font-bold text-slate-500 uppercase tracking-wider">Lvl 1 Coaches</th>
+              <th className="px-8 py-4 text-right text-[11px] font-bold text-slate-500 uppercase tracking-wider">Client Subs</th>
+              <th className="px-8 py-4 text-right text-[11px] font-bold text-slate-500 uppercase tracking-wider">Cluster Clients</th>
+              <th className="px-8 py-4 text-right text-[11px] font-bold text-slate-500 uppercase tracking-wider">Cluster Coaches</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {currentItems.map((item) => (
+              <tr key={item.month} className="hover:bg-slate-50/50 transition-colors">
+                <td className="px-8 py-4 font-medium">{item.month}</td>
+                <td className="px-8 py-4 text-right text-slate-600">{item.coachSubscriptionsLevel1 || 0}</td>
+                <td className="px-8 py-4 text-right text-slate-600">{item.clientSubscriptions || 0}</td>
+                <td className="px-8 py-4 text-right text-slate-600">{item.clusterSubscriptions?.clientSubscriptions || 0}</td>
+                <td className="px-8 py-4 text-right text-slate-600">{item.clusterSubscriptions?.coachSubscriptions || 0}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {totalPages > 1 && (
+        <div className="px-8 py-4 border-t border-slate-100 flex items-center justify-between bg-white">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="text-sm font-semibold text-slate-600 hover:text-slate-900 disabled:opacity-30"
+          >
+            Previous
+          </button>
+          <div className="flex gap-2">
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`w-8 h-8 text-xs font-bold rounded-lg transition-all ${currentPage === i + 1 ? 'bg-green-600 text-white' : 'text-slate-400 hover:bg-slate-100'}`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="text-sm font-semibold text-slate-600 hover:text-slate-900 disabled:opacity-30"
+          >
+            Next
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }

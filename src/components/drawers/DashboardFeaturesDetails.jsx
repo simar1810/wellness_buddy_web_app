@@ -86,8 +86,8 @@ function Container({ topPerformers, clientFollowUps, missingFollowups }) {
   const [filters, setFilters] = useState({
     plans: "all",
     subscriptions: {
-      key: "",
-      direction: ""
+      key: "daysRemaining",
+      direction: "asc"
     }
   })
 
