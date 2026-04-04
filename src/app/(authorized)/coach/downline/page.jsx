@@ -512,7 +512,7 @@ function CoachesList() {
 		}
 	};
 
-	const canAddCoach = ["Club Captain", "Club Leader", "System Leader"].includes(clubType);
+	const canAddCoach = ["Club Captain", "Club Leader", "System Leader", "Club Leader Jr"].includes(clubType);
 
 	return (
 		<div className="bg-[var(--comp-2)] px-4 py-8 rounded-[8px] space-y-4 border-1">
@@ -1073,7 +1073,7 @@ function AddCoachInDownline() {
 		}
 	}
 
-	if (!["System Leader", "Club Leader", "Club Leader"].includes(clubType)) return
+	if (!["System Leader", "Club Leader", "Club Leader",  "Club Leader Jr"].includes(clubType)) return
 
 	return (
 		<Dialog>
