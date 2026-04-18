@@ -144,3 +144,9 @@ export async function getBase64ImageFromUrl(imageUrl) {
 export function nowIST(utcDate = new Date()) {
   return toZonedTime(utcDate);
 }
+
+export function extractNumber(input) {
+  if (!input) return null;
+  const match = String(input).match(/-?\d+(\.\d+)?/);
+  return match ? Number(match[0]) : null;
+}

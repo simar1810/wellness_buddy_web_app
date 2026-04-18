@@ -17,6 +17,7 @@ import {
   setHealthMatrices,
   setNextFollowUpDate,
   stage1Completed,
+  toggleHideHealthMatrices,
 } from "@/config/state-reducers/follow-up";
 import {
   calculateBMIFinal,
@@ -27,12 +28,15 @@ import {
   calculateSMPFinal,
 } from "@/lib/client/statistics";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { sendData } from "@/lib/api";
 import HealthMetrics from "@/components/common/HealthMatrixPieCharts";
 import { differenceInYears, parse } from "date-fns";
 import { mutate } from "swr";
+import { Switch } from "@/components/ui/switch";
+import { DEFAULT_FORM_FIELDS } from "@/config/data/health-matrix";
+import { useAppSelector } from "@/providers/global/hooks";
 
 export default function FollowUpModal({ clientData }) {
   return <Dialog>
@@ -170,9 +174,35 @@ function Stage2({
   heightUnit,
   clientId
 }) {
-  const { healthMatrix, dispatch, ...state } = useCurrentStateContext();
+  const { healthMatrix, hideHealthMatrices, dispatch, ...state } = useCurrentStateContext();
+  const { coachHealthMatrixFields } = useAppSelector(state => state.coach.data);
 
   const closeBtnRef = useRef();
+
+  const formFields = useMemo(() => {
+    if (!coachHealthMatrixFields) return DEFAULT_FORM_FIELDS;
+
+    const { defaultFields = [], coachAddedFields = [] } = coachHealthMatrixFields;
+
+    const activeDefaultFields = DEFAULT_FORM_FIELDS.filter(field =>
+      [...defaultFields, "weightInKgs", "weightInPounds"].includes(field.name) ||
+      (field.name === "ideal_weight" && (defaultFields.includes("ideal_weight") || defaultFields.includes("idealWeight")))
+    );
+
+    const customFields = coachAddedFields.map(field => ({
+      label: field.title,
+      value: "0",
+      info: `Range: ${field.minValue} - ${field.maxValue}`,
+      icon: SVG_ICONS[field.svg] || "/svgs/checklist.svg",
+      name: field.fieldLabel,
+      title: field.title,
+      id: field._id || field.fieldLabel,
+      getMaxValue: () => field.maxValue,
+      getMinValue: () => field.minValue,
+    }));
+
+    return [...activeDefaultFields, ...customFields];
+  }, [coachHealthMatrixFields]);
 
   const payload = {
     ...healthMatrix,
@@ -189,6 +219,7 @@ function Stage2({
       heightUnit,
       heightCms: height
     }
+
   const clienthealthStats = {
     bmi: calculateBMIFinal({ ...payload, ...statObj }),
     muscle: calculateSMPFinal({ ...payload, ...statObj }),
@@ -200,7 +231,7 @@ function Stage2({
 
   async function createFollowUp() {
     try {
-      const data = generateRequestPayload({ healthMatrix, ...state })
+      const data = generateRequestPayload({ healthMatrix, hideHealthMatrices, ...state })
       const response = await sendData(`app/add-followup?clientId=${clientId}`, data)
       if (response.status_code !== 200) throw new Error(response.message || response.error);
       toast.success(response.message);
@@ -222,20 +253,37 @@ function Stage2({
 
   return (
     <div>
+      <label>
+        <div className="select-none cursor-pointer flex items-center gap-2 px-4 pt-4">
+          Hide Body Metrics
+          <Switch
+            checked={hideHealthMatrices}
+            onCheckedChange={value => dispatch(toggleHideHealthMatrices(value))}
+          />
+        </div>
+      </label>
       <div className="p-4">
         <div className="grid grid-cols-3 gap-6">
           <HealthMetrics
             onUpdate={onUpdateHealthMatrix}
             data={payload}
+            fields={formFields}
+            showAll={true}
+            hideHealthMatrices={hideHealthMatrices}
           />
         </div>
-        <Button
-          onClick={createFollowUp}
-          variant="wz"
-          className="block mx-auto mt-10 px-24"
-        >
-          Done
-        </Button>
+        <div className="grid grid-cols-2 gap-4 mt-10">
+          <Button
+            onClick={() => dispatch(setCurrentStage(1))}
+          >Previous</Button>
+          <Button
+            onClick={createFollowUp}
+            variant="wz"
+            className=""
+          >
+            Done
+          </Button>
+        </div>
         <DialogClose ref={closeBtnRef} />
       </div>
     </div>

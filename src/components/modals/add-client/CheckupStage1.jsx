@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { changeFieldvalue, changeHeightUnit, changeWeightUnit, setCurrentStage, stage1Completed } from "@/config/state-reducers/add-client-checkup";
 import useCurrentStateContext from "@/providers/CurrentStateContext";
-import { format } from "date-fns";
+import { differenceInYears, format, isAfter, parse } from "date-fns";
 import Image from "next/image";
 import { toast } from "sonner";
 
@@ -45,7 +45,36 @@ export default function CheckupStage1() {
         placeholder="DD/MM/YYYY"
         className="w-full"
         value={state.dob}
-        onChange={e => dispatch(changeFieldvalue("dob", e.target.value))}
+        onChange={(e) => {
+          const value = e.target.value;
+          dispatch(changeFieldvalue("dob", value));
+          if (!value || value.length !== 10) {
+            dispatch(changeFieldvalue("age", ""));
+            return;
+          }
+          const parsedDate = parse(value, "yyyy-MM-dd", new Date());
+          if (isNaN(parsedDate)) {
+            dispatch(changeFieldvalue("age", ""));
+            return;
+          }
+
+          if (isAfter(parsedDate, new Date())) {
+            dispatch(changeFieldvalue("age", ""));
+            return;
+          }
+
+          if (parsedDate < new Date("1900-01-01")) {
+            dispatch(changeFieldvalue("age", ""));
+            return;
+          }
+
+          dispatch(
+            changeFieldvalue(
+              "age",
+              differenceInYears(new Date(), parsedDate)
+            )
+          );
+        }}
       />
       <div>
         <span className="label font-[600] block mb-1">Gender</span>
