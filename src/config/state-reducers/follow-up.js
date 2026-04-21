@@ -1,5 +1,6 @@
 import { addDays, format, parse } from "date-fns";
 import { followUpInitialState } from "../state-data/follow-up";
+import { calculateIdealWeightFinal } from "@/lib/client/statistics";
 
 export function followUpReducer(state, action) {
   switch (action.type) {
@@ -42,6 +43,11 @@ export function followUpReducer(state, action) {
           ...state.healthMatrix,
           ...action.payload
         }
+      }
+    case "TOGGLE_HIDE_HEALTHMATRICES":
+      return {
+        ...state,
+        hideHealthMatrices: action.payload
       }
     default:
       return state;
@@ -107,25 +113,25 @@ export function init(data) {
 }
 
 const fields = ["weightUnit", "height", "heightUnit", "bmi", "body_composition", "visceral_fat", "rm", "muscle", "fat", "ideal_weight", "bodyAge"];
-export function generateRequestPayload(state) {
+export function generateRequestPayload(state, forIdealWeight) {
   const payload = {
-    healthMatrix: {
-
-    }
+    healthMatrix: {}
   };
-  if (state.healthMatrix["weightUnit"].toLowerCase() === "kg") {
+  if (["kg", "kgs"].includes(state.healthMatrix["weightUnit"]?.toLowerCase())) {
     payload.healthMatrix.weight = String(state.healthMatrix.weightInKgs);
   } else {
     payload.healthMatrix.weight = String(state.healthMatrix.weightInPounds);
   };
-  if (state.healthMatrix["heightUnit"].toLowerCase() === "cm") {
+  if (["cm", "cms"].includes(state.healthMatrix["heightUnit"]?.toLowerCase())) {
     payload.healthMatrix.height = String(state.healthMatrix["heightCms"]);
   } else {
     payload.healthMatrix.height = String(`${state.healthMatrix["heightFeet"]}.${state.healthMatrix["heightInches"]}`);
   }
-  for (const field of fields) {
+  for (const field of fields.filter(metric => state.hideHealthMatrices ? ["heightUnit", "bmi", "weightUnit"].includes(metric) : true)) {
     if (Boolean(state.healthMatrix[field])) payload.healthMatrix[field] = String(state.healthMatrix[field]);
   }
+  payload.healthMatrix.ideal_weight = String(calculateIdealWeightFinal(forIdealWeight))
+
   payload.nextFollowUpDate = (state.healthMatrix.followUpType === "custom")
     ? format(parse(state.nextFollowUpDate, 'yyyy-MM-dd', new Date()), 'dd-MM-yyyy')
     : format(addDays(new Date(), 8), 'dd-MM-yyyy');
@@ -145,4 +151,11 @@ export function stage1Completed(data) {
   };
   if (!data.nextFollowUpDate && data.healthMatrix.followUpType === "custom") return { success: false, field: "nextFollowUpDate" }
   return { success: true };
+}
+
+export function toggleHideHealthMatrices(payload) {
+  return {
+    type: "TOGGLE_HIDE_HEALTHMATRICES",
+    payload
+  }
 }

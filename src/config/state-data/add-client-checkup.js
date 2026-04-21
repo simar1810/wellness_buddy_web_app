@@ -2,6 +2,7 @@ import { addDays, format } from "date-fns";
 
 export const addClientCheckupInitialState = {
   stage: 1,
+  hideHealthMatrices: false,
   name: "",//done
   email: "",
   mobileNumber: "",

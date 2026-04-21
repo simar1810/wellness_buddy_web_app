@@ -30,4 +30,12 @@ export const MEMBERSHIP_TIER_CONFIG = {
       "yyyy-MM-dd"
     )
   },
+  physical: {
+    amount: 6990,
+    days: 30,
+    calcEndDate: (date) => format(
+      addMonths(date, 1),
+      "yyyy-MM-dd"
+    )
+  },
 }

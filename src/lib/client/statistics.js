@@ -501,3 +501,52 @@ export function calculateBodyAge({
     }
   }
 }
+  
+  export function calculateSubcutaneousFat(data) {
+  const { age = 1, gender = "male", bodyComposition = "Medium" } = data
+  const bmi = calculateBMIFinal(data)
+  const g = !["male", "female"].includes(gender.toLowerCase()) ? "male" : gender.toLowerCase();
+
+  const bc = bodyComposition.toLowerCase();
+  if (bc !== "slim" && bc !== "medium" && bc !== "fat") {
+    throw new Error('bodyComposition must be "slim", "medium", or "fat"');
+  }
+
+  if (bmi < 0 || age < 0 || age > 120) {
+    throw new Error("Invalid bmi/age values.");
+  }
+
+  const sexInt = g === "male" ? 1 : 0;
+  let totalBodyFat = 1.20 * bmi + 0.23 * age - 10.8 * sexInt - 5.4;
+
+  totalBodyFat += bc === "slim" ? -1.5 : bc === "fat" ? 1.5 : 0.0;
+
+  const minBF = g === "male" ? 3.0 : 8.0;
+  const maxBF = g === "male" ? 45.0 : 55.0;
+  totalBodyFat = Math.min(Math.max(totalBodyFat, minBF), maxBF);
+
+  let subQFrac = g === "male" ? 0.74 : 0.86;
+
+  const ageOver20 = age > 20 ? age - 20 : 0;
+  subQFrac -= g === "male" ? 0.002 * ageOver20 : 0.001 * ageOver20;
+
+  if (bmi > 25) {
+    subQFrac += Math.min(0.003 * (bmi - 25), 0.06);
+  } else if (bmi < 20) {
+    subQFrac -= Math.min(0.003 * (20 - bmi), 0.03);
+  }
+
+  subQFrac += bc === "slim" ? 0.005 : bc === "fat" ? 0.015 : 0.0;
+  subQFrac = Math.min(Math.max(subQFrac, 0.55), 0.95);
+
+  const subcutaneous = totalBodyFat * subQFrac;
+  const visceral = totalBodyFat * (1.0 - subQFrac);
+
+  const r1 = (v) => parseFloat(v.toFixed(1));
+
+  return {
+    subcutaneousPercent: r1(subcutaneous),
+    visceralPercent: r1(visceral),
+    totalBodyFatPercent: r1(totalBodyFat),
+  };
+}
