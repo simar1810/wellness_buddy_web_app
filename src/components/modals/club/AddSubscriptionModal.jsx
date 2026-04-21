@@ -152,7 +152,7 @@ function SelectTierType({
   }
 
   return <div className="bg-slate-50 m-4 mb-0 px-4 py-2 grid grid-cols-4 gap-4 border-1 rounded-[6px]">
-    {["none", "demo", "silver", "gold"].map((curr) => (
+    {["none", "demo", "silver", "gold", "physical"].map((curr) => (
       <button
         key={curr}
         type="button"
