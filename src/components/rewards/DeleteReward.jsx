@@ -12,7 +12,6 @@ export default function DeleteReward({ rewardId, currentSWRKey }) {
     try {
       setLoading(true);
       const response = await sendData("app/reward", { rewardId }, "DELETE");
-      console.log(response)
       if (response.status_code !== 200) throw new Error(response.message);
       toast.success(response.message);
       revalidate(currentSWRKey, "app/reward")

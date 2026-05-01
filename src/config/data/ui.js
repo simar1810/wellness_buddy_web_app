@@ -103,10 +103,7 @@ export const linkGeneratorFields = [
   { id: 9, label: "Select Meeting Banner", type: "file", inputtype: 5, name: "banner" },
   {
     id: 10, label: "Allowed Client Type", inputtype: 6, name: "allowed_client_type",
-    options: [
-      { id: 1, value: "client", name: "Client" },
-      { id: 2, value: "coach", name: "Coach" },
-    ]
+    options: []
   },
   {
     id: 11, label: "Select A Client", inputtype: 7, name: "one_to_one_client_id",

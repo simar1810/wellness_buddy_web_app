@@ -49,6 +49,7 @@ import {
   Trophy,
   Gem,
   Activity,
+  PlayCircle,
 } from "lucide-react";
 import { FaWeightScale } from "react-icons/fa6";
 import CreateWorkoutModal from "@/components/modals/tools/CreateWorkoutModal";
@@ -268,11 +269,17 @@ export const sidebar__coachContent = [
         title: "Recipes",
         url: "/coach/meals/recipes",
       },
+      {
+        id: 5,
+        icon: <PlayCircle className="icon min-w-[20px] min-h-[20px]" />,
+        title: "YT Recipes",
+        url: "/coach/yt-recipe",
+      },
     ],
   },
   {
     id: 5,
-    title: "Event & Sessions",
+    title: "Feed",
     icon: <Newspaper className="min-w-[20px] min-h-[20px]" />,
     url: "/coach/feed",
     permission: 2, // Permission 2 = Feed

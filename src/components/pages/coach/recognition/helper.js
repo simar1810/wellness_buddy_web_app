@@ -17,8 +17,8 @@ export function validateRecognitionPayload(payload) {
   if (!Array.isArray(payload.availability) || payload.availability.length === 0) {
     return { valid: false, message: "Availibility must be a non-empty array" };
   }
-  if (!payload.availability?.every(item => ["client", "coach"].includes(item))) {
-    return { valid: false, message: "Each item in availibility must be 'client' or 'coach'" };
+  if (!payload.availability?.every(item => typeof item === 'string')) {
+    return { valid: false, message: "Each item in availibility must be string" };
   }
   return { valid: true };
 }

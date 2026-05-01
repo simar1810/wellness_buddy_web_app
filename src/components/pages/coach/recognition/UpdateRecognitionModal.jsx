@@ -29,12 +29,15 @@ import { validateRecognitionPayload } from "./helper";
 import { useRevalidateAndClearCache } from "./useRevalidateAndClearCache";
 import SelectMultiple from "@/components/SelectMultiple";
 import SelectClient from "./SelectClient";
+import { useAppSelector } from "@/providers/global/hooks";
+import { checkArray } from "@/lib/formatter";
 
 export default function UpdateRecognitionModal({
   recognition,
   onSuccess,
   currentCacheKey
 }) {
+  const { client_categories } = useAppSelector(state => state.coach.data)
   const revalidate = useRevalidateAndClearCache()
   const [image, setImage] = useState(null);
   const [status, setStatus] = useState("");
@@ -195,10 +198,11 @@ export default function UpdateRecognitionModal({
           <div className="space-y-2">
             <Label>Availability</Label>
             <SelectMultiple
-              options={[
-                { id: 1, name: "Client", value: "client" },
-                { id: 2, name: "Coach", value: "coach" },
-              ]}
+              options={checkArray(client_categories).map((category, index) => ({
+                id: index + 3,
+                name: category.name,
+                value: ["Client", "All Client", "coach", "Coach"].includes(category.name) ? category.name?.toLowerCase() : category.name
+              }))}
               value={availability}
               onChange={setAvailability}
             />

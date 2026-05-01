@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
+import CustomizableLinks from "./CustomizableLinks";
 
 export default function CoachData({ awards }) {
   return <div className="bg-white p-4 rounded-[18px] border-1">
@@ -35,6 +36,9 @@ export default function CoachData({ awards }) {
       <TabsContent value="integrations">
         <IntegrationsContainer />
       </TabsContent>
+      <TabsContent value="customizable-links">
+        <CustomizableLinks />
+      </TabsContent>
     </Tabs>
   </div>
 }
@@ -44,6 +48,7 @@ const tabItems = [
   { icon: <Users className="w-[16px] h-[16px]" />, value: "club", label: "Club" },
   { icon: <Landmark className="w-[16px] h-[16px]" />, value: "bank", label: "Bank" },
   { icon: <Workflow className="w-[16px] h-[16px]" />, value: "integrations", label: "Integrations", },
+  { icon: <Workflow className="w-[16px] h-[16px]" />, value: "customizable-links", label: "Customazible Links", },
 ];
 
 function Header() {
@@ -54,7 +59,7 @@ function Header() {
       return (
         <TabsTrigger
           key={value}
-          className="min-w-[100px] mb-[-5px] px-2 font-semibold flex-1 basis-0 flex items-center gap-1 rounded-[10px] py-2
+          className="min-w-[130px] mb-[-5px] px-2 font-semibold flex-1 basis-0 flex items-center gap-1 rounded-[10px] py-2
              data-[state=active]:bg-[var(--accent-1)] data-[state=active]:text-[var(--comp-1)]
              data-[state=active]:shadow-none text-[#808080] bg-[var(--comp-1)] border-1 border-[#EFEFEF]"
           value={value}
