@@ -9,15 +9,20 @@ import Image from "next/image";
 import { getObjectUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import { sendDataWithFormData } from "@/lib/api";
+import { useAppSelector } from "@/providers/global/hooks";
+import SelectMultiple from "../SelectMultiple";
+import { checkArray } from "@/lib/formatter";
 
 export default function CreateReward({ currentSWRKey }) {
+  const { client_categories } = useAppSelector(state => state.coach.data)
   const revalidate = useRevalidateAndClearCache()
   const fileRef = useRef()
   const closeRef = useRef()
   const [formData, setFormData] = useState({
     image: "",
     title: "",
-    description: ""
+    description: "",
+    availability: []
   })
   const [creating, setCreating] = useState(false);
 
@@ -40,6 +45,9 @@ export default function CreateReward({ currentSWRKey }) {
       payload.set("title", formData.title)
       payload.set("image", formData.image)
       payload.set("description", formData.description)
+      for (const item of formData.availability) {
+        payload.append("availability", item);
+      }
       const response = await sendDataWithFormData("app/reward", payload)
       if (response.status_code !== 200) throw new Error(response.message)
       toast.success(response.message || "Successfull");
@@ -101,6 +109,24 @@ export default function CreateReward({ currentSWRKey }) {
             onChange={onFieldChange("description")}
           />
         </div>
+
+
+        <div className="space-y-2">
+          <Label className="text-xs font-semibold uppercase text-slate-500">Availability</Label>
+          <SelectMultiple
+            options={checkArray(client_categories).map((category, index) => ({
+              id: index + 3,
+              name: category.name,
+              value: ["Client", "All Client", "coach", "Coach"].includes(category.name) ? category.name?.toLowerCase() : category.name
+            }))}
+            value={checkArray(formData.availability)}
+            onChange={val => setFormData((prev) => ({
+              ...prev,
+              availability: val
+            }))}
+          />
+        </div>
+        
         <div className="grid grid-cols-2 items-center gap-2">
           <DialogClose ref={closeRef} asChild>
             <Button

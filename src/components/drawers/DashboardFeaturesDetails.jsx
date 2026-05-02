@@ -25,6 +25,8 @@ import {
   isBefore, isValid, parse, setDate, setMonth, startOfDay
 } from "date-fns";
 import { ddMMyyyy } from "@/config/data/regex";
+import SelectMultiple from "../SelectMultiple";
+import { MultiSearchableSelect } from "../common/selects/MultiSearchableSelect";
 
 const DATE_FORMATS = ["dd-MM-yyyy", "yyyy-MM-dd", "dd/MM/yyyy", "MM/dd/yyyy", "yyyy/MM/dd"];
 const TONE_CLASSES = {
@@ -87,7 +89,8 @@ function Container({ topPerformers, clientFollowUps, missingFollowups }) {
     plans: "all",
     subscriptions: {
       key: "daysRemaining",
-      direction: "asc"
+      direction: "asc",
+      coach: []
     }
   })
 
@@ -98,6 +101,19 @@ function Container({ topPerformers, clientFollowUps, missingFollowups }) {
   const normalizedPlans = useMemo(() => normalizeMealPlans(plans), [plans]);
   const normalizedIncompletePlans = useMemo(() => normalizeIncompletePlans(plans), [plans])
 
+  const availableCoaches = useMemo(function(){
+    const coachesSet = new Map(
+      subscriptions.map(sub => [sub?.coach?._id, sub?.coach?.name])
+    )
+    const result = []
+    let id = 0
+    for (const [value, label] of coachesSet) {
+      id++
+      result.push({ id, label, value })
+    }
+    return result
+  }, [])
+  
   const tabs = useMemo(
     () =>
       createTabsConfig({
@@ -196,6 +212,7 @@ function Container({ topPerformers, clientFollowUps, missingFollowups }) {
                       onExport={() => exportRowsAsCSV(tabItem.exportFileName, tabItem.columns, tableRows)}
                       filter={filters}
                       onFilterChange={setFilters}
+                      availableCoaches={availableCoaches}
                     />
                   </TabsContent>
                 );
@@ -249,7 +266,8 @@ function DataCard({
   onPageChange,
   onExport,
   filter,
-  onFilterChange
+  onFilterChange,
+  availableCoaches
 }) {
   const hasData = rows.length > 0;
 
@@ -274,6 +292,7 @@ function DataCard({
           selectedTab={selectedTab}
           filter={filter}
           onFilterChange={onFilterChange}
+          availableCoaches={availableCoaches}
         />
       </div>
       <div className="overflow-x-auto">
@@ -739,41 +758,45 @@ function normalizeBirthdays(birthdays = []) {
 function normalizeSubscriptions(subscriptions = [], filters) {
   const sortKey = filters?.key;
   const sortDirection = filters?.direction;
-  const normalized = subscriptions.map((subscription, index) => {
-    const client = subscription?.user || {};
-    const timeline = getSubscriptionTimeline(subscription);
-    return {
-      id: subscription?._id ?? client?._id ?? index,
-      user: {
-        name: client?.name ?? subscription?.name ?? "",
-        username:
-          client?.username ??
-          client?.handle ??
-          subscription?.username ??
+  const coachesSet = new Set(filters.coach)
+  const normalized = subscriptions
+    .filter(item => coachesSet.size === 0 || coachesSet.has(item?.coach?._id))
+    .map((subscription, index) => {
+      const client = subscription?.user || {};
+      const timeline = getSubscriptionTimeline(subscription);
+      return {
+        id: subscription?._id ?? client?._id ?? index,
+        user: {
+          name: client?.name ?? subscription?.name ?? "",
+          username:
+            client?.username ??
+            client?.handle ??
+            subscription?.username ??
+            "",
+          avatar:
+            client?.profilePhoto ??
+            subscription?.profilePhoto ??
+            "",
+        },
+        clientId: sanitizeClientId(
+          client?.clientId ?? subscription?.clientId
+        ),
+        mobileNumber:
+          client?.mobileNumber ??
+          subscription?.mobileNumber ??
           "",
-        avatar:
-          client?.profilePhoto ??
-          subscription?.profilePhoto ??
-          "",
-      },
-      clientId: sanitizeClientId(
-        client?.clientId ?? subscription?.clientId
-      ),
-      mobileNumber:
-        client?.mobileNumber ??
-        subscription?.mobileNumber ??
-        "",
-      validFromRaw: timeline.start,
-      validTillRaw: timeline.end,
-      daysRemainingRaw: timeline.daysRemaining,
-      validFrom: formatDateDisplay(timeline.start),
-      validTill: formatDateDisplay(timeline.end),
-      daysRemaining:
-        timeline.daysRemaining !== null
-          ? createDaysBadge(timeline.daysRemaining)
-          : null,
-    };
-  });
+        validFromRaw: timeline.start,
+        validTillRaw: timeline.end,
+        daysRemainingRaw: timeline.daysRemaining,
+        validFrom: formatDateDisplay(timeline.start),
+        validTill: formatDateDisplay(timeline.end),
+        daysRemaining:
+          timeline.daysRemaining !== null
+            ? createDaysBadge(timeline.daysRemaining)
+            : null,
+        coachId: subscription?.coach?._id
+      };
+    });
 
   if (sortKey && sortDirection) {
     normalized.sort((a, b) => {
@@ -1100,22 +1123,39 @@ function calculateMissingDates(startDate, availableDates, totalDays) {
 function FilterOptions({
   selectedTab,
   filter,
-  onFilterChange
+  onFilterChange,
+  availableCoaches
 }) {
   if (selectedTab == "plans") return <ExpiringMealPlanFilterOptions
     filter={filter}
     onFilterChange={onFilterChange}
   />
-  if (selectedTab == "subscriptions") return <SubscriptionsFilter
-    value={filter.subscriptions}
-    onChange={(newSort) =>
-      onFilterChange(prev => ({
-        ...prev,
-        subscriptions: newSort
-      }))
-    }
-
-  />
+  if (selectedTab == "subscriptions") return <div className="flex items-center gap-2">
+    <div className="max-w-sm">
+      <MultiSearchableSelect
+        value={filter?.subscriptions?.coach}
+        onValueChange={value => onFilterChange(prev => ({
+          ...prev,
+          subscriptions: {
+            ...prev,
+            coach: value
+          }
+        }))}
+        options={availableCoaches}
+        selectLabel="Select Coaches"
+        searchEnabled={false}
+      />
+    </div>
+    <SubscriptionsFilter
+      value={filter.subscriptions}
+      onChange={(newSort) =>
+        onFilterChange(prev => ({
+          ...prev,
+          subscriptions: newSort
+        }))
+      }
+    />
+  </div>
   return <></>
 }
 

@@ -75,10 +75,7 @@ export const meetingEditFormControls = [
     label: "Allowed Client Type",
     inputtype: 6,
     name: "allowed_client_type",
-    options: [
-      { id: 1, value: "client", name: "Client" },
-      { id: 2, value: "coach", name: "Coach" }
-    ],
+    options: [],
     getvalue: (obj) => obj.allowed_client_type || ""
   },
   {

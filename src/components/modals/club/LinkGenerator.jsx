@@ -359,7 +359,11 @@ function SelectMeetingFormField({ field, formData, dispatch }) {
     label={field.label}
     options={[
       ...field.options,
-      ...(client_categories.map((category, index) => ({ id: index + 3, name: category.name, value: category.name })))
+      ...(client_categories.map((category, index) => ({
+        id: index + 3,
+        name: category.name,
+        value: ["Client", "All Client", "coach", "Coach"].includes(category.name) ? category.name?.toLowerCase() : category.name
+      })))
     ]}
     value={formData.allowed_client_type}
     onChange={(newValues) => dispatch(changeFieldvalue("allowed_client_type", newValues))}
