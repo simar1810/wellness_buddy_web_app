@@ -112,7 +112,7 @@ function Container({ topPerformers, clientFollowUps, missingFollowups }) {
       result.push({ id, label, value })
     }
     return result
-  }, [])
+  }, [isLoading, data])
   
   const tabs = useMemo(
     () =>

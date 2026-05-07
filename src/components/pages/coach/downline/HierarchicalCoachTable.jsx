@@ -20,6 +20,7 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
+  Pen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -45,8 +46,9 @@ import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { useAppSelector } from "@/providers/global/hooks";
+import Loader from "@/components/common/Loader";
 
-export default function HierarchicalCoachTable({ coaches = [], onMakeTop }) {
+export default function HierarchicalCoachTable({ coaches = [], mutate, onMakeTop }) {
   const [expandedLevels, setExpandedLevels] = useState(new Set([1]));
   const groupedCoaches = useMemo(() => {
     const groups = {};
@@ -131,6 +133,7 @@ export default function HierarchicalCoachTable({ coaches = [], onMakeTop }) {
       <div className="border rounded-md overflow-hidden bg-white space-y-4">
         {levels.map((level, index) => (
           <LevelTable
+            mutate={mutate}
             key={index}
             level={level}
             expandedLevels={expandedLevels}
@@ -161,7 +164,7 @@ export default function HierarchicalCoachTable({ coaches = [], onMakeTop }) {
   );
 }
 
-function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
+function LevelTable({ mutate, expandedLevels, level, groupedCoaches, toggleLevel }) {
   const [sortBy, setSotrBy] = useState({ type: "none", order: "asc" }) // { type: none, personal, cluster, order: asc, desc }
   const levelNum = Number(level);
   const isExpanded = expandedLevels.has(levelNum);
@@ -191,7 +194,7 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
     <Table>
       <TableHeader>
         <TableRow className="text-white bg-[#4a5568] hover:bg-[#4a5568] border-b-2 border-gray-600">
-          <TableCell colSpan={8} className="font-semibold py-2">
+          <TableCell colSpan={9} className="font-semibold py-2">
             <button
               onClick={() => toggleLevel(levelNum)}
               className="w-full flex items-center gap-2 cursor-pointer"
@@ -223,6 +226,9 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
               <TableHead className="text-gray-800 font-bold py-3">
                 Name
               </TableHead>
+              <TableHead className="text-gray-800 font-bold py-3">
+                Category
+              </TableHead>
               <TableHead className="text-gray-800 font-bold text-center w-[180px] py-3">
                 Club Type
               </TableHead>
@@ -238,7 +244,7 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
                   className={`flex items-center gap-1 font-bold transition-colors ${sortBy.type === "personal" ? "text-blue-600" : "text-gray-800"
                     }`}
                 >
-                  Personal Subscriptions
+                  Personal Subs
                   {getSortIcon("personal")}
                 </button>
               </TableHead>
@@ -249,7 +255,7 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
                   className={`flex items-center gap-1 font-bold transition-colors ${sortBy.type === "cluster" ? "text-blue-600" : "text-gray-800"
                     }`}
                 >
-                  Cluster Subscriptions
+                  Cluster Subs
                   {getSortIcon("cluster")}
                 </button>
               </TableHead>
@@ -271,6 +277,14 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
                     <Link href={`/coach/downline/coach/${coach._id}`}>
                       {coachName}
                     </Link>
+                  </TableCell>
+                  <TableCell className="hover:underline text-gray-900 font-bold flex items-center justify-center gap-1">
+                      {coach.newCoachCategory || "-"}
+                      <UpdateCoachNewCategory
+                        mutate={mutate}
+                        defaultCategory={coach.newCoachCategory}
+                        coachId={coach._id}
+                      />
                   </TableCell>
                   <TableCell className="text-center">
                     {hasEditAccess(coach.clubType)
@@ -311,7 +325,7 @@ function LevelTable({ expandedLevels, level, groupedCoaches, toggleLevel }) {
           {isExpanded && levelCoaches.length > 0 && (
             <TableRow className="bg-blue-50 font-semibold border-b-2 border-blue-200">
               <TableCell />
-              <TableCell colSpan={6} className="text-right py-2 text-blue-900">
+              <TableCell colSpan={7} className="text-right py-2 text-blue-900">
                 Level {level} Total:
               </TableCell>
               <TableCell className="text-center py-2 text-blue-900">
@@ -464,3 +478,68 @@ const sortCoaches = function (coaches, sortBy) {
     }
   });
 };
+
+function UpdateCoachNewCategory({ mutate, defaultCategory, coachId }) {
+  const [category, setCategory] = useState(defaultCategory || "");
+  const [loading, setLoading] = useState(false)
+  const closeBtnRef = useRef()
+
+  const handleValueChange = async function () {
+    try {
+      setLoading(true);
+      const response = await sendData(`app/downline/coach/filter-categories/${coachId}`, { category });
+      if (response.status_code !== 200) throw new Error(response.message);
+      toast.success(response.message);
+      mutate()
+      closeBtnRef.current.click();
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button className="hover:bg-slate-100 p-2 rounded-full transition-colors">
+          <Pen size={14} />
+        </button>
+      </DialogTrigger>
+      
+      <DialogContent className="gap-0 space-y-0 p-0 max-h-[70vh] overflow-y-auto">
+        <DialogTitle className="p-4 border-b">Coach Category</DialogTitle>
+        
+        <div className="p-6">
+          <label className="text-sm font-medium mb-2 block">
+            Select Category
+          </label>
+          
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Physical Coach">Physical Coach</SelectItem>
+              <SelectItem value="Online Coach">Online Coach</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <p className="text-xs text-muted-foreground mt-4">
+            Current Selection: <span className="font-semibold">{category}</span>
+          </p>
+        </div>
+        <div className="px-8 pb-4 grid grid-cols-2 gap-4">
+          <DialogClose asChild>
+            <Button ref={closeBtnRef} disabled={loading} size="sm" variant="destructive">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button disabled={loading} size="sm" onClick={handleValueChange} variant="wz">
+            {loading ? <Loader className="border-white !w-4 !border-2" /> : <>Save</>}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
