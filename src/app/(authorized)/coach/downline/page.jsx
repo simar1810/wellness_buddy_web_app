@@ -491,7 +491,7 @@ function CoachesList() {
 					depth: parseInt(coach?.downline?.depth ?? 0) - parseInt(depth ?? 0)
 				}
 			}))
-	}, [isLoading]);
+	}, [isLoading, data]);
 
 	const coaches = allCoaches.filter(coach => new RegExp(query, "i").test(coach.name));
 
@@ -535,6 +535,7 @@ function CoachesList() {
 				]}
 			/>
 			<HierarchicalCoachTable
+				mutate={mutate}
 				coaches={filteredCoaches}
 				onMakeTop={handleMakeTop}
 			/>
