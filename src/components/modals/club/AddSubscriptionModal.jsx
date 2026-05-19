@@ -75,10 +75,15 @@ export default function AddSubscriptionModal({ _id, onSubmit }) {
           onChange={(e) => setFormData({
             ...formData,
             startDate: e.target.value,
-            endDate: format(
-              addMonths(parse(e.target.value, "yyyy-MM-dd", new Date()), 1),
-              "yyyy-MM-dd"
-            )
+            endDate: tier.toLowerCase() === "demo"
+              ? format(
+                addDays(parse(e.target.value, "yyyy-MM-dd", new Date()), 3),
+                "yyyy-MM-dd"
+              )
+              : format(
+                addMonths(parse(e.target.value, "yyyy-MM-dd", new Date()), 1),
+                "yyyy-MM-dd"
+              )
           })}
           label="Start Date"
           type="date"
