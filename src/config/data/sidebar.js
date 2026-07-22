@@ -501,6 +501,18 @@ export const sidebar__coachContent = [
         title: "Programs",
         url: "/coach/tools/programs",
       },
+      {
+        id: 11,
+        icon: <CalendarDays className="icon min-w-[20px] min-h-[20px]" />,
+        title: "Events",
+        url: "/coach/tools/events",
+      },
+      {
+        id: 12,
+        icon: <Projector className="icon min-w-[20px] min-h-[20px]" />,
+        title: "Exclusive Sessions",
+        url: "/coach/tools/exclusive-sessions",
+      },
       // {
       //   id: 9,
       //   icon: <Tags className="icon min-w-[20px] min-h-[20px]" />,

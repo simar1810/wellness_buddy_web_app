@@ -1,4 +1,5 @@
 import {
+  CalendarDays,
   CalendarRange,
   CircleDollarSign,
   Clock12,
@@ -13,6 +14,7 @@ import {
   PersonStanding,
   Settings,
   Soup,
+  Sparkles,
   Store,
   User
 } from "lucide-react";
@@ -80,6 +82,18 @@ export const sidebar__clientContent = [
     title: "Wz Sessions",
     icon: <Footprints className="min-w-[20px] min-h-[20px]" />,
     url: "/client/app/sessions"
+  },
+  {
+    id: 14,
+    title: "Events",
+    icon: <CalendarDays className="min-w-[20px] min-h-[20px]" />,
+    url: "/client/app/events"
+  },
+  {
+    id: 15,
+    title: "Exclusive Sessions",
+    icon: <Sparkles className="min-w-[20px] min-h-[20px]" />,
+    url: "/client/app/exclusive-sessions"
   },
   // {
   //   id: 10,
