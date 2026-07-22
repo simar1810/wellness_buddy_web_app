@@ -13,6 +13,7 @@ export async function fetchData(endpoint, expireUserSession) {
     const response = await fetch(`${API_ENDPOINT}/${endpoint}`, {
       headers: {
         Authorization: `Bearer ${TOKEN}`,
+        "ngrok-skip-browser-warning": "true",
       },
       cache: "no-store",
     });
@@ -50,6 +51,7 @@ export async function sendData(
         Accept: "application/json",
         "Content-Type": "application/json",
         Authorization: `Bearer ${TOKEN}`,
+        "ngrok-skip-browser-warning": "true",
       },
       body: JSON.stringify(data),
       cache: "no-store",
@@ -84,6 +86,7 @@ export async function sendDataWithFormData(
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${TOKEN}`,
+        "ngrok-skip-browser-warning": "true",
       },
       body: formData,
       cache: "no-store",

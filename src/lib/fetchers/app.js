@@ -295,6 +295,16 @@ export const retrieveSessions = withClientFilter((person) => {
   return fetchData(`app/workout/sessions?person=${person}`);
 });
 
+export function getEvents(person = "coach", page = 1, limit = 50) {
+  return fetchData(`app/events?person=${person}&page=${page}&limit=${limit}`);
+}
+
+export function getExclusiveSessions(person = "coach", page = 1, limit = 50) {
+  return fetchData(
+    `app/exclusive-sessions?person=${person}&page=${page}&limit=${limit}`
+  );
+}
+
 export function retrieveAIAgentHistory(clientId, date) {
   let endpoint = `app/ai/analyze?person=coach&client=${clientId}`
   if (date && date !== "01-01-1970") endpoint += `&date=${date}`
