@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Input } from "../ui/input";
-import { Search, ChevronRight } from "lucide-react";
+import { Search, ChevronRight, Layers } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -38,8 +38,11 @@ import { useAppSelector } from "@/providers/global/hooks";
 import PendingClientClubDataModal from "../modals/client/PendingClientClubDataModal";
 import { DialogTrigger } from "../ui/dialog";
 import { useSWRConfig } from "swr";
+import useSWR from "swr";
 import { SearchBar } from "./AppNavbar";
 import { isCoach, getUserType, getUserPermissions } from "@/lib/permissions";
+import { getToolTabs } from "@/lib/fetchers/app";
+import { catalogTabsForNav } from "@/lib/tool-tabs";
 
 export default function AppSidebar() {
   const [Modal, setModal] = useState();
@@ -52,6 +55,13 @@ export default function AppSidebar() {
   if (!features.includes(4)) sidebarItems = sidebarItems.filter(item => item.id !== 6);
   if (!["System Leader"].includes(clubType)) {
     sidebarItems = sidebarItems.filter(item => item.id !== 3.7);
+    sidebarItems = sidebarItems.map((item) => {
+      if (!item.items) return item;
+      return {
+        ...item,
+        items: item.items.filter((sub) => !sub.systemLeaderOnly),
+      };
+    });
   }
   if (!["System Leader", "Club Leader", "Club Leader Jr", "Club Captain"].includes(clubType)) {
     sidebarItems = sidebarItems.filter(item => item.id !== 14);
@@ -79,6 +89,29 @@ export default function AppSidebar() {
     return false;
   });
   if (!features.includes(3)) sidebarItems = sidebarItems.filter(item => item.id !== 13);
+
+  const { data: toolTabsData } = useSWR("sidebar-tool-tabs", () =>
+    getToolTabs("coach", 1, 50)
+  );
+  const dynamicTabs = catalogTabsForNav(toolTabsData?.data || []);
+  sidebarItems = sidebarItems.map((item) => {
+    if (item.id !== 12) return item;
+    const extras = dynamicTabs.map((tab) => ({
+      id: `tool-tab-${tab._id}`,
+      icon: tab.icon ? (
+        <img
+          src={tab.icon}
+          alt={tab.name}
+          className="icon min-w-[20px] min-h-[20px] w-5 h-5 rounded object-cover"
+        />
+      ) : (
+        <Layers className="icon min-w-[20px] min-h-[20px]" />
+      ),
+      title: tab.name,
+      url: `/coach/tools/custom-tabs/${tab._id}`,
+    }));
+    return { ...item, items: [...(item.items || []), ...extras] };
+  });
 
   return (
     <Sidebar className="w-[204px] bg-[var(--dark-4)] pl-2 pr-0 border-r-1">

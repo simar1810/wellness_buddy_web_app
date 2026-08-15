@@ -23,11 +23,14 @@ import {
   DropdownMenuTrigger
 } from "../ui/dropdown-menu";
 import { useState } from "react";
+import useSWR from "swr";
 import { sidebar__clientContent } from "@/config/data/client-sidebar";
 import { Button } from "../ui/button";
 import { destroyClient } from "@/providers/global/slices/client";
 import { useAppDispatch, useAppSelector } from "@/providers/global/hooks";
 import { toast } from "sonner";
+import { getToolTabs } from "@/lib/fetchers/app";
+import { catalogTabsForNav } from "@/lib/tool-tabs";
 
 export default function AppClientSidebar() {
   const [Modal, setModal] = useState();
@@ -39,6 +42,27 @@ export default function AppClientSidebar() {
   if (organisation !== "Herbalife") {
     sidebarItems = sidebarItems.filter(item => ![6].includes(item.id))
   }
+
+  const { data: toolTabsData } = useSWR("client-sidebar-tool-tabs", () =>
+    getToolTabs("client", 1, 50)
+  );
+  const dynamicTabs = catalogTabsForNav(toolTabsData?.data || []);
+  sidebarItems = sidebarItems.map((item) => {
+    if (item.id !== 11) return item;
+    const extras = dynamicTabs.map((tab) => ({
+      id: `tool-tab-${tab._id}`,
+      icon: tab.icon ? (
+        <img
+          src={tab.icon}
+          alt={tab.name}
+          className="icon min-w-[20px] min-h-[20px] w-5 h-5 rounded object-cover"
+        />
+      ) : null,
+      title: tab.name,
+      url: `/client/app/tools/custom-tabs/${tab._id}`,
+    }));
+    return { ...item, items: [...(item.items || []), ...extras] };
+  });
 
   async function logoutuser() {
     try {
