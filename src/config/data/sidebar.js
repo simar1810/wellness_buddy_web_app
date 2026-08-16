@@ -179,6 +179,14 @@ export const sidebar__coachContent = [
     permission: "coach",
   },
   {
+    id: 3.85,
+    title: "Custom Tools",
+    icon: <Layers className="min-w-[20px] min-h-[20px]" />,
+    url: "/coach/tools/custom-tabs",
+    permission: "coach",
+    systemLeaderOnly: true,
+  },
+  {
     id: 3.9,
     title: "Health Matrix",
     icon: <Activity className="min-w-[20px] min-h-[20px]" />,
@@ -513,13 +521,6 @@ export const sidebar__coachContent = [
         icon: <Projector className="icon min-w-[20px] min-h-[20px]" />,
         title: "Exclusive Sessions",
         url: "/coach/tools/exclusive-sessions",
-      },
-      {
-        id: 15,
-        icon: <Layers className="icon min-w-[20px] min-h-[20px]" />,
-        title: "Custom Tools",
-        url: "/coach/tools/custom-tabs",
-        systemLeaderOnly: true,
       },
       // {
       //   id: 9,

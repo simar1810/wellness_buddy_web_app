@@ -19,7 +19,6 @@ const emptyForm = {
   description: "",
   icon: null,
   status: "active",
-  sortOrder: 0,
   availability: [],
 };
 
@@ -43,7 +42,6 @@ export default function ToolTabFormDialog({
         description: editing.description || "",
         icon: null,
         status: editing.status || "active",
-        sortOrder: editing.sortOrder ?? 0,
         availability: checkArray(editing.availability),
       });
       setExistingIcon(editing.icon || "");
@@ -63,7 +61,6 @@ export default function ToolTabFormDialog({
         name: form.name.trim(),
         description: form.description || "",
         status: form.status || "active",
-        sortOrder: Number(form.sortOrder) || 0,
         availability: checkArray(form.availability),
       };
       if (editing) payload.toolTabId = editing._id;
@@ -162,32 +159,19 @@ export default function ToolTabFormDialog({
               </span>
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="tab-status">Status</Label>
-              <select
-                id="tab-status"
-                className="w-full h-9 rounded-md border border-[var(--comp-3)] bg-transparent px-3 text-sm"
-                value={form.status}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, status: e.target.value }))
-                }
-              >
-                <option value="active">active</option>
-                <option value="inactive">inactive</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="tab-order">Sort order</Label>
-              <Input
-                id="tab-order"
-                type="number"
-                value={form.sortOrder}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, sortOrder: e.target.value }))
-                }
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="tab-status">Status</Label>
+            <select
+              id="tab-status"
+              className="w-full h-9 rounded-md border border-[var(--comp-3)] bg-transparent px-3 text-sm"
+              value={form.status}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, status: e.target.value }))
+              }
+            >
+              <option value="active">active</option>
+              <option value="inactive">inactive</option>
+            </select>
           </div>
           <div className="space-y-2">
             <Label>Availability</Label>

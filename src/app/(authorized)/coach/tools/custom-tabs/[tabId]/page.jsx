@@ -54,6 +54,48 @@ export default function CoachCustomTabDetailPage() {
     mutate("catalog-tool-tabs");
   }
 
+  async function persistPostOrder(nextIds) {
+    const previous = posts;
+    mutate(
+      cacheKey,
+      (current) => {
+        if (!current?.data?.posts) return current;
+        const map = new Map(current.data.posts.map((post) => [post._id, post]));
+        return {
+          ...current,
+          data: {
+            ...current.data,
+            posts: nextIds
+              .map((id, index) =>
+                map.has(id) ? { ...map.get(id), sortOrder: index } : null
+              )
+              .filter(Boolean),
+          },
+        };
+      },
+      false
+    );
+    try {
+      const response = await sendData(
+        "app/tool-tab-posts/reorder",
+        { toolTabPostIds: nextIds },
+        "PUT"
+      );
+      if (response?.status_code !== 200) {
+        throw new Error(response?.message || "Failed to save order");
+      }
+      mutate(cacheKey);
+      toast.success("Order saved");
+    } catch (err) {
+      mutate(
+        cacheKey,
+        { ...data, data: { ...data?.data, posts: previous } },
+        false
+      );
+      toast.error(err.message);
+    }
+  }
+
   return (
     <div className="content-container content-height-screen">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -78,6 +120,11 @@ export default function CoachCustomTabDetailPage() {
               {tab?.description && (
                 <p className="text-sm text-[var(--dark-3)] mt-1 max-w-xl">
                   {tab.description}
+                </p>
+              )}
+              {isSystemLeader && posts.length > 1 && (
+                <p className="text-xs text-[var(--dark-3)] mt-2">
+                  Drag the grip on a card to change post order.
                 </p>
               )}
             </div>
@@ -146,6 +193,8 @@ export default function CoachCustomTabDetailPage() {
         <ToolPostGrid
           posts={posts}
           isSystemLeader={isSystemLeader}
+          canReorder={isSystemLeader && posts.length > 1}
+          onReorder={persistPostOrder}
           onPreview={(post) => setPreview(post)}
           onEdit={(post) => {
             setEditing(post);
@@ -164,6 +213,7 @@ export default function CoachCustomTabDetailPage() {
           onSaved={() => {
             mutate(cacheKey);
             mutate("catalog-tool-tabs");
+            mutate("sidebar-tool-tabs");
           }}
         />
       )}

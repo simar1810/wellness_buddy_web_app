@@ -55,6 +55,7 @@ export default function AppSidebar() {
   if (!features.includes(4)) sidebarItems = sidebarItems.filter(item => item.id !== 6);
   if (!["System Leader"].includes(clubType)) {
     sidebarItems = sidebarItems.filter(item => item.id !== 3.7);
+    sidebarItems = sidebarItems.filter((item) => !item.systemLeaderOnly);
     sidebarItems = sidebarItems.map((item) => {
       if (!item.items) return item;
       return {
@@ -94,24 +95,32 @@ export default function AppSidebar() {
     getToolTabs("coach", 1, 50)
   );
   const dynamicTabs = catalogTabsForNav(toolTabsData?.data || []);
-  sidebarItems = sidebarItems.map((item) => {
-    if (item.id !== 12) return item;
-    const extras = dynamicTabs.map((tab) => ({
-      id: `tool-tab-${tab._id}`,
-      icon: tab.icon ? (
-        <img
-          src={tab.icon}
-          alt={tab.name}
-          className="icon min-w-[20px] min-h-[20px] w-5 h-5 rounded object-cover"
-        />
-      ) : (
-        <Layers className="icon min-w-[20px] min-h-[20px]" />
-      ),
-      title: tab.name,
-      url: `/coach/tools/custom-tabs/${tab._id}`,
-    }));
-    return { ...item, items: [...(item.items || []), ...extras] };
-  });
+  const extras = dynamicTabs.map((tab) => ({
+    id: `tool-tab-${tab._id}`,
+    icon: tab.icon ? (
+      <img
+        src={tab.icon}
+        alt={tab.name}
+        className="icon min-w-[20px] min-h-[20px] w-5 h-5 rounded object-cover"
+      />
+    ) : (
+      <Layers className="min-w-[20px] min-h-[20px]" />
+    ),
+    title: tab.name,
+    url: `/coach/tools/custom-tabs/${tab._id}`,
+  }));
+  const insertAt = (() => {
+    const cmsIndex = sidebarItems.findIndex((item) => item.id === 3.85);
+    if (cmsIndex >= 0) return cmsIndex + 1;
+    const rewardIndex = sidebarItems.findIndex((item) => item.id === 3.8);
+    if (rewardIndex >= 0) return rewardIndex + 1;
+    return sidebarItems.length;
+  })();
+  sidebarItems = [
+    ...sidebarItems.slice(0, insertAt),
+    ...extras,
+    ...sidebarItems.slice(insertAt),
+  ];
 
   return (
     <Sidebar className="w-[204px] bg-[var(--dark-4)] pl-2 pr-0 border-r-1">

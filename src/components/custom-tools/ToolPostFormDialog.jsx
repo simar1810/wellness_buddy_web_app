@@ -21,7 +21,6 @@ const emptyForm = {
   image: null,
   ytLink: "",
   status: "active",
-  sortOrder: 0,
   availability: [],
 };
 
@@ -48,7 +47,6 @@ export default function ToolPostFormDialog({
         image: null,
         ytLink: editing.ytLink || "",
         status: editing.status || "active",
-        sortOrder: editing.sortOrder ?? 0,
         availability: checkArray(editing.availability),
       });
       setExistingImage(editing.image || "");
@@ -73,7 +71,6 @@ export default function ToolPostFormDialog({
         description: form.description || "",
         mediaType: form.mediaType,
         status: form.status || "active",
-        sortOrder: Number(form.sortOrder) || 0,
         availability: checkArray(form.availability),
       };
       if (editing) payload.toolTabPostId = editing._id;
@@ -204,32 +201,19 @@ export default function ToolPostFormDialog({
               />
             </div>
           )}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="post-status">Status</Label>
-              <select
-                id="post-status"
-                className="w-full h-9 rounded-md border border-[var(--comp-3)] bg-transparent px-3 text-sm"
-                value={form.status}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, status: e.target.value }))
-                }
-              >
-                <option value="active">active</option>
-                <option value="inactive">inactive</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="post-order">Sort order</Label>
-              <Input
-                id="post-order"
-                type="number"
-                value={form.sortOrder}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, sortOrder: e.target.value }))
-                }
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="post-status">Status</Label>
+            <select
+              id="post-status"
+              className="w-full h-9 rounded-md border border-[var(--comp-3)] bg-transparent px-3 text-sm"
+              value={form.status}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, status: e.target.value }))
+              }
+            >
+              <option value="active">active</option>
+              <option value="inactive">inactive</option>
+            </select>
           </div>
           <div className="space-y-2">
             <Label>Availability</Label>
