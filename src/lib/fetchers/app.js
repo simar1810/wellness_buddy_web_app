@@ -305,6 +305,24 @@ export function getExclusiveSessions(person = "coach", page = 1, limit = 50) {
   );
 }
 
+export function getToolTabs(person = "coach", page = 1, limit = 50) {
+  return fetchData(
+    `app/tool-tabs?person=${person}&page=${page}&limit=${limit}`
+  );
+}
+
+export function getToolTab(tabId, person = "coach", page = 1, limit = 20) {
+  return fetchData(
+    `app/tool-tabs/${tabId}?person=${person}&page=${page}&limit=${limit}`
+  );
+}
+
+export function getToolTabPosts(tabId, person = "coach", page = 1, limit = 20) {
+  return fetchData(
+    `app/tool-tabs/${tabId}/posts?person=${person}&page=${page}&limit=${limit}`
+  );
+}
+
 export function retrieveAIAgentHistory(clientId, date) {
   let endpoint = `app/ai/analyze?person=coach&client=${clientId}`
   if (date && date !== "01-01-1970") endpoint += `&date=${date}`

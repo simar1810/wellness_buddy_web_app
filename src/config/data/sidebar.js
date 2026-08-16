@@ -50,6 +50,7 @@ import {
   Gem,
   Activity,
   PlayCircle,
+  Layers,
 } from "lucide-react";
 import { FaWeightScale } from "react-icons/fa6";
 import CreateWorkoutModal from "@/components/modals/tools/CreateWorkoutModal";
@@ -176,6 +177,14 @@ export const sidebar__coachContent = [
     icon: <Gem className="min-w-[20px] min-h-[20px]" />,
     url: "/coach/reward",
     permission: "coach",
+  },
+  {
+    id: 3.85,
+    title: "Custom Tools",
+    icon: <Layers className="min-w-[20px] min-h-[20px]" />,
+    url: "/coach/tools/custom-tabs",
+    permission: "coach",
+    systemLeaderOnly: true,
   },
   {
     id: 3.9,
