@@ -28,12 +28,17 @@ export default function InputMobileNumber() {
       return;
     }
     try {
-      const data = { credential: "+91" + mobileNumber, fcmToken: "" };
+      const data = {
+        credential: "+91" + mobileNumber,
+        fcmToken: "",
+        otpChannel: "sms",
+      };
       const res = await sendData(
         "app/signin?authMode=mob&clientType=web",
         data
       );
       if (res.status_code === 400) throw new Error(res.message);
+      dispatch({ type: "UPDATE_OTP_CHANNEL", payload: "sms" });
       dispatch({
         type: "UPDATE_CURRENT_STATE",
         payload: {
@@ -42,6 +47,7 @@ export default function InputMobileNumber() {
           isFirstTime: res.data.isFirstTime,
         },
       });
+      toast.success(res.message || "OTP sent successfully!");
     } catch (err) {
       toast.error(err.message || "Please try again later!");
     }

@@ -15,6 +15,8 @@ export default function reducer(state, action) {
       return newState;
     case "UPDATE_OTP":
       return { ...state, otp: action.payload }
+    case "UPDATE_OTP_CHANNEL":
+      return { ...state, otpChannel: action.payload, otp: "" }
     case "UPDATE_LOGIN_TYPE":
       return { ...state, loginType: action.payload }
     case "UPDATE_USER_LOGIN":
@@ -87,5 +89,12 @@ export function updateUserLogin(field, value) {
   return {
     type: "UPDATE_USER_LOGIN",
     payload: { field, value }
+  }
+}
+
+export function updateOtpChannel(payload) {
+  return {
+    type: "UPDATE_OTP_CHANNEL",
+    payload
   }
 }

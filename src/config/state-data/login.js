@@ -2,6 +2,7 @@ const state = {
   stage: 1,
   mobileNumber: "",
   otp: "",
+  otpChannel: "sms", // "sms" | "whatsapp"
   isFirstTime: false,
   loginType: "coach", // "coach" or "user"
   userLogin: {
