@@ -61,23 +61,21 @@ export function normalizeHexColor(hex = "") {
 export function youtubeVideoId(url) {
   try {
     const parsedUrl = new URL(url);
-    const hostname = parsedUrl.hostname;
+    const hostname = parsedUrl.hostname.replace(/^www\./, "");
 
-    if (hostname === 'youtu.be') {
-      return parsedUrl.pathname.slice(1); // short URL
+    if (hostname === "youtu.be") {
+      return parsedUrl.pathname.slice(1).split("/")[0] || false;
     }
 
-    if (hostname.includes('youtube.com')) {
-      if (parsedUrl.pathname === '/watch') {
-        return parsedUrl.searchParams.get('v');
+    if (hostname.includes("youtube.com") || hostname.includes("youtube-nocookie.com")) {
+      if (parsedUrl.pathname === "/watch") {
+        return parsedUrl.searchParams.get("v") || false;
       }
 
-      if (parsedUrl.pathname.startsWith('/embed/')) {
-        return parsedUrl.pathname.split('/embed/')[1];
-      }
-
-      if (parsedUrl.pathname.startsWith('/v/')) {
-        return parsedUrl.pathname.split('/v/')[1];
+      for (const prefix of ["/embed/", "/shorts/", "/live/", "/v/"]) {
+        if (parsedUrl.pathname.startsWith(prefix)) {
+          return parsedUrl.pathname.split(prefix)[1]?.split(/[/?#]/)[0] || false;
+        }
       }
     }
   } catch (e) {
