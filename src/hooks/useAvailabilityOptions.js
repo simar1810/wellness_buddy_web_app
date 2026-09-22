@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { checkArray } from "@/lib/formatter";
+import { availabilityOptionValue } from "@/lib/availability";
 import { useAppSelector } from "@/providers/global/hooks";
 
 export function useAvailabilityOptions() {
@@ -11,13 +12,11 @@ export function useAvailabilityOptions() {
   return useMemo(
     () => [
       { id: 1, name: "All Client", value: "client" },
-      { id: 2, name: "Coach", value: "coach" },
+      { id: 2, name: "Coach / App Coach", value: "coach" },
       ...checkArray(client_categories).map((category, index) => ({
         id: index + 3,
         name: category.name,
-        value: ["Client", "All Client", "coach", "Coach"].includes(category.name)
-          ? category.name?.toLowerCase()
-          : category.name,
+        value: availabilityOptionValue(category.name),
       })),
     ],
     [client_categories]

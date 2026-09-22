@@ -31,6 +31,7 @@ import SelectMultiple from "@/components/SelectMultiple";
 import SelectClient from "./SelectClient";
 import { useAppSelector } from "@/providers/global/hooks";
 import { checkArray } from "@/lib/formatter";
+import { availabilityOptionValue } from "@/lib/availability";
 
 export default function UpdateRecognitionModal({
   recognition,
@@ -201,7 +202,7 @@ export default function UpdateRecognitionModal({
               options={checkArray(client_categories).map((category, index) => ({
                 id: index + 3,
                 name: category.name,
-                value: ["Client", "All Client", "coach", "Coach"].includes(category.name) ? category.name?.toLowerCase() : category.name
+                value: availabilityOptionValue(category.name),
               }))}
               value={availability}
               onChange={setAvailability}
