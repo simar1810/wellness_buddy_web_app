@@ -18,6 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
+import { RowCheckbox } from "@/components/bulk/bulkSelection";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,8 @@ export default function ToolPostGrid({
   onPreview,
   onEdit,
   onDelete,
+  selected = [],
+  onSelectionChange,
 }) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -74,6 +77,8 @@ export default function ToolPostGrid({
             onPreview={onPreview}
             onEdit={onEdit}
             onDelete={onDelete}
+            selected={selected}
+            onSelectionChange={onSelectionChange}
           />
         ) : (
           <PostCard
@@ -86,6 +91,8 @@ export default function ToolPostGrid({
             onPreview={onPreview}
             onEdit={onEdit}
             onDelete={onDelete}
+            selected={selected}
+            onSelectionChange={onSelectionChange}
           />
         )
       )}
@@ -141,12 +148,29 @@ function PostCard({
   onEdit,
   onDelete,
   handleProps,
+  selected = [],
+  onSelectionChange,
 }) {
   const cover = postCover(post);
   const isYoutube = post.mediaType === "youtube";
+  const showCheckbox = isSystemLeader && typeof onSelectionChange === "function";
+
   return (
-    <div className="rounded-[14px] overflow-hidden bg-[var(--comp-2)] border border-[var(--comp-3)]">
+    <div className="rounded-[14px] overflow-hidden bg-[var(--comp-2)] border border-[var(--comp-3)] relative">
       <div className="relative">
+        {showCheckbox && (
+          <div
+            className={`absolute z-10 bg-white/90 rounded p-1 ${
+              canReorder ? "top-2 left-12" : "top-2 left-2"
+            }`}
+          >
+            <RowCheckbox
+              id={post._id}
+              selected={selected}
+              onChange={onSelectionChange}
+            />
+          </div>
+        )}
         {canReorder && (
           <div className="absolute top-2 left-2 z-10 rounded-md bg-black/50 text-white">
             <SortableHandle

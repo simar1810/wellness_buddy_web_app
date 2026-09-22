@@ -1,11 +1,27 @@
-import { Gift, Edit2, Trash2 } from "lucide-react";
+import { Gift } from "lucide-react";
 import DeleteReward from "./DeleteReward";
 import UpdateReward from "./UpdateReward";
+import { RowCheckbox } from "@/components/bulk/bulkSelection";
 
-export function RewardCard({ item, currentSWRKey, onDelete, onEdit }) {
+export function RewardCard({
+  item,
+  currentSWRKey,
+  selected = [],
+  onSelectionChange,
+  showCheckbox = false,
+}) {
   return (
     <div className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md transition-all duration-300">
       <div className="relative aspect-video w-full bg-slate-50 border-b border-slate-100 overflow-hidden">
+        {showCheckbox && onSelectionChange && (
+          <div className="absolute top-2 left-2 z-10 bg-white/90 rounded p-1 border shadow-sm">
+            <RowCheckbox
+              id={item._id}
+              selected={selected}
+              onChange={onSelectionChange}
+            />
+          </div>
+        )}
         {item.image ? (
           <img
             src={item.image}

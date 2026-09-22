@@ -3,9 +3,18 @@ import ContentError from "@/components/common/ContentError";
 import ContentLoader from "@/components/common/ContentLoader";
 import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
 import EditProgramModal from "@/components/modals/tools/EditProgramModal";
+import BulkUploadDialog from "@/components/bulk/BulkUploadDialog";
+import BulkDeleteToolbar from "@/components/bulk/BulkDeleteToolbar";
+import BulkAvailabilityField, {
+  DEFAULT_BULK_AVAILABILITY,
+} from "@/components/bulk/BulkAvailabilityField";
+import { RowCheckbox, SelectAllCheckbox } from "@/components/bulk/bulkSelection";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { sendData } from "@/lib/api";
+import { submitBulkCreate, submitBulkDelete } from "@/lib/bulkCatalog";
+import { checkArray } from "@/lib/formatter";
 import { getClientPrograms } from "@/lib/fetchers/app";
 import { DndContext } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
@@ -20,33 +29,140 @@ import { Badge } from "@/components/ui/badge";
 
 export default function Page() {
   const [isBeingShuffled, setIsBeingShuffled] = useState(false);
+  const [selected, setSelected] = useState([]);
   const { isLoading, error, data } = useSWR("client/programs", getClientPrograms);
   if (isLoading) return <ContentLoader />
   if (error || data?.status_code !== 200) return <ContentError title={error || data?.message} />
   const programs = data.data;
+  const programIds = programs.map((p) => p._id);
+
   return <div className="content-container content-height-screen">
-    <div className="mb-10 flex items-center justify-between gap-2">
+    <div className="mb-10 flex items-center justify-between gap-2 flex-wrap">
       <h2>Programs</h2>
-      <Link href="/coach/tools/programs/add" className="bg-green-700 text-white px-4 py-2 ml-auto rounded-[10px] font-bold">Add</Link>
-      {!isBeingShuffled
-        ? <Button onClick={() => setIsBeingShuffled(true)} className="font-bold">Shuffle</Button>
-        : <Button onClick={() => setIsBeingShuffled(false)} variant="secondary" className="font-bold ">Cancel</Button>}
+      <div className="flex items-center gap-2 flex-wrap ml-auto">
+        {!isBeingShuffled && programs.length > 0 && (
+          <div className="flex items-center gap-2 mr-1">
+            <SelectAllCheckbox
+              ids={programIds}
+              selected={selected}
+              onChange={setSelected}
+            />
+            <span className="text-xs text-muted-foreground">Select all</span>
+          </div>
+        )}
+        {!isBeingShuffled && (
+          <BulkUploadDialog
+            title="Bulk Upload Programs"
+            createEmptyRow={() => ({
+              name: "",
+              subTitle: "",
+              link: "",
+              image: null,
+              availability: DEFAULT_BULK_AVAILABILITY,
+            })}
+            renderRow={(row, _i, onChange) => (
+              <div className="space-y-2">
+                <Input
+                  placeholder="Name"
+                  value={row.name}
+                  onChange={(e) => onChange({ name: e.target.value })}
+                />
+                <Input
+                  placeholder="Subtitle"
+                  value={row.subTitle}
+                  onChange={(e) => onChange({ subTitle: e.target.value })}
+                />
+                <Input
+                  placeholder="Link"
+                  value={row.link}
+                  onChange={(e) => onChange({ link: e.target.value })}
+                />
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    onChange({ image: e.target.files?.[0] || null })
+                  }
+                />
+                <BulkAvailabilityField
+                  value={row.availability}
+                  onChange={(availability) => onChange({ availability })}
+                />
+              </div>
+            )}
+            onSubmit={async (rows) => {
+              const result = await submitBulkCreate(
+                "app/programs/bulk",
+                rows,
+                (row, imageUrl) => {
+                  if (!row.name?.trim()) {
+                    throw new Error("Each row needs a name");
+                  }
+                  if (!imageUrl) throw new Error("Each row needs an image");
+                  return {
+                    name: row.name,
+                    subTitle: row.subTitle || "",
+                    link: row.link || "",
+                    image: imageUrl,
+                    isActive: true,
+                    availability: checkArray(row.availability).length
+                      ? row.availability
+                      : DEFAULT_BULK_AVAILABILITY,
+                  };
+                }
+              );
+              mutate("client/programs");
+              setSelected([]);
+              return result;
+            }}
+          />
+        )}
+        <Link href="/coach/tools/programs/add" className="bg-green-700 text-white px-4 py-2 rounded-[10px] font-bold">Add</Link>
+        {!isBeingShuffled
+          ? <Button onClick={() => setIsBeingShuffled(true)} className="font-bold">Shuffle</Button>
+          : <Button onClick={() => setIsBeingShuffled(false)} variant="secondary" className="font-bold ">Cancel</Button>}
+      </div>
     </div>
+
+    {!isBeingShuffled && (
+      <BulkDeleteToolbar
+        selectedCount={selected.length}
+        label="programs"
+        onClear={() => setSelected([])}
+        onConfirmDelete={async () => {
+          await submitBulkDelete("app/programs/bulk", { programIds: selected });
+          setSelected([]);
+          mutate("client/programs");
+        }}
+      />
+    )}
+
     {isBeingShuffled
       ? <ShufflePrograms
         programs={programs}
         setIsBeingShuffled={setIsBeingShuffled}
       />
-      : <ProgramList programs={programs} />}
+      : <ProgramList
+        programs={programs}
+        selected={selected}
+        onSelectionChange={setSelected}
+      />}
   </div>
 }
 
-function ProgramList({ programs }) {
+function ProgramList({ programs, selected = [], onSelectionChange }) {
   return <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
     {programs.map((program, index) => <div
-      key={index}
-      className="bg-[var(--comp-1)] rounded-[10px] border-1 overflow-clip hover:[&_.actions]:opacity-100"
+      key={program._id || index}
+      className="bg-[var(--comp-1)] rounded-[10px] border-1 overflow-clip hover:[&_.actions]:opacity-100 relative"
     >
+      <div className="absolute top-2 left-2 z-10 bg-white/90 rounded p-1 border shadow-sm">
+        <RowCheckbox
+          id={program._id}
+          selected={selected}
+          onChange={onSelectionChange}
+        />
+      </div>
       <div className="relative">
         <div className="absolute bottom-2 right-2 flex items-center gap-1">
           <div className="bg-white px-2 py-1 rounded-[10px] border-1 actions opacity-0 flex items-center gap-1">
@@ -104,9 +220,9 @@ function ShufflePrograms({ programs, setIsBeingShuffled }) {
   return <DndContext onDragEnd={handleDragEnd}>
     <SortableContext items={programOrder}>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {programOrder.map((id, index) => {
+        {programOrder.map((id) => {
           const program = programs.find(p => p._id === id);
-          return <SortableProgram key={id} program={program} index={index} />;
+          return <SortableProgram key={id} program={program} />;
         })}
       </div>
     </SortableContext>
@@ -121,7 +237,7 @@ function ShufflePrograms({ programs, setIsBeingShuffled }) {
   </DndContext>
 }
 
-function SortableProgram({ program, index }) {
+function SortableProgram({ program }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: program._id,
   });

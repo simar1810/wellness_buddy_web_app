@@ -9,9 +9,18 @@ import { toast } from "sonner";
 import ContentError from "@/components/common/ContentError";
 import ContentLoader from "@/components/common/ContentLoader";
 import YouTubeEmbed from "@/components/common/YoutubeEmbed";
+import BulkUploadDialog from "@/components/bulk/BulkUploadDialog";
+import BulkDeleteToolbar from "@/components/bulk/BulkDeleteToolbar";
+import BulkAvailabilityField, {
+  DEFAULT_BULK_AVAILABILITY,
+} from "@/components/bulk/BulkAvailabilityField";
+import { SelectAllCheckbox } from "@/components/bulk/bulkSelection";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { sendData } from "@/lib/api";
+import { submitBulkCreate, submitBulkDelete } from "@/lib/bulkCatalog";
+import { checkArray } from "@/lib/formatter";
 import { getToolTab } from "@/lib/fetchers/app";
 import { downloadCsv } from "@/lib/tool-tabs";
 import { useAppSelector } from "@/providers/global/hooks";
@@ -31,6 +40,7 @@ export default function CoachCustomTabDetailPage() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [selected, setSelected] = useState([]);
 
   if (isLoading) return <ContentLoader />;
   if (error || data?.status_code !== 200) {
@@ -39,6 +49,7 @@ export default function CoachCustomTabDetailPage() {
 
   const tab = data?.data?.tab;
   const posts = data?.data?.posts || [];
+  const postIds = posts.map((p) => p._id);
 
   async function handleDelete(toolTabPostId) {
     const response = await sendData(
@@ -50,6 +61,7 @@ export default function CoachCustomTabDetailPage() {
       throw new Error(response?.message || "Failed to delete");
     }
     toast.success("Post deleted");
+    setSelected((prev) => prev.filter((id) => id !== toolTabPostId));
     mutate(cacheKey);
     mutate("catalog-tool-tabs");
   }
@@ -130,7 +142,17 @@ export default function CoachCustomTabDetailPage() {
             </div>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          {isSystemLeader && posts.length > 0 && (
+            <div className="flex items-center gap-2 mr-1">
+              <SelectAllCheckbox
+                ids={postIds}
+                selected={selected}
+                onChange={setSelected}
+              />
+              <span className="text-xs text-muted-foreground">Select all</span>
+            </div>
+          )}
           <Button
             variant="wz_outline"
             className="cursor-pointer"
@@ -156,20 +178,125 @@ export default function CoachCustomTabDetailPage() {
             Export
           </Button>
           {isSystemLeader && (
-            <Button
-              variant="wz"
-              className="cursor-pointer"
-              onClick={() => {
-                setEditing(null);
-                setOpen(true);
-              }}
-            >
-              <Plus className="w-4 h-4" />
-              Add Post
-            </Button>
+            <>
+              <BulkUploadDialog
+                title="Bulk Upload Posts"
+                createEmptyRow={() => ({
+                  title: "",
+                  mediaType: "image",
+                  ytLink: "",
+                  image: null,
+                  availability: DEFAULT_BULK_AVAILABILITY,
+                })}
+                renderRow={(row, _i, onChange) => (
+                  <div className="space-y-2">
+                    <Input
+                      placeholder="Title"
+                      value={row.title}
+                      onChange={(e) => onChange({ title: e.target.value })}
+                    />
+                    <select
+                      className="h-9 w-full rounded-md border border-[var(--comp-3)] bg-transparent px-3 text-sm"
+                      value={row.mediaType}
+                      onChange={(e) => onChange({ mediaType: e.target.value })}
+                    >
+                      <option value="image">Image</option>
+                      <option value="youtube">YouTube</option>
+                    </select>
+                    {row.mediaType === "youtube" ? (
+                      <Input
+                        placeholder="YouTube URL"
+                        value={row.ytLink}
+                        onChange={(e) => onChange({ ytLink: e.target.value })}
+                      />
+                    ) : (
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          onChange({ image: e.target.files?.[0] || null })
+                        }
+                      />
+                    )}
+                    <BulkAvailabilityField
+                      value={row.availability}
+                      onChange={(availability) => onChange({ availability })}
+                    />
+                  </div>
+                )}
+                onSubmit={async (rows) => {
+                  const result = await submitBulkCreate(
+                    "app/tool-tab-posts/bulk-create",
+                    rows,
+                    (row, imageUrl) => {
+                      if (!row.title?.trim()) {
+                        throw new Error("Each row needs a title");
+                      }
+                      const availability = checkArray(row.availability).length
+                        ? row.availability
+                        : DEFAULT_BULK_AVAILABILITY;
+                      if (row.mediaType === "youtube") {
+                        if (!row.ytLink?.trim()) {
+                          throw new Error("YouTube rows need a video URL");
+                        }
+                        return {
+                          title: row.title,
+                          mediaType: "youtube",
+                          ytLink: row.ytLink,
+                          availability,
+                          status: "active",
+                        };
+                      }
+                      if (!imageUrl) {
+                        throw new Error("Image rows need an image file");
+                      }
+                      return {
+                        title: row.title,
+                        mediaType: "image",
+                        image: imageUrl,
+                        availability,
+                        status: "active",
+                      };
+                    },
+                    { tabId }
+                  );
+                  mutate(cacheKey);
+                  mutate("catalog-tool-tabs");
+                  setSelected([]);
+                  return result;
+                }}
+              />
+              <Button
+                variant="wz"
+                className="cursor-pointer"
+                onClick={() => {
+                  setEditing(null);
+                  setOpen(true);
+                }}
+              >
+                <Plus className="w-4 h-4" />
+                Add Post
+              </Button>
+            </>
           )}
         </div>
       </div>
+
+      {isSystemLeader && (
+        <BulkDeleteToolbar
+          selectedCount={selected.length}
+          label="posts"
+          onClear={() => setSelected([])}
+          onConfirmDelete={async () => {
+            await submitBulkDelete("app/tool-tab-posts/bulk", {
+              toolTabPostIds: selected,
+            });
+            setSelected([]);
+            mutate(cacheKey);
+            mutate("catalog-tool-tabs");
+          }}
+        />
+      )}
 
       {posts.length === 0 ? (
         <div className="text-center py-16 rounded-[12px] bg-[var(--comp-2)] border border-[var(--comp-3)]">
@@ -201,6 +328,8 @@ export default function CoachCustomTabDetailPage() {
             setOpen(true);
           }}
           onDelete={handleDelete}
+          selected={selected}
+          onSelectionChange={isSystemLeader ? setSelected : undefined}
         />
       )}
 

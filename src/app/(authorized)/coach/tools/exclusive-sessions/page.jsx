@@ -7,12 +7,20 @@ import ContentLoader from "@/components/common/ContentLoader";
 import YouTubeEmbed from "@/components/common/YoutubeEmbed";
 import SelectMultiple from "@/components/SelectMultiple";
 import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
+import BulkUploadDialog from "@/components/bulk/BulkUploadDialog";
+import BulkDeleteToolbar from "@/components/bulk/BulkDeleteToolbar";
+import BulkAvailabilityField, {
+  DEFAULT_BULK_AVAILABILITY,
+} from "@/components/bulk/BulkAvailabilityField";
+import { RowCheckbox, SelectAllCheckbox } from "@/components/bulk/bulkSelection";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { sendData } from "@/lib/api";
+import { submitBulkCreate, submitBulkDelete } from "@/lib/bulkCatalog";
+import { checkArray } from "@/lib/formatter";
 import { getExclusiveSessions } from "@/lib/fetchers/app";
 import { useAppSelector } from "@/providers/global/hooks";
 import { youtubeVideoId } from "@/lib/utils";
@@ -47,6 +55,7 @@ export default function CoachExclusiveSessionsPage() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(null);
+  const [selected, setSelected] = useState([]);
 
   const availabilityOptions = useMemo(
     () => [
@@ -67,6 +76,7 @@ export default function CoachExclusiveSessionsPage() {
   }
 
   const sessions = data?.data || [];
+  const sessionIds = sessions.map((s) => s._id);
 
   function openCreate() {
     setEditing(null);
@@ -133,6 +143,7 @@ export default function CoachExclusiveSessionsPage() {
         throw new Error(response.message || "Failed to delete");
       }
       toast.success("Session deleted");
+      setSelected((prev) => prev.filter((id) => id !== exclusiveSessionId));
       mutate("catalog-exclusive-sessions");
     } catch (err) {
       toast.error(err.message || "Something went wrong");
@@ -141,7 +152,7 @@ export default function CoachExclusiveSessionsPage() {
 
   return (
     <div className="content-container content-height-screen">
-      <div className="flex items-center justify-between mb-6 gap-4">
+      <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-[var(--accent-1)]" />
@@ -152,12 +163,93 @@ export default function CoachExclusiveSessionsPage() {
           </p>
         </div>
         {isSystemLeader && (
-          <Button variant="wz" onClick={openCreate}>
-            <Plus className="w-4 h-4" />
-            Add Session
-          </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            {sessions.length > 0 && (
+              <div className="flex items-center gap-2 mr-2">
+                <SelectAllCheckbox
+                  ids={sessionIds}
+                  selected={selected}
+                  onChange={setSelected}
+                />
+                <span className="text-xs text-muted-foreground">Select all</span>
+              </div>
+            )}
+            <BulkUploadDialog
+              title="Bulk Upload Exclusive Sessions"
+              createEmptyRow={() => ({
+                title: "",
+                ytLink: "",
+                description: "",
+                availability: DEFAULT_BULK_AVAILABILITY,
+              })}
+              renderRow={(row, _i, onChange) => (
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Title"
+                    value={row.title}
+                    onChange={(e) => onChange({ title: e.target.value })}
+                  />
+                  <Input
+                    placeholder="YouTube URL"
+                    value={row.ytLink}
+                    onChange={(e) => onChange({ ytLink: e.target.value })}
+                  />
+                  <Input
+                    placeholder="Description (optional)"
+                    value={row.description}
+                    onChange={(e) => onChange({ description: e.target.value })}
+                  />
+                  <BulkAvailabilityField
+                    value={row.availability}
+                    onChange={(availability) => onChange({ availability })}
+                  />
+                </div>
+              )}
+              onSubmit={async (rows) => {
+                const result = await submitBulkCreate(
+                  "app/exclusive-sessions/bulk",
+                  rows,
+                  (row) => {
+                    if (!row.title?.trim() || !row.ytLink?.trim()) {
+                      throw new Error("Each row needs title and YouTube URL");
+                    }
+                    return {
+                      title: row.title,
+                      description: row.description || "",
+                      ytLink: row.ytLink,
+                      availability: checkArray(row.availability).length
+                        ? row.availability
+                        : DEFAULT_BULK_AVAILABILITY,
+                      status: "active",
+                    };
+                  }
+                );
+                mutate("catalog-exclusive-sessions");
+                return result;
+              }}
+            />
+            <Button variant="wz" onClick={openCreate}>
+              <Plus className="w-4 h-4" />
+              Add Session
+            </Button>
+          </div>
         )}
       </div>
+
+      {isSystemLeader && (
+        <BulkDeleteToolbar
+          selectedCount={selected.length}
+          label="sessions"
+          onClear={() => setSelected([])}
+          onConfirmDelete={async () => {
+            await submitBulkDelete("app/exclusive-sessions/bulk", {
+              exclusiveSessionIds: selected,
+            });
+            setSelected([]);
+            mutate("catalog-exclusive-sessions");
+          }}
+        />
+      )}
 
       {sessions.length === 0 ? (
         <div className="text-center py-16 rounded-[12px] bg-[var(--comp-2)] border border-[var(--comp-3)]">
@@ -168,8 +260,17 @@ export default function CoachExclusiveSessionsPage() {
           {sessions.map((session) => (
             <div
               key={session._id}
-              className="rounded-[14px] overflow-hidden bg-[#0f1a12] border border-[var(--comp-3)]"
+              className="rounded-[14px] overflow-hidden bg-[#0f1a12] border border-[var(--comp-3)] relative"
             >
+              {isSystemLeader && (
+                <div className="absolute top-2 left-2 z-10 bg-white/90 rounded p-1">
+                  <RowCheckbox
+                    id={session._id}
+                    selected={selected}
+                    onChange={setSelected}
+                  />
+                </div>
+              )}
               <button
                 type="button"
                 className="relative w-full aspect-video group"

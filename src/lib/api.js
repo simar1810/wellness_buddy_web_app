@@ -56,7 +56,21 @@ export async function sendData(
       body: JSON.stringify(data),
       cache: "no-store",
     });
-    const retrievedData = await response.json();
+    const contentType = response.headers.get("content-type") || "";
+    const raw = await response.text();
+    if (!contentType.includes("application/json")) {
+      throw new Error(
+        response.status === 404
+          ? `API route not found (${endpoint}). Restart backend on feature/bulk-upload-delete-catalog.`
+          : `API returned non-JSON (${response.status}). Is the backend running the bulk branch?`
+      );
+    }
+    let retrievedData;
+    try {
+      retrievedData = JSON.parse(raw);
+    } catch {
+      throw new Error(`Invalid JSON from API (${endpoint})`);
+    }
     if (response.status === 401) {
       if (expireUserSession) await expireUserSession();
       return null;

@@ -23,6 +23,10 @@ import { Layers, Plus, Search, Download } from "lucide-react";
 import { toast } from "sonner";
 import ContentError from "@/components/common/ContentError";
 import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
+import BulkUploadDialog from "@/components/bulk/BulkUploadDialog";
+import BulkAvailabilityField, {
+  DEFAULT_BULK_AVAILABILITY,
+} from "@/components/bulk/BulkAvailabilityField";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +41,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { sendData } from "@/lib/api";
+import { submitBulkCreate, submitBulkDelete } from "@/lib/bulkCatalog";
+import { checkArray } from "@/lib/formatter";
 import { getToolTabs } from "@/lib/fetchers/app";
 import { downloadCsv } from "@/lib/tool-tabs";
 import { useAppSelector } from "@/providers/global/hooks";
@@ -261,7 +267,7 @@ function CoachCustomTabsPageInner() {
             visibility rules as Events.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button
             variant="wz_outline"
             className="cursor-pointer"
@@ -286,6 +292,74 @@ function CoachCustomTabsPageInner() {
             <Download className="w-4 h-4" />
             Export CSV
           </Button>
+          <BulkUploadDialog
+            title="Bulk Upload Tool Tabs"
+            createEmptyRow={() => ({
+              name: "",
+              icon: "",
+              image: null,
+              description: "",
+              availability: DEFAULT_BULK_AVAILABILITY,
+            })}
+            renderRow={(row, _i, onChange) => (
+              <div className="space-y-2">
+                <Input
+                  placeholder="Tab name"
+                  value={row.name}
+                  onChange={(e) => onChange({ name: e.target.value })}
+                />
+                <Input
+                  placeholder="Icon URL (or upload file below)"
+                  value={row.icon}
+                  onChange={(e) => onChange({ icon: e.target.value })}
+                />
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    onChange({ image: e.target.files?.[0] || null })
+                  }
+                />
+                <Input
+                  placeholder="Description (optional)"
+                  value={row.description}
+                  onChange={(e) => onChange({ description: e.target.value })}
+                />
+                <BulkAvailabilityField
+                  value={row.availability}
+                  onChange={(availability) => onChange({ availability })}
+                />
+              </div>
+            )}
+            onSubmit={async (rows) => {
+              const result = await submitBulkCreate(
+                "app/tool-tabs/bulk-create",
+                rows,
+                (row, imageUrl) => {
+                  if (!row.name?.trim() || row.name.trim().length < 3) {
+                    throw new Error("Each tab name must be at least 3 characters");
+                  }
+                  const icon = imageUrl || row.icon?.trim();
+                  if (!icon) {
+                    throw new Error("Each row needs an icon URL or image file");
+                  }
+                  return {
+                    name: row.name.trim(),
+                    description: row.description || "",
+                    icon,
+                    availability: checkArray(row.availability).length
+                      ? row.availability
+                      : DEFAULT_BULK_AVAILABILITY,
+                    status: "active",
+                  };
+                }
+              );
+              mutate("catalog-tool-tabs");
+              mutate("sidebar-tool-tabs");
+              setSelected([]);
+              return result;
+            }}
+          />
           <Button
             variant="wz"
             className="cursor-pointer"
@@ -336,7 +410,7 @@ function CoachCustomTabsPageInner() {
       </p>
 
       {selected.length > 0 && (
-        <div className="mb-4 flex items-center gap-3 rounded-[12px] border border-[var(--comp-3)] bg-[var(--comp-2)] p-3">
+        <div className="mb-4 flex items-center gap-3 rounded-[12px] border border-[var(--comp-3)] bg-[var(--comp-2)] p-3 flex-wrap">
           <span className="text-sm tabular-nums">{selected.length} selected</span>
           <Button
             size="sm"
@@ -346,6 +420,34 @@ function CoachCustomTabsPageInner() {
           >
             Mark inactive
           </Button>
+          <DualOptionActionModal
+            title={`Delete ${selected.length} tab(s)?`}
+            description="This also deletes every post in the selected tabs. This cannot be undone."
+            action={async (setLoading, btnRef) => {
+              try {
+                setLoading(true);
+                await submitBulkDelete("app/tool-tabs/bulk", {
+                  toolTabIds: selected,
+                });
+                setSelected([]);
+                mutate("catalog-tool-tabs");
+                mutate("sidebar-tool-tabs");
+                toast.success("Tabs deleted");
+                btnRef?.current?.click();
+              } catch (err) {
+                toast.error(err?.message || "Bulk delete failed");
+              } finally {
+                setLoading(false);
+              }
+            }}
+          >
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="destructive" className="cursor-pointer">
+                <Trash2 className="w-4 h-4" />
+                Bulk Delete
+              </Button>
+            </AlertDialogTrigger>
+          </DualOptionActionModal>
           <Button
             size="sm"
             variant="ghost"

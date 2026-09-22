@@ -7,12 +7,19 @@ import ContentLoader from "@/components/common/ContentLoader";
 import YouTubeEmbed from "@/components/common/YoutubeEmbed";
 import SelectMultiple from "@/components/SelectMultiple";
 import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
+import BulkUploadDialog from "@/components/bulk/BulkUploadDialog";
+import BulkDeleteToolbar from "@/components/bulk/BulkDeleteToolbar";
+import BulkAvailabilityField, {
+  DEFAULT_BULK_AVAILABILITY,
+} from "@/components/bulk/BulkAvailabilityField";
+import { RowCheckbox, SelectAllCheckbox } from "@/components/bulk/bulkSelection";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { sendData, uploadImage } from "@/lib/api";
+import { submitBulkCreate, submitBulkDelete } from "@/lib/bulkCatalog";
 import { getEvents } from "@/lib/fetchers/app";
 import { useAppSelector } from "@/providers/global/hooks";
 import { getObjectUrl } from "@/lib/utils";
@@ -55,6 +62,7 @@ export default function CoachEventsPage() {
   const [existingImageUrl, setExistingImageUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(null);
+  const [selected, setSelected] = useState([]);
   const fileRef = useRef(null);
 
   const availabilityOptions = useMemo(
@@ -78,6 +86,7 @@ export default function CoachEventsPage() {
   }
 
   const events = data?.data || [];
+  const eventIds = events.map((e) => e._id);
 
   function openCreate() {
     setEditing(null);
@@ -112,7 +121,6 @@ export default function CoachEventsPage() {
     try {
       setSaving(true);
 
-      // Same as CreateRecognitionModal: uploadImage → then JSON sendData
       const payload = {
         title: formData.title,
         description: formData.description || "",
@@ -125,7 +133,6 @@ export default function CoachEventsPage() {
 
       if (formData.image) {
         const uploadImageToast = toast.loading("Uploading image.");
-        // Same compression as Meals — keeps server-action payload small
         const compressed = await imageCompression(formData.image, {
           maxSizeMB: 0.5,
           maxWidthOrHeight: 1600,
@@ -135,14 +142,12 @@ export default function CoachEventsPage() {
         if (imageUploadResponse instanceof Error) {
           toast.dismiss(uploadImageToast);
           throw new Error(
-            imageUploadResponse.message?.includes("<!DOCTYPE")
-              ? "Upload failed — restart the web app after .env change, then retry."
-              : imageUploadResponse.message || "Image upload failed"
+            imageUploadResponse.message || "Image upload failed"
           );
         }
         if (!imageUploadResponse?.img) {
           toast.dismiss(uploadImageToast);
-          throw new Error("Image upload returned empty URL. Check AWS/.env.");
+          throw new Error("Image upload returned empty URL.");
         }
         toast.dismiss(uploadImageToast);
         payload.image = imageUploadResponse.img;
@@ -159,13 +164,7 @@ export default function CoachEventsPage() {
         payload,
         editing ? "PUT" : "POST"
       );
-      if (response instanceof Error) {
-        throw new Error(
-          response.message?.includes("<!DOCTYPE")
-            ? "API returned HTML instead of JSON. Restart Next.js (port 3050) so it picks up localhost API."
-            : response.message
-        );
-      }
+      if (response instanceof Error) throw new Error(response.message);
       if (response?.status_code !== 200) {
         throw new Error(response?.message || "Failed to save event");
       }
@@ -188,6 +187,7 @@ export default function CoachEventsPage() {
         throw new Error(response.message || "Failed to delete");
       }
       toast.success("Event deleted");
+      setSelected((prev) => prev.filter((id) => id !== eventId));
       mutate("catalog-events");
     } catch (err) {
       toast.error(err.message || "Something went wrong");
@@ -196,7 +196,7 @@ export default function CoachEventsPage() {
 
   return (
     <div className="content-container content-height-screen">
-      <div className="flex items-center justify-between mb-6 gap-4">
+      <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Upcoming Events</h1>
           <p className="text-sm text-[var(--dark-3)] mt-1">
@@ -204,12 +204,103 @@ export default function CoachEventsPage() {
           </p>
         </div>
         {isSystemLeader && (
-          <Button variant="wz" onClick={openCreate}>
-            <Plus className="w-4 h-4" />
-            Add Event
-          </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            {events.length > 0 && (
+              <div className="flex items-center gap-2 mr-2">
+                <SelectAllCheckbox
+                  ids={eventIds}
+                  selected={selected}
+                  onChange={setSelected}
+                />
+                <span className="text-xs text-muted-foreground">Select all</span>
+              </div>
+            )}
+            <BulkUploadDialog
+              title="Bulk Upload Events"
+              createEmptyRow={() => ({
+                title: "",
+                description: "",
+                eventDate: "",
+                ytLink: "",
+                image: null,
+                availability: DEFAULT_BULK_AVAILABILITY,
+              })}
+              renderRow={(row, _i, onChange) => (
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Title"
+                    value={row.title}
+                    onChange={(e) => onChange({ title: e.target.value })}
+                  />
+                  <Input
+                    type="date"
+                    value={row.eventDate}
+                    onChange={(e) => onChange({ eventDate: e.target.value })}
+                  />
+                  <Input
+                    placeholder="YouTube URL (optional)"
+                    value={row.ytLink}
+                    onChange={(e) => onChange({ ytLink: e.target.value })}
+                  />
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      onChange({ image: e.target.files?.[0] || null })
+                    }
+                  />
+                  <BulkAvailabilityField
+                    value={row.availability}
+                    onChange={(availability) => onChange({ availability })}
+                  />
+                </div>
+              )}
+              onSubmit={async (rows) => {
+                const result = await submitBulkCreate(
+                  "app/events/bulk",
+                  rows,
+                  (row, imageUrl) => {
+                    if (!row.title?.trim() || !row.eventDate) {
+                      throw new Error("Each row needs title and event date");
+                    }
+                    if (!imageUrl) throw new Error("Each row needs an image");
+                    return {
+                      title: row.title,
+                      description: row.description || "",
+                      eventDate: new Date(row.eventDate).toISOString(),
+                      ytLink: row.ytLink || undefined,
+                      image: imageUrl,
+                      availability: checkArray(row.availability).length
+                        ? row.availability
+                        : DEFAULT_BULK_AVAILABILITY,
+                      status: "active",
+                    };
+                  }
+                );
+                mutate("catalog-events");
+                return result;
+              }}
+            />
+            <Button variant="wz" onClick={openCreate}>
+              <Plus className="w-4 h-4" />
+              Add Event
+            </Button>
+          </div>
         )}
       </div>
+
+      {isSystemLeader && (
+        <BulkDeleteToolbar
+          selectedCount={selected.length}
+          label="events"
+          onClear={() => setSelected([])}
+          onConfirmDelete={async () => {
+            await submitBulkDelete("app/events/bulk", { eventIds: selected });
+            setSelected([]);
+            mutate("catalog-events");
+          }}
+        />
+      )}
 
       {events.length === 0 ? (
         <div className="text-center py-16 rounded-[12px] bg-[var(--comp-2)] border border-[var(--comp-3)]">
@@ -221,8 +312,17 @@ export default function CoachEventsPage() {
           {events.map((event) => (
             <div
               key={event._id}
-              className="rounded-[14px] overflow-hidden bg-[var(--comp-2)] border border-[var(--comp-3)]"
+              className="rounded-[14px] overflow-hidden bg-[var(--comp-2)] border border-[var(--comp-3)] relative"
             >
+              {isSystemLeader && (
+                <div className="absolute top-2 left-2 z-10 bg-white/90 rounded p-1">
+                  <RowCheckbox
+                    id={event._id}
+                    selected={selected}
+                    onChange={setSelected}
+                  />
+                </div>
+              )}
               <button
                 type="button"
                 className="relative w-full aspect-video group"
