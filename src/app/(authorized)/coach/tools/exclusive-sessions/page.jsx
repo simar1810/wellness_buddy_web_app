@@ -9,6 +9,9 @@ import SelectMultiple from "@/components/SelectMultiple";
 import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
 import BulkUploadDialog from "@/components/bulk/BulkUploadDialog";
 import BulkDeleteToolbar from "@/components/bulk/BulkDeleteToolbar";
+import BulkAvailabilityField, {
+  DEFAULT_BULK_AVAILABILITY,
+} from "@/components/bulk/BulkAvailabilityField";
 import { RowCheckbox, SelectAllCheckbox } from "@/components/bulk/bulkSelection";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -17,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { sendData } from "@/lib/api";
 import { submitBulkCreate, submitBulkDelete } from "@/lib/bulkCatalog";
+import { checkArray } from "@/lib/formatter";
 import { getExclusiveSessions } from "@/lib/fetchers/app";
 import { useAppSelector } from "@/providers/global/hooks";
 import { youtubeVideoId } from "@/lib/utils";
@@ -176,7 +180,7 @@ export default function CoachExclusiveSessionsPage() {
                 title: "",
                 ytLink: "",
                 description: "",
-                availability: ["client", "coach"],
+                availability: DEFAULT_BULK_AVAILABILITY,
               })}
               renderRow={(row, _i, onChange) => (
                 <div className="space-y-2">
@@ -195,6 +199,10 @@ export default function CoachExclusiveSessionsPage() {
                     value={row.description}
                     onChange={(e) => onChange({ description: e.target.value })}
                   />
+                  <BulkAvailabilityField
+                    value={row.availability}
+                    onChange={(availability) => onChange({ availability })}
+                  />
                 </div>
               )}
               onSubmit={async (rows) => {
@@ -209,7 +217,9 @@ export default function CoachExclusiveSessionsPage() {
                       title: row.title,
                       description: row.description || "",
                       ytLink: row.ytLink,
-                      availability: row.availability || ["client", "coach"],
+                      availability: checkArray(row.availability).length
+                        ? row.availability
+                        : DEFAULT_BULK_AVAILABILITY,
                       status: "active",
                     };
                   }

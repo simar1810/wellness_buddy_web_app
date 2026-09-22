@@ -5,12 +5,16 @@ import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
 import EditProgramModal from "@/components/modals/tools/EditProgramModal";
 import BulkUploadDialog from "@/components/bulk/BulkUploadDialog";
 import BulkDeleteToolbar from "@/components/bulk/BulkDeleteToolbar";
+import BulkAvailabilityField, {
+  DEFAULT_BULK_AVAILABILITY,
+} from "@/components/bulk/BulkAvailabilityField";
 import { RowCheckbox, SelectAllCheckbox } from "@/components/bulk/bulkSelection";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { sendData } from "@/lib/api";
 import { submitBulkCreate, submitBulkDelete } from "@/lib/bulkCatalog";
+import { checkArray } from "@/lib/formatter";
 import { getClientPrograms } from "@/lib/fetchers/app";
 import { DndContext } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
@@ -54,6 +58,7 @@ export default function Page() {
               subTitle: "",
               link: "",
               image: null,
+              availability: DEFAULT_BULK_AVAILABILITY,
             })}
             renderRow={(row, _i, onChange) => (
               <div className="space-y-2">
@@ -79,6 +84,10 @@ export default function Page() {
                     onChange({ image: e.target.files?.[0] || null })
                   }
                 />
+                <BulkAvailabilityField
+                  value={row.availability}
+                  onChange={(availability) => onChange({ availability })}
+                />
               </div>
             )}
             onSubmit={async (rows) => {
@@ -96,6 +105,9 @@ export default function Page() {
                     link: row.link || "",
                     image: imageUrl,
                     isActive: true,
+                    availability: checkArray(row.availability).length
+                      ? row.availability
+                      : DEFAULT_BULK_AVAILABILITY,
                   };
                 }
               );

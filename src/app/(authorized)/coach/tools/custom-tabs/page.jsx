@@ -24,6 +24,9 @@ import { toast } from "sonner";
 import ContentError from "@/components/common/ContentError";
 import DualOptionActionModal from "@/components/modals/DualOptionActionModal";
 import BulkUploadDialog from "@/components/bulk/BulkUploadDialog";
+import BulkAvailabilityField, {
+  DEFAULT_BULK_AVAILABILITY,
+} from "@/components/bulk/BulkAvailabilityField";
 import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +42,7 @@ import {
 } from "@/components/ui/table";
 import { sendData } from "@/lib/api";
 import { submitBulkCreate, submitBulkDelete } from "@/lib/bulkCatalog";
+import { checkArray } from "@/lib/formatter";
 import { getToolTabs } from "@/lib/fetchers/app";
 import { downloadCsv } from "@/lib/tool-tabs";
 import { useAppSelector } from "@/providers/global/hooks";
@@ -295,6 +299,7 @@ function CoachCustomTabsPageInner() {
               icon: "",
               image: null,
               description: "",
+              availability: DEFAULT_BULK_AVAILABILITY,
             })}
             renderRow={(row, _i, onChange) => (
               <div className="space-y-2">
@@ -320,6 +325,10 @@ function CoachCustomTabsPageInner() {
                   value={row.description}
                   onChange={(e) => onChange({ description: e.target.value })}
                 />
+                <BulkAvailabilityField
+                  value={row.availability}
+                  onChange={(availability) => onChange({ availability })}
+                />
               </div>
             )}
             onSubmit={async (rows) => {
@@ -338,7 +347,9 @@ function CoachCustomTabsPageInner() {
                     name: row.name.trim(),
                     description: row.description || "",
                     icon,
-                    availability: ["client", "coach"],
+                    availability: checkArray(row.availability).length
+                      ? row.availability
+                      : DEFAULT_BULK_AVAILABILITY,
                     status: "active",
                   };
                 }

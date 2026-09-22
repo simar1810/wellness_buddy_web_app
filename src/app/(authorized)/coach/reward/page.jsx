@@ -6,10 +6,13 @@ import CreateReward from "@/components/rewards/CreateReward";
 import { RewardCard } from "@/components/rewards/RewardCard";
 import BulkUploadDialog from "@/components/bulk/BulkUploadDialog";
 import BulkDeleteToolbar from "@/components/bulk/BulkDeleteToolbar";
+import BulkAvailabilityField, {
+  DEFAULT_BULK_AVAILABILITY,
+} from "@/components/bulk/BulkAvailabilityField";
 import { SelectAllCheckbox } from "@/components/bulk/bulkSelection";
 import { fetchData } from "@/lib/api";
 import { submitBulkCreate, submitBulkDelete } from "@/lib/bulkCatalog";
-import { buildUrlWithQueryParams } from "@/lib/formatter";
+import { buildUrlWithQueryParams, checkArray } from "@/lib/formatter";
 import { Input } from "@/components/ui/input";
 import { RefreshCcw, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -85,6 +88,7 @@ export default function Page() {
                 title: "",
                 description: "",
                 image: null,
+                availability: DEFAULT_BULK_AVAILABILITY,
               })}
               renderRow={(row, _i, onChange) => (
                 <div className="space-y-2">
@@ -105,6 +109,10 @@ export default function Page() {
                       onChange({ image: e.target.files?.[0] || null })
                     }
                   />
+                  <BulkAvailabilityField
+                    value={row.availability}
+                    onChange={(availability) => onChange({ availability })}
+                  />
                 </div>
               )}
               onSubmit={async (rows) => {
@@ -120,6 +128,9 @@ export default function Page() {
                       title: row.title,
                       description: row.description,
                       image: imageUrl,
+                      availability: checkArray(row.availability).length
+                        ? row.availability
+                        : DEFAULT_BULK_AVAILABILITY,
                     };
                   }
                 );

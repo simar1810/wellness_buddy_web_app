@@ -5,10 +5,11 @@ import ContentLoader from "@/components/common/ContentLoader";
 import CreateRecognitionModal from "@/components/pages/coach/recognition/CreateRecognitionModal";
 import BulkUploadDialog from "@/components/bulk/BulkUploadDialog";
 import BulkDeleteToolbar from "@/components/bulk/BulkDeleteToolbar";
+import BulkAvailabilityField from "@/components/bulk/BulkAvailabilityField";
 import { RowCheckbox, SelectAllCheckbox } from "@/components/bulk/bulkSelection";
 import { fetchData } from "@/lib/api";
 import { submitBulkCreate, submitBulkDelete } from "@/lib/bulkCatalog";
-import { buildUrlWithQueryParams } from "@/lib/formatter";
+import { buildUrlWithQueryParams, checkArray } from "@/lib/formatter";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
 import { Calendar, User, Sparkles, RefreshCcw } from "lucide-react";
@@ -17,6 +18,8 @@ import UpdateRecognitionModal from "@/components/pages/coach/recognition/UpdateR
 import Pagination from "@/components/common/Pagination";
 import { Input } from "@/components/ui/input";
 import { useAppSelector } from "@/providers/global/hooks";
+
+const DEFAULT_RECOGNITION_AVAILABILITY = ["coach"];
 
 export default function Page() {
   const coach = useAppSelector((state) => state.coach.data);
@@ -88,7 +91,7 @@ export default function Page() {
                 description: "",
                 image: null,
                 person: "coach",
-                availability: ["coach"],
+                availability: DEFAULT_RECOGNITION_AVAILABILITY,
               })}
               renderRow={(row, _i, onChange) => (
                 <div className="space-y-2">
@@ -109,6 +112,10 @@ export default function Page() {
                       onChange({ image: e.target.files?.[0] || null })
                     }
                   />
+                  <BulkAvailabilityField
+                    value={row.availability}
+                    onChange={(availability) => onChange({ availability })}
+                  />
                 </div>
               )}
               onSubmit={async (rows) => {
@@ -124,7 +131,9 @@ export default function Page() {
                       title: row.title,
                       description: row.description || "",
                       person: "coach",
-                      availability: ["coach"],
+                      availability: checkArray(row.availability).length
+                        ? row.availability
+                        : DEFAULT_RECOGNITION_AVAILABILITY,
                       image: imageUrl,
                       status: "active",
                       recognisedAt: new Date().toISOString(),

@@ -11,12 +11,16 @@ import ContentLoader from "@/components/common/ContentLoader";
 import YouTubeEmbed from "@/components/common/YoutubeEmbed";
 import BulkUploadDialog from "@/components/bulk/BulkUploadDialog";
 import BulkDeleteToolbar from "@/components/bulk/BulkDeleteToolbar";
+import BulkAvailabilityField, {
+  DEFAULT_BULK_AVAILABILITY,
+} from "@/components/bulk/BulkAvailabilityField";
 import { SelectAllCheckbox } from "@/components/bulk/bulkSelection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { sendData } from "@/lib/api";
 import { submitBulkCreate, submitBulkDelete } from "@/lib/bulkCatalog";
+import { checkArray } from "@/lib/formatter";
 import { getToolTab } from "@/lib/fetchers/app";
 import { downloadCsv } from "@/lib/tool-tabs";
 import { useAppSelector } from "@/providers/global/hooks";
@@ -182,6 +186,7 @@ export default function CoachCustomTabDetailPage() {
                   mediaType: "image",
                   ytLink: "",
                   image: null,
+                  availability: DEFAULT_BULK_AVAILABILITY,
                 })}
                 renderRow={(row, _i, onChange) => (
                   <div className="space-y-2">
@@ -213,6 +218,10 @@ export default function CoachCustomTabDetailPage() {
                         }
                       />
                     )}
+                    <BulkAvailabilityField
+                      value={row.availability}
+                      onChange={(availability) => onChange({ availability })}
+                    />
                   </div>
                 )}
                 onSubmit={async (rows) => {
@@ -223,6 +232,9 @@ export default function CoachCustomTabDetailPage() {
                       if (!row.title?.trim()) {
                         throw new Error("Each row needs a title");
                       }
+                      const availability = checkArray(row.availability).length
+                        ? row.availability
+                        : DEFAULT_BULK_AVAILABILITY;
                       if (row.mediaType === "youtube") {
                         if (!row.ytLink?.trim()) {
                           throw new Error("YouTube rows need a video URL");
@@ -231,7 +243,7 @@ export default function CoachCustomTabDetailPage() {
                           title: row.title,
                           mediaType: "youtube",
                           ytLink: row.ytLink,
-                          availability: ["client", "coach"],
+                          availability,
                           status: "active",
                         };
                       }
@@ -242,7 +254,7 @@ export default function CoachCustomTabDetailPage() {
                         title: row.title,
                         mediaType: "image",
                         image: imageUrl,
-                        availability: ["client", "coach"],
+                        availability,
                         status: "active",
                       };
                     },
