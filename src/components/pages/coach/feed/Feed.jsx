@@ -4,14 +4,28 @@ import FeedHeader from "./FeedHeader";
 import FeedComments from "./FeedComments";
 import YouTubeEmbed from "@/components/common/YoutubeEmbed";
 import { useState } from "react";
+import { RowCheckbox } from "@/components/bulk/bulkSelection";
+import { useFeedBulk } from "@/components/pages/coach/feed/FeedBulkContext";
 
 export default function Feed({
   feeds,
   feed
 }) {
   const [commentsOpened, setCommentsOpened] = useState(false);
+  const { selected, setSelected, selectable } = useFeedBulk();
+  const postId = feed.postId || feed._id;
+
   return <div className="relative border-b-1 py-2">
     <div>
+      {selectable && postId && (
+        <div className="absolute top-3 left-3 z-10 bg-white/90 rounded p-1 border shadow-sm">
+          <RowCheckbox
+            id={postId}
+            selected={selected}
+            onChange={setSelected}
+          />
+        </div>
+      )}
       <FeedHeader feed={feed} />
       {feed.contentType === "img"
         ? <FeedImage images={feed.images} />
