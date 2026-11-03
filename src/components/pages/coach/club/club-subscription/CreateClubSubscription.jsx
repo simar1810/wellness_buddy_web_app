@@ -29,9 +29,10 @@ export default function CreateSubscriptionDialog({
   onCreated,
   subscription = {},
   type = "new",
+  trigger,
+  coachName,
 }) {
-
-  const [formData, setFormData] = useState({
+  const defaultForm = () => ({
     startDate: subscription.startDate
       ? format(new Date(subscription.startDate), "yyyy-MM-dd")
       : format(new Date(), "yyyy-MM-dd"),
@@ -42,6 +43,9 @@ export default function CreateSubscriptionDialog({
     paymentMode: subscription.paymentMode ? subscription.paymentMode : "Cash",
     description: subscription.description || ""
   });
+
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState(defaultForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const closeRef = useRef()
@@ -99,30 +103,42 @@ export default function CreateSubscriptionDialog({
           ? await sendData(`app/clubSubscription/coach/${coachId}`, payload, "POST")
           : await sendData(`app/clubSubscription/coach/${coachId}`, payload, "PUT");
 
-      if (response?.error) {
-        toast.error(response.error);
+      if (response instanceof Error) throw response;
+      if (response?.error || (response?.status_code && response.status_code !== 200 && response.status !== true)) {
+        toast.error(response.error || response.message || "Failed to create subscription");
       } else {
-        toast.success("Subscription created successfully!");
-        onCreated();
-        setFormData({ startDate: "", endDate: "", amount: "", paymentMode: "" });
+        toast.success("Membership updated successfully!");
+        onCreated?.();
+        setFormData(defaultForm());
+        setOpen(false);
       }
     } catch (err) {
-      toast.error("Failed to create subscription");
+      toast.error(err?.message || "Failed to create subscription");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) setFormData(defaultForm());
+      }}
+    >
       <DialogTrigger asChild>
-        <Button>New</Button>
+        {trigger || <Button type="button">New</Button>}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <form onSubmit={handleSubmit} className="space-y-4">
           <DialogHeader>
             <DialogTitle>
-              {type === "new" ? "Create New Subscription" : "Edit Subscription"}
+              {type === "new"
+                ? coachName
+                  ? `Update Membership — ${coachName}`
+                  : "Create New Subscription"
+                : "Edit Subscription"}
             </DialogTitle>
           </DialogHeader>
 

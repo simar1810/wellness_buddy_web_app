@@ -21,6 +21,7 @@ import {
   ArrowUp,
   ArrowDown,
   Pen,
+  CalendarPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -47,6 +48,12 @@ import { AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { useAppSelector } from "@/providers/global/hooks";
 import Loader from "@/components/common/Loader";
+import CreateSubscriptionDialog from "@/components/pages/coach/club/club-subscription/CreateClubSubscription";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function HierarchicalCoachTable({ coaches = [], mutate, onMakeTop }) {
   const [expandedLevels, setExpandedLevels] = useState(new Set([1]));
@@ -311,9 +318,40 @@ function LevelTable({ mutate, expandedLevels, level, groupedCoaches, toggleLevel
                   </TableCell>
                   <TableCell className="">
                     <div className="flex items-center justify-end gap-2 pr-8">
-                      <Link href={`/coach/downline/coach/${coach._id}`}>
-                        <Eye className="w-[20px] h-[20px] mx-auto" />
-                      </Link>
+                      {hasEditAccess(coach.clubType) && (
+                        <CreateSubscriptionDialog
+                          coachId={coach._id}
+                          coachName={coachName}
+                          onCreated={() => {
+                            mutate?.();
+                            mutate("app/downline/coaches");
+                          }}
+                          trigger={
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="min-h-11 min-w-11 rounded-xl border-[var(--comp-3)]"
+                              aria-label={`Update membership for ${coachName}`}
+                              title="Update membership"
+                            >
+                              <CalendarPlus className="w-4 h-4 text-[var(--accent-1)]" />
+                            </Button>
+                          }
+                        />
+                      )}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link
+                            href={`/coach/downline/coach/${coach._id}`}
+                            className="inline-flex min-h-11 min-w-11 items-center justify-center"
+                            aria-label={`View ${coachName}`}
+                          >
+                            <Eye className="w-[20px] h-[20px]" />
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent>View coach</TooltipContent>
+                      </Tooltip>
                       {hasEditAccess(coach.clubType)
                         && <DeleteDownlineCoach coachId={coach._id} />}
                     </div>
