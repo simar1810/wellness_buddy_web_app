@@ -146,8 +146,9 @@ export default function BulkMembershipDialog() {
         <DialogHeader>
           <DialogTitle>Bulk Membership</DialogTitle>
           <DialogDescription>
-            Assign club membership to coaches by mobile number. Existing club
-            membership for each matched coach is replaced.
+            Add a new club membership period for coaches by mobile number.
+            Previous payment history is kept — this only appends a new period
+            and sets status Active.
           </DialogDescription>
         </DialogHeader>
 
@@ -209,10 +210,10 @@ export default function BulkMembershipDialog() {
               role="alert"
               className="rounded-lg border border-amber-500/40 bg-amber-50 px-3 py-2 text-sm text-amber-950"
             >
-              This replaces existing club membership for{" "}
+              This will add a membership period for{" "}
               <strong>{phoneNumbers.length}</strong> coach
-              {phoneNumbers.length === 1 ? "" : "es"}. Press confirm again to
-              continue.
+              {phoneNumbers.length === 1 ? "" : "es"} without deleting older
+              history. Press confirm again to continue.
             </div>
           )}
 
