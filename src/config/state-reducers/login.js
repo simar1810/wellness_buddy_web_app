@@ -6,15 +6,22 @@ export default function reducer(state, action) {
       const newState = {
         ...state,
         stage: action.payload.stage,
-        isFirstTime: action.payload.isFirstTime
+        isFirstTime: action.payload.isFirstTime ?? state.isFirstTime,
+        hasPin: action.payload.hasPin ?? state.hasPin,
       }
-      if (action.payload.stage === 2) {
+      if (action.payload.stage === 2 && action.payload.user) {
         newState.refreshToken = action.payload.user.refreshToken;
         newState.user = action.payload.user;
+      }
+      if (action.payload.stage === 4) {
+        newState.pin = "";
+        newState.hasPin = true;
       }
       return newState;
     case "UPDATE_OTP":
       return { ...state, otp: action.payload }
+    case "UPDATE_PIN":
+      return { ...state, pin: action.payload }
     case "UPDATE_OTP_CHANNEL":
       return { ...state, otpChannel: action.payload, otp: "" }
     case "UPDATE_LOGIN_TYPE":

@@ -1,6 +1,7 @@
 import useCurrentStateContext from "@/providers/CurrentStateContext";
 import InputMobileNumber from "./InputMobileNumber";
 import InputOTPContainer from "./InputOTPContainer";
+import InputPinContainer from "./InputPinContainer";
 import { useAppSelector } from "@/providers/global/hooks";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -12,6 +13,7 @@ export default function LoginContainer() {
 
   const router = useRouter();
 
+  // stage: 1 mobile, 2 OTP, 3 register, 4 PIN
   const Component = (function () {
     switch (stage) {
       case 1:
@@ -20,6 +22,10 @@ export default function LoginContainer() {
         return InputOTPContainer;
       case 3:
         return RegisterContainer;
+      case 4:
+        return InputPinContainer;
+      default:
+        return InputMobileNumber;
     }
   })();
 

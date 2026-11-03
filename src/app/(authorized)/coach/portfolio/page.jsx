@@ -3,6 +3,7 @@ import ContentError from "@/components/common/ContentError";
 import ContentLoader from "@/components/common/ContentLoader";
 import CoachData from "@/components/pages/coach/portfolio/CoachData";
 import CoachDetailsCard from "@/components/pages/coach/portfolio/CoachDetailsCard";
+import CoachPinSecurityCard from "@/components/pages/coach/portfolio/CoachPinSecurityCard";
 import { getCoachProfile } from "@/lib/fetchers/app";
 import { useAppSelector } from "@/providers/global/hooks";
 import useSWR from "swr";
@@ -18,7 +19,10 @@ export default function Page() {
   const coachData = data.data;
 
   return <div className="mt-4 grid md:grid-cols-2 items-start gap-4">
-    <CoachDetailsCard coachData={coachData} />
+    <div className="space-y-4">
+      <CoachDetailsCard coachData={coachData} />
+      <CoachPinSecurityCard />
+    </div>
     <CoachData awards={coachData.awards} />
   </div>
 }
