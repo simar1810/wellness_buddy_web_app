@@ -36,6 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useTabsContentNavigation } from "@/hooks/useTabsContentNavigation";
 import { SyncedCoachClientDetails } from "@/components/modals/coach/SyncedCoachesModal";
+import BulkMembershipDialog from "@/components/modals/club/BulkMembershipDialog";
 import { cn, copyText } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DeleteClientModal from "@/components/modals/client/DeleteClientModal";
@@ -132,7 +133,12 @@ export default function Page() {
 							<TabsTrigger value="visualizer">Visualizer</TabsTrigger>
 							<TabsTrigger value="clients">Clients</TabsTrigger>
 						</TabsList>
-						{coachData.clubType === "System Leader" && <DownlineIncrement />}
+						{coachData.clubType === "System Leader" && (
+							<div className="flex items-center gap-2 ml-auto shrink-0">
+								<BulkMembershipDialog />
+								<DownlineIncrement />
+							</div>
+						)}
 					</div>
 
 					<TabsContent value="list">
