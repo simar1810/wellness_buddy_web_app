@@ -10,6 +10,7 @@ import UserLoginForm from "./UserLoginForm";
 export default function InputMobileNumber() {
   const { mobileNumber, loginType, dispatch } = useCurrentStateContext();
   const [touched, setTouched] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Allow only digits, max 10
   const handleChange = (e) => {
@@ -22,34 +23,62 @@ export default function InputMobileNumber() {
   };
 
   const sendOtp = async () => {
+    const data = {
+      credential: "+91" + mobileNumber,
+      fcmToken: "",
+      otpChannel: "sms",
+    };
+    const res = await sendData(
+      "app/signin?authMode=mob&clientType=web",
+      data
+    );
+    if (res.status_code === 400) throw new Error(res.message);
+    dispatch({ type: "UPDATE_OTP_CHANNEL", payload: "sms" });
+    dispatch({
+      type: "UPDATE_CURRENT_STATE",
+      payload: {
+        stage: 2,
+        user: res.data.user,
+        isFirstTime: res.data.isFirstTime,
+        hasPin: false,
+      },
+    });
+    toast.success(res.message || "OTP sent successfully!");
+  };
+
+  const continueLogin = async () => {
     setTouched(true);
     if (mobileNumber.length !== 10) {
       toast.error("Please enter a valid 10-digit mobile number.");
       return;
     }
+    if (isLoading) return;
     try {
-      const data = {
+      setIsLoading(true);
+      const methodRes = await sendData("app/loginMethod", {
         credential: "+91" + mobileNumber,
-        fcmToken: "",
-        otpChannel: "sms",
-      };
-      const res = await sendData(
-        "app/signin?authMode=mob&clientType=web",
-        data
-      );
-      if (res.status_code === 400) throw new Error(res.message);
-      dispatch({ type: "UPDATE_OTP_CHANNEL", payload: "sms" });
-      dispatch({
-        type: "UPDATE_CURRENT_STATE",
-        payload: {
-          stage: 2,
-          user: res.data.user,
-          isFirstTime: res.data.isFirstTime,
-        },
       });
-      toast.success(res.message || "OTP sent successfully!");
+      if (methodRes.status_code !== 200) {
+        throw new Error(methodRes.message || "Please try again later!");
+      }
+
+      const hasPin = Boolean(methodRes.data?.hasPin);
+      if (hasPin) {
+        dispatch({
+          type: "UPDATE_CURRENT_STATE",
+          payload: {
+            stage: 4,
+            hasPin: true,
+          },
+        });
+        return;
+      }
+
+      await sendOtp();
     } catch (err) {
       toast.error(err.message || "Please try again later!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -97,7 +126,7 @@ export default function InputMobileNumber() {
                 value={mobileNumber}
                 onChange={handleChange}
                 onBlur={() => setTouched(true)}
-                className={`w-full pl-12 pr-3 py-2 border rounded focus:outline-none ${touched && !isValid
+                className={`w-full pl-12 pr-3 py-2 border rounded focus:outline-none min-h-[44px] ${touched && !isValid
                   ? "border-red-500"
                   : "border-gray-300 focus:border-indigo-500"
                   }`}
@@ -113,11 +142,11 @@ export default function InputMobileNumber() {
           <Button
             variant="wz"
             size="lg"
-            className="w-full"
-            onClick={sendOtp}
-            disabled={!isValid}
+            className="w-full min-h-[44px]"
+            onClick={continueLogin}
+            disabled={!isValid || isLoading}
           >
-            Send OTP
+            {isLoading ? "Please wait..." : "Continue"}
           </Button>
         </TabsContent>
 
